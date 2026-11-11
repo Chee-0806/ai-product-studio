@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | discovery | 值得做吗？证据是什么？ | `product/discovery/*.md` | 证据支持一个明确方向 |
 | prd | 做什么？怎样算完成？ | `product/PRD.md` 的 REQ 块 | 每条需求有 ID、优先级、验收 |
-| prototype | 界面如何承载这些需求？ | `prototype/screens/*.html` | 主流程能点通，需求有 `data-req` |
+| prototype | 界面如何承载这些需求？ | `prototype/screens/*.html`，或 `screens.json` + SPA 入口 | 主流程能点通，需求有 `data-req` / 路由 `reqs` |
 | review | 有没有漏、有没有多、文案是否一致？ | 评审结论 + 修改 | 人明确说「通过」 |
 | handoff | 研发能否据此拆任务？ | 分享链接 / 导出物 | 研发确认可以开工 |
 
@@ -27,7 +27,7 @@
 
 任何会影响已存在需求或页面的改动，按 `AGENTS.md` 第 6 节的顺序一次做完：
 
-1. 搜索受影响的 `REQ-` 与 `data-req`；
+1. 搜索受影响的 `REQ-`、`data-req` 与 `prototype/screens.json` 的 `reqs`；
 2. 改 PRD（行为、验收、版本、变更记录）；
 3. 改原型；
 4. 必要时新增 ADR；
@@ -113,7 +113,7 @@ draft ──► prototyped ──► approved ──► delivered
 
 评审通过后：
 
-- 运行 `npm run export`，生成 `dist/<产品>-v<版本>/` 与同名 zip；**只把 zip 发给研发**，不要发整个工作区。
+- 运行 `npm run export`，生成 `dist/<产品>-v<版本>/` 与同名 zip；**只把 zip 发给研发**，不要发整个工作区。多页导出 `prototype/screens/`；SPA 导出入口与依赖文件。
 - 目录页链接可以发给参会人看原型；研发以交付包里的 `PRD.html` + `prototype/index.html` 为准。
 - 需要文档时从 PRD 导出，不另写一份「精简版需求」（会变成第二份真相）；
 - `prototype/spikes/` 里未被采纳的探索，在阶段结束时删除或移到归档分支；

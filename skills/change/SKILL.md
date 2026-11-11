@@ -25,14 +25,14 @@ description: 当要修改已有需求、页面、文案或流程时使用；定�
    grep -R "REQ-00x" product prototype STATE.md docs
    ```
 
-   找出所有 `data-req`、PRD 引用、STATE 描述。
+   找出所有 `data-req`、`prototype/screens.json` 里的 `reqs`、PRD 引用、STATE 描述。
 
 2. **判断变更类型**：
    - 只改文案/措辞：patch（如果 PRD 引用了文案，两边同改）；
    - 改行为/范围：minor；
    - 改方向/核心流程：major + 新 ADR。
 3. **改 PRD**：行为、验收、边界、版本、变更记录。
-4. **改原型**：所有受影响页面；保持 `data-req` 与链接有效。
+4. **改原型**：所有受影响页面；保持 `data-req`、SPA 清单 `reqs`、`route` 与链接有效。SPA 改的是入口/清单，不要把既有单页应用拆成多页。
 5. **改决策**：推翻旧取舍时新增 ADR，旧 ADR 标 `superseded by`。
 6. **更新 STATE**：版本、下一步。
 7. **刷新并检查**：`npm run sync && npm run check`；失败自己修。
@@ -57,3 +57,4 @@ description: 当要修改已有需求、页面、文案或流程时使用；定�
 - 不要删除历史需求或复用 ID。
 - 不要改完不跑检查，也不要让用户代跑。
 - 不要为了通过检查把状态改回 `draft` 或删掉页面；先判断真实进度。
+- 不要绕过外部资源白名单，也不要为了让缩略图好看删除必要的预览图声明。

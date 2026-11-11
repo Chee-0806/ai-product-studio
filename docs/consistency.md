@@ -15,15 +15,15 @@
 | 信息 | 写在哪 | 不写在哪 |
 | --- | --- | --- |
 | 需求、行为、验收 | `product/PRD.md` | 页面注释、STATE、README |
-| 界面结构、交互、视觉 | `prototype/screens/*.html` | PRD 的布局描述 |
+| 界面结构、交互、视觉 | `prototype/screens/*.html`（多页）或 `screens.json` + 入口（SPA） | PRD 的布局描述 |
 | 是否做到 | REQ 的 `状态` | 单独的进度表 |
-| 需求 ↔ 页面 | 由 `data-req` 推导 | 手工映射表（工作台由脚本生成） |
+| 需求 ↔ 页面 | 由 `data-req` 或 SPA 路由 `reqs` 推导 | 手工映射表（工作台由脚本生成） |
 | 为什么 | `product/decisions/*.md` | PRD 的长篇理由 |
 | 本次协作到哪 | `STATE.md` | 聊天记录 |
 
 ## 3. 三个机械不变量
 
-1. **原型不能发明需求**：每个 `data-req` 必须指向 PRD 中存在的 REQ。
+1. **原型不能发明需求**：每个 `data-req` / SPA 路由 `reqs` 必须指向 PRD 中存在的 REQ。
 2. **状态不能虚报**：`prototyped` / `approved` / `delivered` 必须有页面覆盖；`dropped` 不得有页面。
 3. **版本不能分叉**：`STATE.md` 的 `spec_version` 必须等于 PRD 的 `version`；工作台必须是最新生成物。
 
@@ -36,11 +36,13 @@
 - front matter 必须有 `product`、`version`、`updated`、`status`；
 - `version` 是 `x.y.z`；`updated` 是 `YYYY-MM-DD`；
 - `status` ∈ `draft | review | approved`；
+- `basis_required` 可选，只能是 `true` / `false`；
 - REQ 标题格式 `### REQ-001 标题`（2~4 级标题均可）；
 - REQ ID 不重复；
 - `状态` ∈ `draft | prototyped | approved | delivered | dropped`，支持中文别名；
 - `优先级` ∈ `P0 | P1 | P2`；
-- 非 `dropped` 需求至少一条 `- [ ]` 验收。
+- 非 `dropped` 需求至少一条 `- [ ]` 验收；
+- `basis_required: true` 时，每条非 `dropped` 需求必须有 `- **依据**: ...`。
 
 ### 原型
 
@@ -49,11 +51,15 @@
   <meta name="screen:id" content="home">
   <meta name="screen:title" content="首页 · 一键开录">
   <meta name="screen:flow" content="记录">
+  <meta name="screen:form" content="mobile">
   ```
 - 页面 ID 不重复；
+- `screen:form` ∈ `mobile | desktop | responsive`，不写默认 `responsive`；
 - 每个 `data-req` 能在 PRD 找到；
 - 页面没有任何 `data-req` 会告警；
 - 没有 `screen:flow` 会告警。
+- 有 `prototype/screens.json` 且 `mode: "spa"` 时，改按清单校验：`entry` 存在、界面 `id` 唯一、`route` 以 `#` 开头、`reqs` 在 PRD 中存在。
+- 页面加载的外部 `http(s)` 资源（script / img / link / iframe / 字体 / CSS `url()`）必须在 `prototype/external.json` 的 `allow` 里；未声明直接失败。普通 `<a href>` 外链不检查。
 
 ### 状态与覆盖
 
@@ -108,6 +114,19 @@ npm run sync
 
 ID 永不复用。删除需求用 `dropped`；页面改名时同时改 `screen:id` 与所有链接。
 
+### `引用了未声明的外部资源 https://...`
+
+二选一：
+
+- 把域名加入 `prototype/external.json` 的 `allow`，例如 `https://webapi.amap.com` 或 `https://*.example.com`；
+- 把资源下载到 `prototype/assets/vendor/`，改用相对路径。
+
+白名单不是离线保证。内网/断网演示时，仍需提前 vendor，或提供 `previews/` 预览图。
+
+### `PRD 开启了 basis_required，必须补「- **依据**: ...」`
+
+给对应需求补一条依据，写清来源：法规条款、标准编号、访谈日期与样本、数据看板或 ADR 链接。不要写「业务要求」这种无法核对的空话。确实没有依据的需求，要么补调研，要么标 `dropped`。
+
 ### `REQ-005 状态是 draft，但已有页面覆盖`
 
 要么把状态改为 `prototyped`（说明它已经进入正式原型），要么把页面移回 `spikes/` 或移除 `data-req`。
@@ -139,7 +158,9 @@ ID 永不复用。删除需求用 `dropped`；页面改名时同时改 `screen:i
 - 无法判断验收标准是否真的覆盖了所有边界态；
 - 无法判断原型交互是否符合真实业务规则；
 - 页面嵌套目录只校验文件，不校验链接是否可达；
-- 工作台缩略图只内联 `assets/app.css` 与页面自身；页面若引用外部图片/字体，缩略图可能不显示，但直接打开页面正常。
+- SPA 的 `reqs` 是路由级追溯，无法判断某个按钮是否属于某条需求；
+- 工作台缩略图只内联 `assets/app.css` 与页面自身；外部资源页面会降级为占位卡，有 `preview` 时显示预览图；
+- 外部资源白名单只校验「有没有声明」，不校验资源是否可访问、是否被篡改；
 - 工作台顶部的构建状态来自最近一次 `sync`；AI 没有运行刷新时，页面不会自己更新。
 
 这些由 `docs/review-checklist.md` 覆盖。评审时明确写出「无法验证」的项，不要默认通过。

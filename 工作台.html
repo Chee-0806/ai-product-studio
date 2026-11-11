@@ -449,6 +449,77 @@ td a:hover {
   transform-origin: top left;
 }
 
+.proto--desktop .proto__frame {
+  width: 176px;
+  aspect-ratio: 1440 / 900;
+}
+
+.proto--desktop .proto__frame iframe {
+  width: 1440px;
+  height: 900px;
+  transform: scale(0.1222);
+}
+
+.proto--responsive .proto__frame {
+  width: 160px;
+  aspect-ratio: 16 / 10;
+}
+
+.proto--responsive .proto__frame iframe {
+  width: 1280px;
+  height: 800px;
+  transform: scale(0.125);
+}
+
+.proto__frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.proto__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.proto__placeholder svg {
+  color: var(--ink-3);
+}
+
+.proto__placeholder small {
+  color: var(--ink-3);
+  font-size: 10px;
+}
+
+.proto__form {
+  display: inline-block;
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink-3);
+  font-size: 10.5px;
+  line-height: 1.5;
+  vertical-align: 1px;
+}
+
+.basis {
+  max-width: 240px;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
 .proto__body {
   display: flex;
   flex-direction: column;
@@ -638,7 +709,9 @@ footer {
   th:nth-child(1),
   td:nth-child(1),
   th:nth-child(3),
-  td:nth-child(3) {
+  td:nth-child(3),
+  th.basis,
+  td.basis {
     display: none;
   }
 }
@@ -658,6 +731,22 @@ footer {
 
   .proto__frame iframe {
     transform: scale(0.2872);
+  }
+
+  .proto--desktop .proto__frame {
+    width: 140px;
+  }
+
+  .proto--desktop .proto__frame iframe {
+    transform: scale(0.0972);
+  }
+
+  .proto--responsive .proto__frame {
+    width: 128px;
+  }
+
+  .proto--responsive .proto__frame iframe {
+    transform: scale(0.1);
   }
 }
 
@@ -751,7 +840,7 @@ footer {
     <section class="flow-group">
       <h3 class="flow-title">记录 <span class="count">2</span></h3>
       <div class="index">
-        <article class="proto">
+        <article class="proto proto--mobile">
           <a class="proto__link" href="prototype/screens/home.html" aria-label="打开 首页 · 一键开录">
             <span class="proto__frame">
               <iframe srcdoc="&lt;!doctype html&gt;
@@ -762,6 +851,7 @@ footer {
 &lt;meta name=&quot;screen:id&quot; content=&quot;home&quot;&gt;
 &lt;meta name=&quot;screen:title&quot; content=&quot;首页 · 一键开录&quot;&gt;
 &lt;meta name=&quot;screen:flow&quot; content=&quot;记录&quot;&gt;
+&lt;meta name=&quot;screen:form&quot; content=&quot;mobile&quot;&gt;
 &lt;title&gt;首页 · 回声纪要&lt;/title&gt;
 &lt;style&gt;
 :root {
@@ -2031,12 +2121,12 @@ a.list-item:hover {
             </span>
             <span class="proto__body">
               <span class="proto__title">首页 · 一键开录</span>
-              <span class="proto__meta">REQ-001</span>
+              <span class="proto__meta"><span class="proto__form">手机</span> · REQ-001</span>
               <span class="proto__hint">打开原型 →</span>
             </span>
           </a>
         </article>
-<article class="proto">
+<article class="proto proto--mobile">
           <a class="proto__link" href="prototype/screens/recording.html" aria-label="打开 录音中 · 实时转写">
             <span class="proto__frame">
               <iframe srcdoc="&lt;!doctype html&gt;
@@ -2047,6 +2137,7 @@ a.list-item:hover {
 &lt;meta name=&quot;screen:id&quot; content=&quot;recording&quot;&gt;
 &lt;meta name=&quot;screen:title&quot; content=&quot;录音中 · 实时转写&quot;&gt;
 &lt;meta name=&quot;screen:flow&quot; content=&quot;记录&quot;&gt;
+&lt;meta name=&quot;screen:form&quot; content=&quot;mobile&quot;&gt;
 &lt;title&gt;录音中 · 回声纪要&lt;/title&gt;
 &lt;style&gt;
 :root {
@@ -3347,7 +3438,7 @@ a.list-item:hover {
             </span>
             <span class="proto__body">
               <span class="proto__title">录音中 · 实时转写</span>
-              <span class="proto__meta">REQ-002</span>
+              <span class="proto__meta"><span class="proto__form">手机</span> · REQ-002</span>
               <span class="proto__hint">打开原型 →</span>
             </span>
           </a>
@@ -3356,7 +3447,7 @@ a.list-item:hover {
     </section><section class="flow-group">
       <h3 class="flow-title">纪要 <span class="count">1</span></h3>
       <div class="index">
-        <article class="proto">
+        <article class="proto proto--mobile">
           <a class="proto__link" href="prototype/screens/note.html" aria-label="打开 纪要详情 · 编辑与分享">
             <span class="proto__frame">
               <iframe srcdoc="&lt;!doctype html&gt;
@@ -3367,6 +3458,7 @@ a.list-item:hover {
 &lt;meta name=&quot;screen:id&quot; content=&quot;note&quot;&gt;
 &lt;meta name=&quot;screen:title&quot; content=&quot;纪要详情 · 编辑与分享&quot;&gt;
 &lt;meta name=&quot;screen:flow&quot; content=&quot;纪要&quot;&gt;
+&lt;meta name=&quot;screen:form&quot; content=&quot;mobile&quot;&gt;
 &lt;title&gt;纪要详情 · 回声纪要&lt;/title&gt;
 &lt;style&gt;
 :root {
@@ -4809,7 +4901,7 @@ a.list-item:hover {
             </span>
             <span class="proto__body">
               <span class="proto__title">纪要详情 · 编辑与分享</span>
-              <span class="proto__meta">REQ-004 · REQ-003</span>
+              <span class="proto__meta"><span class="proto__form">手机</span> · REQ-004 · REQ-003</span>
               <span class="proto__hint">打开原型 →</span>
             </span>
           </a>

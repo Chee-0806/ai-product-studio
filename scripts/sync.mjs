@@ -9,6 +9,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  FORMS,
+  FORM_LABELS,
+  isExternalAllowed,
+  loadExternalPolicy,
+  loadScreens,
+} from './lib/screens.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHECK_ONLY = process.argv.includes('--check');
@@ -16,7 +23,9 @@ const STRICT = process.argv.includes('--strict');
 
 const PRD = path.join(ROOT, 'product/PRD.md');
 const STATE = path.join(ROOT, 'STATE.md');
-const SCREENS_DIR = path.join(ROOT, 'prototype/screens');
+const PROTOTYPE_DIR = path.join(ROOT, 'prototype');
+const SCREENS_DIR = path.join(PROTOTYPE_DIR, 'screens');
+const SCREEN_MANIFEST = path.join(PROTOTYPE_DIR, 'screens.json');
 const GALLERY = path.join(ROOT, '工作台.html');
 
 const errors = [];
@@ -127,6 +136,7 @@ function parseRequirements(body, file) {
         priority: '',
         acceptance: 0,
         story: '',
+        basis: '',
       };
       return;
     }
@@ -147,6 +157,7 @@ function parseRequirements(body, file) {
     if (key === '状态') cur.status = value;
     else if (key === '优先级') cur.priority = value.toUpperCase();
     else if (key === '用户故事') cur.story = value;
+    else if (key === '依据') cur.basis = value;
     else if (key === '验收') inAcceptance = true;
   });
   flush();
@@ -161,36 +172,64 @@ function normalizeStatus(raw) {
   return value.toLowerCase();
 }
 
-function walkHtml(dir) {
-  if (!fs.existsSync(dir)) return [];
-  const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => cmp(a.name, b.name))) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...walkHtml(full));
-    else if (entry.isFile() && entry.name.endsWith('.html')) out.push(full);
-  }
-  return out;
+function screenLabel(screen) {
+  if (screen.source === 'manifest') return `prototype/screens.json（${screen.id || '未命名界面'}）`;
+  return screen.relFile;
 }
 
-function parseScreen(file) {
-  const html = fs.readFileSync(file, 'utf8');
-  const meta = {};
-  for (const tag of html.matchAll(/<meta\b[^>]*>/gi)) {
-    const name = tag[0].match(/\bname=["']([^"']+)["']/i)?.[1];
-    const content = tag[0].match(/\bcontent=["']([^"']*)["']/i)?.[1] ?? '';
-    if (name && name.toLowerCase().startsWith('screen:')) {
-      meta[name.slice(7).toLowerCase()] = content;
+function validateScreens(screens, reqMap) {
+  const ids = new Map();
+  const covered = new Map();
+  for (const screen of screens) {
+    const label = screenLabel(screen);
+    if (screen.source !== 'manifest') {
+      if (!screen.id) fail(`${label}：缺少 <meta name="screen:id">`);
+      if (!screen.title) fail(`${label}：缺少 <meta name="screen:title">`);
+      if (!FORMS.includes(screen.form)) {
+        fail(`${label}：screen:form 只能是 ${FORMS.join(' | ')}（当前「${screen.form}」）`);
+      }
+    }
+    if (!screen.flow) warn(`${label}：缺少 flow，工作台会归入「未分组」`);
+    if (screen.source !== 'manifest' && screen.id) {
+      if (ids.has(screen.id)) fail(`页面 ID 重复：${screen.id}（${label} 与 ${ids.get(screen.id)}）`);
+      else ids.set(screen.id, label);
+    }
+    if (screen.reqs.length === 0) {
+      warn(`${label}：没有关联任何需求，无法追溯到 PRD`);
+    }
+    for (const reqId of screen.reqs) {
+      if (!reqMap.has(reqId)) {
+        fail(`${label}：需求 ${reqId} 在 PRD 中不存在（原型不能定义新需求）`);
+        continue;
+      }
+      if (!covered.has(reqId)) covered.set(reqId, []);
+      covered.get(reqId).push(screen);
     }
   }
-  const reqs = uniq([...html.matchAll(/data-req=["'](REQ-\d{3})["']/g)].map((m) => m[1]));
-  return {
-    file,
-    relFile: path.relative(ROOT, file),
-    id: (meta.id || '').trim(),
-    title: (meta.title || '').trim(),
-    flow: (meta.flow || '').trim(),
-    reqs,
+  return covered;
+}
+
+function validateExternal(screens, loaded, policy) {
+  for (const message of policy.errors) fail(message);
+
+  const check = (label, urls) => {
+    const uniqueUrls = uniq(urls);
+    const blocked = uniqueUrls.filter((url) => !isExternalAllowed(url, policy.allow));
+    if (blocked.length) {
+      fail(
+        `${label}：引用了未声明的外部资源 ${blocked.join('、')}。` +
+          '把域名加入 prototype/external.json 的 allow，或把资源放到 assets/vendor/',
+      );
+    }
+    // 已声明的不再告警：企业项目可能必须用地图/字体服务，工作台卡片会显示「缩略图已降级」。
   };
+
+  for (const screen of screens) {
+    if (screen.mode === 'multi' && screen.externalUrls.length) check(screen.relFile, screen.externalUrls);
+  }
+  if (loaded.mode === 'spa' && loaded.entryExternal.length) {
+    check(`prototype/${loaded.entry}`, loaded.entryExternal);
+  }
 }
 
 function validatePrd(prd) {
@@ -207,9 +246,19 @@ function validatePrd(prd) {
   if (prd.status && !['draft', 'review', 'approved'].includes(prd.status)) {
     fail(`product/PRD.md：status 只能是 draft | review | approved（当前「${prd.status}」）`);
   }
+  if (prd.basis_required !== undefined) {
+    const value = String(prd.basis_required).trim().toLowerCase();
+    if (!['true', 'false'].includes(value)) {
+      fail(`product/PRD.md：basis_required 只能是 true 或 false（当前「${prd.basis_required}」）`);
+    } else {
+      prd.basis_required = value === 'true';
+    }
+  } else {
+    prd.basis_required = false;
+  }
 }
 
-function validateRequirements(reqs) {
+function validateRequirements(reqs, prd) {
   const seen = new Map();
   for (const req of reqs) {
     if (seen.has(req.id)) {
@@ -235,6 +284,10 @@ function validateRequirements(reqs) {
     if (req.status !== 'dropped' && req.acceptance === 0) {
       fail(`${req.id}：至少需要一条「- [ ]」验收标准`);
     }
+
+    if (prd.basis_required && req.status !== 'dropped' && !req.basis) {
+      fail(`${req.id}：PRD 开启了 basis_required，必须补「- **依据**: ...」（访谈、法规、数据或决策链接）`);
+    }
   }
   return seen;
 }
@@ -254,30 +307,6 @@ function validateState(state, prd) {
     fail(`STATE.md：updated 必须是 YYYY-MM-DD（当前「${state.updated}」）`);
   }
   if (!state.next_action) fail('STATE.md：front matter 缺少 next_action（下一件具体要做的事）');
-}
-
-function validateScreens(screens, reqMap) {
-  const ids = new Map();
-  const covered = new Map();
-  for (const screen of screens) {
-    if (!screen.id) fail(`${screen.relFile}：缺少 <meta name="screen:id">`);
-    if (!screen.title) fail(`${screen.relFile}：缺少 <meta name="screen:title">`);
-    if (!screen.flow) warn(`${screen.relFile}：缺少 <meta name="screen:flow">，工作台会归入「未分组」`);
-    if (screen.id) {
-      if (ids.has(screen.id)) fail(`页面 ID 重复：${screen.id}（${screen.relFile} 与 ${ids.get(screen.id)}）`);
-      else ids.set(screen.id, screen.relFile);
-    }
-    if (screen.reqs.length === 0) warn(`${screen.relFile}：没有任何 data-req，无法追溯到需求`);
-    for (const reqId of screen.reqs) {
-      if (!reqMap.has(reqId)) {
-        fail(`${screen.relFile}：data-req="${reqId}" 在 PRD 中不存在（原型不能定义新需求）`);
-        continue;
-      }
-      if (!covered.has(reqId)) covered.set(reqId, []);
-      covered.get(reqId).push(screen);
-    }
-  }
-  return covered;
 }
 
 function validateCoverage(reqMap, covered) {
@@ -306,13 +335,15 @@ function screenPreviewHtml(file, tokens, appCss) {
   return html;
 }
 
-function renderGallery(prd, state, reqs, screens, covered, build = { errors: [], warnings: [] }) {
+function renderGallery(prd, state, reqs, screens, covered, build = { errors: [], warnings: [] }, mode = 'multi') {
   const tokens = readAsset(path.join(ROOT, 'prototype/assets/tokens.css'));
   const appCss = readAsset(path.join(ROOT, 'prototype/assets/app.css'));
   const workbenchCss = readAsset(path.join(ROOT, 'prototype/assets/workbench.css'));
   const stageLabel = STAGE_LABELS[state.stage] || state.stage || '未设置';
   const nextAction = state.next_action || '先读一遍 PRD，确定下一步要做什么';
   const sortedReqs = [...reqs].sort((a, b) => cmp(a.id, b.id));
+  const showBasis = prd.basis_required === true || sortedReqs.some((req) => req.basis);
+  const pageWord = mode === 'spa' ? '个界面' : '个页面';
   const reqOrder = (screen) =>
     screen.reqs.length ? Math.min(...screen.reqs.map((id) => Number(id.slice(4)))) : 9999;
   const sortedScreens = [...screens].sort(
@@ -372,11 +403,14 @@ function renderGallery(prd, state, reqs, screens, covered, build = { errors: [],
             .map((s) => `<a href="${esc(s.relFile)}">${esc(s.title || s.id)}</a>`)
             .join('、')
         : '<span class="muted">—</span>';
+      const basisCell = showBasis
+        ? `<td class="basis" title="${esc(req.basis || '')}">${esc(req.basis || '—')}</td>`
+        : '';
       return `<tr class="${req.status === 'dropped' ? 'is-dropped' : ''}">
         <td><code>${esc(req.id)}</code></td>
         <td>${esc(req.title)}</td>
         <td>${esc(req.priority || '—')}</td>
-        <td>${pills(req.status)}</td>
+        <td>${pills(req.status)}</td>${basisCell}
         <td>${links}</td>
       </tr>`;
     })
@@ -388,22 +422,33 @@ function renderGallery(prd, state, reqs, screens, covered, build = { errors: [],
       <h3 class="flow-title">${esc(flow)} <span class="count">${list.length}</span></h3>
       <div class="index">
         ${list
-          .map(
-            (screen) => `<article class="proto">
+          .map((screen) => {
+            const form = FORMS.includes(screen.form) ? screen.form : 'responsive';
+            const formLabel = FORM_LABELS[form] || form;
+            const placeholderIcon =
+              '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>';
+            const frame = screen.previewRel
+              ? `<img src="${esc(screen.previewRel)}" alt="${esc(screen.title)} 预览" loading="lazy">`
+              : screen.mode === 'spa'
+                ? `<span class="proto__placeholder">${placeholderIcon}<span>单页应用</span><small>点开查看</small></span>`
+                : screen.externalUrls.length
+                  ? `<span class="proto__placeholder">${placeholderIcon}<span>外部资源</span><small>缩略图已降级</small></span>`
+                  : `<iframe srcdoc="${esc(screenPreviewHtml(screen.file, tokens, appCss))}" title="${esc(screen.title)}" loading="lazy" tabindex="-1"></iframe>`;
+            return `<article class="proto proto--${form}">
           <a class="proto__link" href="${esc(screen.relFile)}" aria-label="打开 ${esc(screen.title)}">
             <span class="proto__frame">
-              <iframe srcdoc="${esc(screenPreviewHtml(screen.file, tokens, appCss))}" title="${esc(screen.title)}" loading="lazy" tabindex="-1"></iframe>
+              ${frame}
             </span>
             <span class="proto__body">
               <span class="proto__title">${esc(screen.title || screen.id)}</span>
-              <span class="proto__meta">${
-                screen.reqs.length ? screen.reqs.map((r) => esc(r)).join(' · ') : '未标注需求'
+              <span class="proto__meta"><span class="proto__form">${esc(formLabel)}</span>${
+                screen.reqs.length ? ` · ${screen.reqs.map((r) => esc(r)).join(' · ')}` : ' · 未标注需求'
               }</span>
-              <span class="proto__hint">打开原型 →</span>
+              <span class="proto__hint">打开${screen.mode === 'spa' ? '这个界面' : '原型'} →</span>
             </span>
           </a>
-        </article>`,
-          )
+        </article>`;
+          })
           .join('\n')}
       </div>
     </section>`,
@@ -442,7 +487,7 @@ ${workbenchCss}
   <section class="stats">
     <div class="stat"><b>${sortedReqs.length}</b><span>需求总数</span></div>
     <div class="stat"><b>${done.length}</b><span>已有原型（不含已砍）</span></div>
-    <div class="stat"><b>${sortedScreens.length}</b><span>原型页面</span></div>
+    <div class="stat"><b>${sortedScreens.length}</b><span>${mode === 'spa' ? '原型界面' : '原型页面'}</span></div>
     <div class="stat"><b>${sortedReqs.filter((r) => r.status === 'draft').length}</b><span>待做原型</span></div>
   </section>
 
@@ -451,7 +496,7 @@ ${workbenchCss}
     ${
       sortedReqs.length
         ? `<table>
-      <thead><tr><th>ID</th><th>需求</th><th>优先级</th><th>状态</th><th>在哪个页面</th></tr></thead>
+      <thead><tr><th>ID</th><th>需求</th><th>优先级</th><th>状态</th>${showBasis ? '<th>依据</th>' : ''}<th>在哪个页面</th></tr></thead>
       <tbody>${reqRows}</tbody>
     </table>`
         : '<p class="empty">还没有需求。把想法告诉 AI，它会先帮你写第一条。</p>'
@@ -459,8 +504,8 @@ ${workbenchCss}
   </section>
 
   <section>
-    <h2>原型页面</h2>
-    ${sortedScreens.length ? cardsByFlow : '<p class="empty">还没有原型页面。让 AI 先做一个首页。</p>'}
+    <h2>${mode === 'spa' ? '原型界面' : '原型页面'}</h2>
+    ${sortedScreens.length ? cardsByFlow : `<p class="empty">还没有原型${mode === 'spa' ? '界面' : '页面'}。让 AI 先做一个首页。</p>`}
   </section>
 
   <details class="help">
@@ -490,7 +535,7 @@ ${workbenchCss}
     </div>
   </details>
 
-  <footer>${esc(prd.product || '')} · ${sortedScreens.length} 个页面 · 规格版本 ${esc(prd.version || '—')} · 由 AI 自动生成，不用手改</footer>
+  <footer>${esc(prd.product || '')} · ${sortedScreens.length} ${pageWord} · 规格版本 ${esc(prd.version || '—')} · 由 AI 自动生成，不用手改</footer>
 </div>
 </body>
 </html>
@@ -504,21 +549,28 @@ function main() {
 
   const body = prdText ? prdText.replace(/^---\r?\n[\s\S]*?\r?\n---/, '') : '';
   const reqs = parseRequirements(body, PRD);
-  const reqMap = validateRequirements(reqs);
+  const reqMap = validateRequirements(reqs, prd);
 
   const stateText = readText(STATE);
   const state = stateText ? parseFrontMatter(stateText, STATE) : {};
   if (stateText) validateState(state, prd);
 
-  const screens = walkHtml(SCREENS_DIR).map(parseScreen);
+  const loaded = loadScreens({ root: ROOT, screensDir: SCREENS_DIR, manifestFile: SCREEN_MANIFEST });
+  errors.push(...loaded.errors);
+  warnings.push(...loaded.warnings);
+  const screens = loaded.screens;
+
   if (screens.length === 0 && [...reqMap.values()].some((r) => ['prototyped', 'approved', 'delivered'].includes(r.status))) {
     fail('没有任何原型页面，但存在 prototyped/approved/delivered 的需求');
   }
   const covered = validateScreens(screens, reqMap);
   validateCoverage(reqMap, covered);
 
+  const externalPolicy = loadExternalPolicy(PROTOTYPE_DIR);
+  validateExternal(screens, loaded, externalPolicy);
+
   // 即使检查失败也要生成工作台：把失败状态直接显示给人看，而不是静默保留旧页面。
-  const html = renderGallery(prd, state, reqs, screens, covered, { errors, warnings });
+  const html = renderGallery(prd, state, reqs, screens, covered, { errors, warnings }, loaded.mode);
   let current = null;
   try {
     current = fs.readFileSync(GALLERY, 'utf8');
@@ -535,7 +587,9 @@ function main() {
 
   const active = reqs.filter((r) => r.status !== 'dropped');
   const done = active.filter((r) => (covered.get(r.id) || []).length > 0);
-  console.log(`PRD v${prd.version || '?'} · ${reqs.length} 个需求 · ${screens.length} 个页面`);
+  console.log(
+    `PRD v${prd.version || '?'} · ${reqs.length} 个需求 · ${screens.length} 个${loaded.mode === 'spa' ? '界面（SPA）' : '页面'}`,
+  );
   console.log(active.length ? `覆盖：${done.length}/${active.length} 个有效需求已出原型` : '覆盖：还没有需求');
   report();
 }

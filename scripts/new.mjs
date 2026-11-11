@@ -95,7 +95,7 @@ async function main() {
   };
 
   // 工位骨架：规则、技能、脚本、样式、文档
-  for (const file of ['AGENTS.md', 'CLAUDE.md', '.gitignore', 'package.json', 'THIRD_PARTY_NOTICES.md']) {
+  for (const file of ['AGENTS.md', 'CLAUDE.md', '.gitignore', 'package.json', 'LICENSE', 'THIRD_PARTY_NOTICES.md']) {
     copyFile(file);
   }
   for (const dir of ['skills', 'packs', 'scripts', 'docs', 'LICENSES', 'prototype/assets', 'prototype/spikes']) {
@@ -105,6 +105,8 @@ async function main() {
   // 新项目从空开始，不复制示例需求、原型和决策
   fs.mkdirSync(path.join(target, 'prototype', 'screens'), { recursive: true });
   fs.writeFileSync(path.join(target, 'prototype', 'screens', '.gitkeep'), '');
+  fs.mkdirSync(path.join(target, 'prototype', 'previews'), { recursive: true });
+  fs.writeFileSync(path.join(target, 'prototype', 'previews', '.gitkeep'), '');
   fs.mkdirSync(path.join(target, 'product', 'discovery'), { recursive: true });
   fs.mkdirSync(path.join(target, 'product', 'decisions'), { recursive: true });
   copyFile('product/decisions/README.md');
@@ -127,6 +129,8 @@ version: 0.1.0
 updated: ${today}
 owner: 产品经理
 status: draft
+# 强监管/企业项目改成 true；开启后每条非 dropped 需求必须有「- **依据**: ...」
+basis_required: false
 ---
 
 # ${product} · PRD
@@ -278,7 +282,11 @@ npm run pack:remove -- pm-methods
 - \`npm run pack:add -- <包名>\`：安装可选方法包
 - \`npm run dev\`：可选，本地预览
 
-完整规则见 \`AGENTS.md\`，工作流见 \`docs/workflow.md\`。
+完整规则见 \`AGENTS.md\`，工作流见 \`docs/workflow.md\`。企业项目的桌面/SPA/外部资源/需求依据，见 \`docs/enterprise.md\`。
+
+## 许可证
+
+自有代码与文档采用 MIT（见 \`LICENSE\`）；\`packs/pm-methods/\` 中的 Anthropic 技能采用 Apache-2.0（见 \`THIRD_PARTY_NOTICES.md\` 与 \`LICENSES/\`）。
 `;
   fs.writeFileSync(path.join(target, 'README.md'), readme);
 

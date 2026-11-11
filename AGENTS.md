@@ -12,7 +12,7 @@
 每个工位是一个产品的工作区，不是代码仓库。核心产物只有三类：
 
 - `product/PRD.md`：要做什么、为什么、怎样算验收。
-- `prototype/screens/*.html`：界面长什么样、怎么交互。
+- `prototype/screens/*.html`：界面长什么样、怎么交互。单页应用（SPA）也可以只放入口文件，用 `prototype/screens.json` 列出界面与路由。
 - `工作台.html`：给用户看的唯一入口，展示当前阶段、下一步、需求进度和原型页面；由脚本生成。
 
 PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，要么明确是 `draft`；原型里的每个界面元素要么追溯到某条需求，要么明确是探索稿。
@@ -23,7 +23,7 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 | --- | --- | --- |
 | 为什么做、取舍是什么 | `product/decisions/*.md` | PRD 只链接，不复述理由 |
 | 要做什么、验收标准 | `product/PRD.md` 的 REQ 块 | 原型不得定义新需求 |
-| 界面长什么样、如何交互 | `prototype/screens/*.html` | PRD 不粘贴布局细节 |
+| 界面长什么样、如何交互 | `prototype/screens/*.html`（多页）或 `prototype/screens.json` + 入口（SPA） | PRD 不粘贴布局细节 |
 | 每条需求做到哪一步 | REQ 块的 `状态` 字段 | 覆盖关系由 `data-req` 推导，不另设进度表 |
 | 本轮协作到哪、下一步 | `STATE.md` | 汇报只写链接，不复制全文 |
 
@@ -81,7 +81,7 @@ npm run pack:remove -- pm-methods
 | --- | --- | --- | --- |
 | discovery | 有一个待验证的问题 | `product/discovery/*.md` | 证据足够支撑一个方向 |
 | prd | 方向确定 | PRD 新增/修改 REQ 与验收 | 每条需求 ID、优先级、验收齐全 |
-| prototype | 需求已存在 | `screens/*.html` + `data-req` | 每个页面可打开、可走通主流程 |
+| prototype | 需求已存在 | `screens/*.html` + `data-req`，或 `screens.json` + 入口 | 每个页面/路由可打开、可走通主流程 |
 | review | PRD 与原型都完成 | 评审结论、修改项 | 人明确说「通过」 |
 | handoff | 评审通过 | 分享链接/导出物 | 研发可据此拆任务 |
 
@@ -97,6 +97,7 @@ npm run pack:remove -- pm-methods
 
 - ID 固定为 `REQ-001` 三位数字，**永不复用、永不重编号**。删除需求用 `dropped`，不删 ID。
 - 每条非 `dropped` 需求必须有：`状态`、`优先级`、`用户故事`、`行为`、至少一条 `- [ ]` 验收。
+- 强监管/企业项目在 PRD front matter 写 `basis_required: true`，每条非 `dropped` 需求再补 `- **依据**: ...`（法规、标准、访谈、数据或 ADR 链接）；缺依据校验失败。普通项目可写 `basis_required: false` 或不写。
 - PRD 中引用界面文案时用「」标注，原型必须逐字一致；改文案时两边同改。
 - 行为变化必须升 `version` 并补「变更记录」；仅澄清措辞用 patch，行为/范围变化用 minor，方向重做用 major。
 
@@ -107,11 +108,15 @@ npm run pack:remove -- pm-methods
   <meta name="screen:id" content="home">
   <meta name="screen:title" content="首页 · 一键开录">
   <meta name="screen:flow" content="记录">
+  <meta name="screen:form" content="mobile">
   ```
+  `screen:form` 取 `mobile | desktop | responsive`；不写默认 `responsive`。企业桌面端项目用 `desktop`，响应式后台用 `responsive`。
 - 实现某条需求的元素，必须带 `data-req="REQ-00x"`；标在**最小可定位容器**上，不要给整个 `<body>` 打标。
 - `data-req` 只能引用 PRD 中已存在的需求。原型不能发明行为；需要新行为就先加 REQ。
 - 页面之间用真实相对链接串起来，主流程必须能点通。
-- 只用 `prototype/assets/` 下的共享样式与原生 HTML/CSS/JS；不引 CDN、不引构建链、不装依赖。
+- **单页应用**：在 `prototype/screens.json` 写 `mode: "spa"`、`entry` 与每个界面的 `id/title/route/flow/form/reqs`。路由必须以 `#` 开头，保证 `file://` 双击可开；每个界面的 `reqs` 就是该路由的需求追溯，不再要求入口 HTML 里逐元素标 `data-req`。没有 `screens.json` 时按原来的 `screens/*.html` 扫描。
+- 只用 `prototype/assets/` 下的共享样式与原生 HTML/CSS/JS；不引构建链、不装依赖。外部地图/字体等服务必须写进 `prototype/external.json` 的 `allow` 白名单；能 vendor 到 `assets/vendor/` 的优先本地化。
+- 含外部资源或体积过大的页面，用 `screen:preview`（图片路径相对 `prototype/`）或 `screens.json` 的 `preview` 提供静态预览图；工作台不会再内联这类页面，改为显示降级卡片。
 - 使用真实感的中文示例数据；禁止 lorem ipsum、`TODO`、空按钮、死链。
 - PRD 第 6 节列出的边界态，在对应页面要有可演示的呈现；不能演示的，在汇报里说明。
 
@@ -155,6 +160,8 @@ npm run pack:remove -- pm-methods
 - 不要把整个工作区打包发；内部工作台、`STATE.md`、脚本、调研与决策不属于交付物。
 - 用户说「发给研发」「导出交付包」时，运行 `npm run export`；它会先跑 `npm run check`。
 - 产物：`dist/<产品>-v<版本>/` 与同名 `.zip`。入口是 `index.html`，PRD 是 `PRD.html` / `PRD.md`，原型是 `prototype/index.html`。
+- 多页原型导出 `prototype/screens/`；SPA 导出入口文件与它依赖的脚本/样式/数据，内部清单、预览图和 `external.json` 不进入交付包。
+- 交付包保留已声明白名单的外部资源；`README.md` 会列出域名。内网/离线交付时，提醒用户提前 vendor 或准备本地副本。
 - **只发 zip**；系统没有 `zip` 命令时，发 `dist/<产品>-v<版本>/` 文件夹。
 - `dist/` 是生成物，不手改、不提交。
 - 评审通过后，主动问用户是否要导出交付包。
@@ -224,11 +231,15 @@ install.sh                远程安装入口（下载模板并调用 new.mjs）
 product/PRD.md            需求与验收的唯一事实源
 product/discovery/        问题定义与证据；不写解决方案细节
 product/decisions/        ADR：一次决策一个文件，只增不改
-prototype/screens/        正式原型，进入工作台，必须带 data-req
+prototype/screens/        多页原型，进入工作台，必须带 data-req
+prototype/screens.json    SPA 清单：入口、路由、界面与需求追溯；可选
+prototype/external.json   外部资源白名单；可选
+prototype/previews/       工作台静态预览图；可选，不进入交付包
 prototype/spikes/         探索稿，不进入工作台，不得被正式页面链接
 prototype/assets/         共享 tokens 与组件样式
 skills/                   已安装的核心技能：prototype / review / change
 packs/                    可选内容包源，默认不安装（pm-methods）
+LICENSE                   自有代码与文档的 MIT 许可证
 THIRD_PARTY_NOTICES.md    外部技能来源、许可证与修改说明
 LICENSES/                 第三方许可证原文
 scripts/sync.mjs          一致性校验 + 工作台生成
@@ -236,7 +247,8 @@ scripts/check-skills.mjs  技能格式校验（含可选包源）
 scripts/pack.mjs          安装/移除可选内容包
 scripts/export.mjs        生成研发交付包
 scripts/new.mjs           从模板创建新项目
-docs/                     工作流、一致性模型、原型规范、评审清单
+scripts/lib/screens.mjs   多页/SPA 页面读取与外部资源匹配
+docs/                     工作流、一致性模型、原型规范、评审清单、企业适配
 dist/                     导出的交付包，生成物，不提交
 STATE.md                  会话交接板
 ```

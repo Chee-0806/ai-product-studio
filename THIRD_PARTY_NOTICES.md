@@ -1,6 +1,6 @@
 # 第三方与来源说明
 
-本仓库的 `packs/pm-methods/skills/` 中有 8 个可选技能来自 Anthropic 官方开源仓库，做了本地化适配；其余技能为本工位自有。内容包默认不安装。
+本仓库自有代码与文档采用 **MIT**（见根目录 [`LICENSE`](LICENSE)）。`packs/pm-methods/skills/` 中有 8 个可选技能来自 Anthropic 官方开源仓库，采用 **Apache-2.0**，做了本地化适配；其余技能为本工位自有。内容包默认不安装。
 
 ## Anthropic knowledge-work-plugins
 
@@ -36,10 +36,11 @@
 
 原始版权归 Anthropic 所有；修改部分归本仓库。Apache-2.0 允许商用与再分发，但要求保留许可证与修改声明。
 
-## 本工位自有技能
+## 本工位自有内容
 
 - `skills/prototype/SKILL.md`
 - `skills/review/SKILL.md`
 - `skills/change/SKILL.md`
+- `scripts/`、`prototype/assets/`、`docs/` 与模板文档
 
-这些技能只封装本工位的「PRD ↔ 静态 HTML 原型」一致性流程，不复制上面的 PM 方法论。
+这些内容采用 MIT，只封装本工位的「PRD ↔ 静态 HTML 原型」一致性流程，不复制上面的 PM 方法论。

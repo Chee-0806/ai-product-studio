@@ -21,7 +21,7 @@ npm run pack:remove -- pm-methods
 
 | 技能 | 什么时候用 | 产物 |
 | --- | --- | --- |
-| [`prototype`](prototype/SKILL.md) | 把已有 REQ 做成可点页面 | `prototype/screens/*.html` |
+| [`prototype`](prototype/SKILL.md) | 把已有 REQ 做成可点页面 | `prototype/screens/*.html` 或 `screens.json` + SPA 入口 |
 | [`review`](review/SKILL.md) | 评审 PRD、原型或两者一致性 | 必改 / 建议 / 未验证 |
 | [`change`](change/SKILL.md) | 改已有需求、页面或文案 | 两边同步 + 版本 + 工作台 |
 

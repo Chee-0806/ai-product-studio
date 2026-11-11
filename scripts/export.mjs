@@ -14,11 +14,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { loadExternalPolicy, loadScreens, walkHtml } from './lib/screens.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PRD_FILE = path.join(ROOT, 'product/PRD.md');
-const SCREENS_DIR = path.join(ROOT, 'prototype/screens');
-const ASSETS_DIR = path.join(ROOT, 'prototype/assets');
+const PROTOTYPE_DIR = path.join(ROOT, 'prototype');
+const SCREENS_DIR = path.join(PROTOTYPE_DIR, 'screens');
+const SCREEN_MANIFEST = path.join(PROTOTYPE_DIR, 'screens.json');
+const ASSETS_DIR = path.join(PROTOTYPE_DIR, 'assets');
 const DIST_DIR = path.join(ROOT, 'dist');
 
 const esc = (value) =>
@@ -78,7 +81,7 @@ function parseRequirements(body) {
     const heading = line.match(/^#{2,4}\s+(REQ-\d{3})\s+(.+?)\s*$/);
     if (heading) {
       if (cur) reqs.push(cur);
-      cur = { id: heading[1], title: heading[2], status: '', priority: '' };
+      cur = { id: heading[1], title: heading[2], status: '', priority: '', basis: '' };
       continue;
     }
     if (!cur) continue;
@@ -93,42 +96,12 @@ function parseRequirements(body) {
     const value = field[2].trim().replace(/`/g, '');
     if (key === '状态') cur.status = normalizeStatus(value);
     else if (key === '优先级') cur.priority = value.toUpperCase();
+    else if (key === '依据') cur.basis = value;
   }
   if (cur) reqs.push(cur);
   return reqs;
 }
 
-function walkHtml(dir) {
-  if (!fs.existsSync(dir)) return [];
-  const out = [];
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) out.push(...walkHtml(full));
-    else if (entry.isFile() && entry.name.endsWith('.html')) out.push(full);
-  }
-  return out;
-}
-
-function parseScreens() {
-  return walkHtml(SCREENS_DIR).map((file) => {
-    const html = read(file);
-    const meta = {};
-    for (const tag of html.matchAll(/<meta\b[^>]*>/gi)) {
-      const name = tag[0].match(/\bname=["']([^"']+)["']/i)?.[1];
-      const content = tag[0].match(/\bcontent=["']([^"']*)["']/i)?.[1] ?? '';
-      if (name && name.toLowerCase().startsWith('screen:')) meta[name.slice(7).toLowerCase()] = content;
-    }
-    const reqs = uniq([...html.matchAll(/data-req=["'](REQ-\d{3})["']/g)].map((m) => m[1]));
-    return {
-      file,
-      rel: path.relative(SCREENS_DIR, file),
-      id: meta.id || path.basename(file, '.html'),
-      title: meta.title || meta.id || path.basename(file, '.html'),
-      flow: meta.flow || '未分组',
-      reqs,
-    };
-  });
-}
 
 /* ---------------- Markdown → HTML（PRD 用到的子集） ---------------- */
 
@@ -388,22 +361,26 @@ function renderPrdPage(product, prd, markdown) {
 `;
 }
 
-function renderHandoffIndex(product, prd, reqs, screens, covered) {
+function renderHandoffIndex(product, prd, reqs, screens, covered, mode, entry) {
   const active = reqs.filter((req) => req.status !== 'dropped');
   const done = active.filter((req) => (covered.get(req.id) || []).length > 0);
+  const showBasis = String(prd.basis_required).toLowerCase() === 'true' || active.some((req) => req.basis);
   const rows = active
     .map((req) => {
       const pages = covered.get(req.id) || [];
       const pageLinks = pages.length
         ? pages
-            .map((screen) => `<a href="prototype/screens/${esc(screen.rel)}">${esc(screen.title)}</a>`)
+            .map((screen) => `<a href="prototype/${esc(screen.href)}">${esc(screen.title)}</a>`)
             .join('、')
         : '<span class="muted">—</span>';
+      const basisCell = showBasis ? `<td>${esc(req.basis || '—')}</td>` : '';
       return `<tr><td><code>${esc(req.id)}</code></td><td>${esc(req.title)}</td><td>${esc(
         req.priority || '—',
-      )}</td><td>${esc(STATUS_LABELS[req.status] || req.status || '—')}</td><td>${pageLinks}</td></tr>`;
+      )}</td><td>${esc(STATUS_LABELS[req.status] || req.status || '—')}</td>${basisCell}<td>${pageLinks}</td></tr>`;
     })
     .join('');
+  const prototypeNote = mode === 'spa' ? '同一个单页应用里的界面' : '静态页面';
+  const pageLabel = mode === 'spa' ? '个界面' : '个原型页面';
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -438,7 +415,7 @@ function renderHandoffIndex(product, prd, reqs, screens, covered) {
     <div class="stats">
       <span><strong>${active.length}</strong> 条有效需求</span>
       <span><strong>${done.length}</strong> 条已有原型</span>
-      <span><strong>${screens.length}</strong> 个原型页面</span>
+      <span><strong>${screens.length}</strong> ${pageLabel}</span>
     </div>
   </section>
 
@@ -451,15 +428,15 @@ function renderHandoffIndex(product, prd, reqs, screens, covered) {
     <a class="card" href="prototype/index.html">
       <span class="num">02 / PROTOTYPE</span>
       <strong>可点原型</strong>
-      <p>${screens.length} 个静态页面，直接双击打开</p>
+      <p>${screens.length} ${pageLabel}，${prototypeNote}，直接双击打开</p>
     </a>
   </div>
 
-  <h2>需求 → 原型页面</h2>
+  <h2>需求 → ${mode === 'spa' ? '原型界面' : '原型页面'}</h2>
   ${
     active.length
       ? `<table>
-    <thead><tr><th>ID</th><th>需求</th><th>优先级</th><th>状态</th><th>页面</th></tr></thead>
+    <thead><tr><th>ID</th><th>需求</th><th>优先级</th><th>状态</th>${showBasis ? '<th>依据</th>' : ''}<th>${mode === 'spa' ? '界面' : '页面'}</th></tr></thead>
     <tbody>${rows}</tbody>
   </table>`
       : '<p class="muted">PRD 中没有有效需求。</p>'
@@ -470,7 +447,11 @@ function renderHandoffIndex(product, prd, reqs, screens, covered) {
     <ul>
       <li><code>index.html</code>：这个首页</li>
       <li><code>PRD.html</code>：可阅读的 PRD；<code>PRD.md</code>：原始 Markdown</li>
-      <li><code>prototype/index.html</code>：原型目录；<code>prototype/screens/</code>：页面</li>
+      <li><code>prototype/index.html</code>：原型目录；${
+        mode === 'spa'
+          ? `<code>prototype/${esc(entry)}</code>：单页应用入口`
+          : '<code>prototype/screens/</code>：页面'
+      }</li>
       <li><code>README.md</code>：交付说明</li>
     </ul>
   </div>
@@ -482,11 +463,11 @@ function renderHandoffIndex(product, prd, reqs, screens, covered) {
 `;
 }
 
-function renderPrototypeIndex(product, prd, screens) {
+function renderPrototypeIndex(product, prd, screens, mode) {
   const cards = screens
     .map(
-      (screen) => `<a class="screen" href="screens/${esc(screen.rel)}">
-      <span class="screen__flow">${esc(screen.flow)}</span>
+      (screen) => `<a class="screen" href="${esc(screen.href)}">
+      <span class="screen__flow">${esc(screen.flow || '未分组')}</span>
       <strong>${esc(screen.title)}</strong>
       <span class="screen__id">${esc(screen.id)}</span>
       <span class="screen__reqs">${
@@ -519,7 +500,7 @@ function renderPrototypeIndex(product, prd, screens) {
     <div>
       <p class="eyebrow">INTERACTIVE PROTOTYPE</p>
       <h1>${esc(product)} · 原型</h1>
-      <p class="meta">${screens.length} 个页面 · 对应 PRD v${esc(prd.version)}</p>
+      <p class="meta">${screens.length} 个${mode === 'spa' ? '界面（单页应用）' : '页面'} · 对应 PRD v${esc(prd.version)}</p>
     </div>
     <div>
       <a class="back" href="../index.html">← 交付首页</a>
@@ -528,32 +509,43 @@ function renderPrototypeIndex(product, prd, screens) {
     </div>
   </div>
   <div class="screens">${cards || '<p class="muted">还没有原型页面。</p>'}</div>
-  <footer>静态 HTML 原型，仅用于需求与交互确认，不含后端逻辑。</footer>
+  <footer>${mode === 'spa' ? '静态 HTML 单页应用' : '静态 HTML 原型'}，仅用于需求与交互确认，不含后端逻辑。</footer>
 </div>
 </body>
 </html>
 `;
 }
 
-function renderPackageReadme(product, prd, reqs, screens) {
+function renderPackageReadme(product, prd, reqs, screens, mode, externalHosts = []) {
+  const pageLabel = mode === 'spa' ? '界面' : '原型页面';
+  const prototypeLine =
+    mode === 'spa'
+      ? '- `prototype/`：静态 HTML 单页应用、脚本、数据与共享样式'
+      : '- `prototype/`：静态 HTML 页面与共享样式';
+  const externalNote = externalHosts.length
+    ? `\n## 外部资源\n\n原型依赖以下外部域名；离线或内网环境需要提前准备本地副本：\n\n${externalHosts
+        .map((item) => `- \`${item}\``)
+        .join('\n')}\n`
+    : '';
+
   return `# ${product} · 交付包
 
 - 版本：v${prd.version}
 - PRD 更新：${prd.updated}
 - 导出日期：${new Date().toISOString().slice(0, 10)}
 - 有效需求：${reqs.filter((req) => req.status !== 'dropped').length}
-- 原型页面：${screens.length}
+- ${pageLabel}：${screens.length}
 
 ## 打开方式
 
 1. 双击根目录的 \`index.html\`。
 2. 看需求：\`PRD.html\`；需要原始 Markdown 时看 \`PRD.md\`。
-3. 看原型：\`prototype/index.html\`，再点具体页面。
+3. 看原型：\`prototype/index.html\`，再点具体${mode === 'spa' ? '界面' : '页面'}。
 
 ## 包含
 
 - \`PRD.html\` / \`PRD.md\`
-- \`prototype/\`：静态 HTML 页面与共享样式
+${prototypeLine}
 - \`index.html\`：交付首页
 
 ## 不包含
@@ -561,7 +553,7 @@ function renderPackageReadme(product, prd, reqs, screens) {
 - 内部工作台、\`STATE.md\`、脚本与检查工具
 - 调研原始材料、决策记录（如需请单独提供）
 - 后端、真实数据、登录与权限实现
-
+${externalNote}
 ## 说明
 
 原型是静态 HTML，用于确认流程、界面和边界态，不是生产代码。需求中的验收标准以 \`PRD.html\` 为准。
@@ -570,11 +562,26 @@ function renderPackageReadme(product, prd, reqs, screens) {
 
 /* ---------------- 构建 ---------------- */
 
+function rewriteWorkbenchLinks(file, protoRoot) {
+  const relativeDir = path.relative(protoRoot, path.dirname(file));
+  const depth = relativeDir ? relativeDir.split(path.sep).filter(Boolean).length : 0;
+  const target = depth === 0 ? 'index.html' : `${'../'.repeat(depth)}index.html`;
+  const html = read(file)
+    .replace(/href="(?:\.\.\/|\.\/)*工作台\.html"/g, `href="${target}"`)
+    .replace(/>← 工作台</g, '>← 原型目录<');
+  fs.writeFileSync(file, html);
+}
+
 function build() {
   const prdText = read(PRD_FILE);
   const { data: prd, body } = parseFrontMatter(prdText);
   const reqs = parseRequirements(body);
-  const screens = parseScreens();
+
+  const loaded = loadScreens({ root: ROOT, screensDir: SCREENS_DIR, manifestFile: SCREEN_MANIFEST });
+  if (loaded.errors.length) {
+    throw new Error(`原型清单有错误，先修好再导出：\n${loaded.errors.map((item) => `- ${item}`).join('\n')}`);
+  }
+  const { screens, mode, entry } = loaded;
   const covered = new Map();
   for (const screen of screens) {
     for (const id of screen.reqs) {
@@ -583,6 +590,23 @@ function build() {
     }
   }
 
+  const policy = loadExternalPolicy(PROTOTYPE_DIR);
+  if (policy.errors.length) throw new Error(policy.errors.join('\n'));
+  const usedExternalUrls = [
+    ...screens.flatMap((screen) => screen.externalUrls || []),
+    ...(mode === 'spa' ? loaded.entryExternal || [] : []),
+  ];
+  const externalHosts = [
+    ...new Set(
+      usedExternalUrls.map((url) => {
+        try {
+          return new URL(url.startsWith('//') ? `https:${url}` : url).host;
+        } catch {
+          return url;
+        }
+      }),
+    ),
+  ];
   const product = (prd.product || '产品').trim();
   const version = prd.version || '0.0.0';
   const safeName = product.replace(/[\\/:*?"<>|]/g, '-').trim() || 'product';
@@ -590,23 +614,42 @@ function build() {
   const outDir = path.join(DIST_DIR, baseName);
 
   fs.rmSync(outDir, { recursive: true, force: true });
-  fs.mkdirSync(path.join(outDir, 'prototype', 'screens'), { recursive: true });
-  fs.cpSync(SCREENS_DIR, path.join(outDir, 'prototype', 'screens'), { recursive: true });
-  fs.cpSync(ASSETS_DIR, path.join(outDir, 'prototype', 'assets'), { recursive: true });
+  fs.mkdirSync(path.join(outDir, 'prototype'), { recursive: true });
 
-  for (const file of walkHtml(path.join(outDir, 'prototype', 'screens'))) {
-    const html = read(file)
-      .replace(/href="\.\.\/\.\.\/工作台\.html"/g, 'href="../index.html"')
-      .replace(/>← 工作台</g, '>← 原型目录<');
-    fs.writeFileSync(file, html);
+  if (mode === 'spa') {
+    fs.cpSync(PROTOTYPE_DIR, path.join(outDir, 'prototype'), {
+      recursive: true,
+      filter: (source) => {
+        const relative = path.relative(PROTOTYPE_DIR, source);
+        if (!relative) return true;
+        const parts = relative.split(path.sep);
+        if (parts.includes('.DS_Store')) return false;
+        return !['spikes', 'previews', 'screens.json', 'external.json'].includes(parts[0]);
+      },
+    });
+    for (const file of walkHtml(path.join(outDir, 'prototype'))) {
+      rewriteWorkbenchLinks(file, path.join(outDir, 'prototype'));
+    }
+  } else {
+    fs.mkdirSync(path.join(outDir, 'prototype', 'screens'), { recursive: true });
+    fs.cpSync(SCREENS_DIR, path.join(outDir, 'prototype', 'screens'), { recursive: true });
+    fs.cpSync(ASSETS_DIR, path.join(outDir, 'prototype', 'assets'), { recursive: true });
+    for (const file of walkHtml(path.join(outDir, 'prototype', 'screens'))) {
+      rewriteWorkbenchLinks(file, path.join(outDir, 'prototype'));
+    }
   }
 
   fs.writeFileSync(path.join(outDir, 'PRD.md'), prdText);
   fs.writeFileSync(path.join(outDir, 'PRD.html'), renderPrdPage(product, prd, body));
-  fs.mkdirSync(path.join(outDir, 'prototype'), { recursive: true });
-  fs.writeFileSync(path.join(outDir, 'prototype', 'index.html'), renderPrototypeIndex(product, prd, screens));
-  fs.writeFileSync(path.join(outDir, 'index.html'), renderHandoffIndex(product, prd, reqs, screens, covered));
-  fs.writeFileSync(path.join(outDir, 'README.md'), renderPackageReadme(product, prd, reqs, screens));
+  fs.writeFileSync(path.join(outDir, 'prototype', 'index.html'), renderPrototypeIndex(product, prd, screens, mode));
+  fs.writeFileSync(
+    path.join(outDir, 'index.html'),
+    renderHandoffIndex(product, prd, reqs, screens, covered, mode, entry),
+  );
+  fs.writeFileSync(
+    path.join(outDir, 'README.md'),
+    renderPackageReadme(product, prd, reqs, screens, mode, externalHosts),
+  );
 
   const zipName = `${baseName}.zip`;
   const zipPath = path.join(DIST_DIR, zipName);

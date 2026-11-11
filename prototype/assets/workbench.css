@@ -396,6 +396,77 @@ td a:hover {
   transform-origin: top left;
 }
 
+.proto--desktop .proto__frame {
+  width: 176px;
+  aspect-ratio: 1440 / 900;
+}
+
+.proto--desktop .proto__frame iframe {
+  width: 1440px;
+  height: 900px;
+  transform: scale(0.1222);
+}
+
+.proto--responsive .proto__frame {
+  width: 160px;
+  aspect-ratio: 16 / 10;
+}
+
+.proto--responsive .proto__frame iframe {
+  width: 1280px;
+  height: 800px;
+  transform: scale(0.125);
+}
+
+.proto__frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.proto__placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.proto__placeholder svg {
+  color: var(--ink-3);
+}
+
+.proto__placeholder small {
+  color: var(--ink-3);
+  font-size: 10px;
+}
+
+.proto__form {
+  display: inline-block;
+  padding: 0 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--ink-3);
+  font-size: 10.5px;
+  line-height: 1.5;
+  vertical-align: 1px;
+}
+
+.basis {
+  max-width: 240px;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
 .proto__body {
   display: flex;
   flex-direction: column;
@@ -585,7 +656,9 @@ footer {
   th:nth-child(1),
   td:nth-child(1),
   th:nth-child(3),
-  td:nth-child(3) {
+  td:nth-child(3),
+  th.basis,
+  td.basis {
     display: none;
   }
 }
@@ -605,6 +678,22 @@ footer {
 
   .proto__frame iframe {
     transform: scale(0.2872);
+  }
+
+  .proto--desktop .proto__frame {
+    width: 140px;
+  }
+
+  .proto--desktop .proto__frame iframe {
+    transform: scale(0.0972);
+  }
+
+  .proto--responsive .proto__frame {
+    width: 128px;
+  }
+
+  .proto--responsive .proto__frame iframe {
+    transform: scale(0.1);
   }
 }
 
