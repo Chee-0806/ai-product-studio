@@ -7,7 +7,9 @@
 
 ## 1. 这个仓库是什么
 
-一个**产品设计工位**，不是代码仓库。核心产物只有三类：
+一个**可复用的产品设计工位框架**。模板工程可以生成多个工位；当前目录同时是模板和示例工位（回声纪要）。
+
+每个工位是一个产品的工作区，不是代码仓库。核心产物只有三类：
 
 - `product/PRD.md`：要做什么、为什么、怎样算验收。
 - `prototype/screens/*.html`：界面长什么样、怎么交互。
@@ -40,7 +42,15 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 
 ### 技能路由
 
-任务匹配时，先读对应的 `skills/<name>/SKILL.md`，再动手：
+**核心技能默认安装**。任务匹配时，先读对应的 `skills/<name>/SKILL.md`，再动手：
+
+| 任务 | 技能 |
+| --- | --- |
+| 做页面、改界面 | `prototype` |
+| 评审、查一致性 | `review` |
+| 改已有需求/页面/文案 | `change` |
+
+**可选内容包默认不安装**。只有当 `skills/` 下确实存在对应目录时才使用；不存在就按通用产品方法做，不要假装有这个技能，也不要自行创建：
 
 | 任务 | 技能 |
 | --- | --- |
@@ -52,11 +62,16 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 | 指标复盘 | `metrics-review` |
 | 周报、汇报、发布公告 | `stakeholder-update` |
 | 排研发迭代（可选） | `sprint-planning` |
-| 做页面、改界面 | `prototype` |
-| 评审、查一致性 | `review` |
-| 改已有需求/页面/文案 | `change` |
 
-前 8 个来自 Anthropic 官方 `product-management` 插件（Apache-2.0），已做本地化适配；后 3 个是本工位的原型一致性流程。来源与修改说明见 `THIRD_PARTY_NOTICES.md`。技能只写流程，不写产品需求；与 `AGENTS.md` 冲突时以本文件为准。
+可选包来自 Anthropic 官方 `product-management` 插件（Apache-2.0），放在 `packs/pm-methods/skills/`；安装与移除：
+
+```bash
+npm run pack:list
+npm run pack:add -- pm-methods
+npm run pack:remove -- pm-methods
+```
+
+来源与修改说明见 `THIRD_PARTY_NOTICES.md`。技能只写流程，不写产品需求；与 `AGENTS.md` 冲突时以本文件为准。
 
 技能正文多为英文；执行时用中文与用户交流、用中文输出，保留原框架名（如 RICE、JTBD）。
 
@@ -108,6 +123,7 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 ### 5.4 生成物
 
 - **禁止手改 `工作台.html`**，它由 `node scripts/sync.mjs` 生成。
+- 工作台顶部显示构建状态；检查失败时会直接显示错误，并提示内容可能不是最新的。不要把红色失败状态留给用户，修好后再重新生成。
 - 每次改动结束都跑 `npm run sync` 和 `npm run check`；必须通过。不要要求用户代跑。`npm run check` 同时校验 PRD/原型一致性与技能格式。
 
 ## 6. 一次变更的标准动作
@@ -211,11 +227,13 @@ product/decisions/        ADR：一次决策一个文件，只增不改
 prototype/screens/        正式原型，进入工作台，必须带 data-req
 prototype/spikes/         探索稿，不进入工作台，不得被正式页面链接
 prototype/assets/         共享 tokens 与组件样式
-skills/                   可复用的产品工作流程（SKILL.md）
+skills/                   已安装的核心技能：prototype / review / change
+packs/                    可选内容包源，默认不安装（pm-methods）
 THIRD_PARTY_NOTICES.md    外部技能来源、许可证与修改说明
 LICENSES/                 第三方许可证原文
 scripts/sync.mjs          一致性校验 + 工作台生成
-scripts/check-skills.mjs  技能格式校验
+scripts/check-skills.mjs  技能格式校验（含可选包源）
+scripts/pack.mjs          安装/移除可选内容包
 scripts/export.mjs        生成研发交付包
 scripts/new.mjs           从模板创建新项目
 docs/                     工作流、一致性模型、原型规范、评审清单

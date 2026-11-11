@@ -1,10 +1,19 @@
 # 产品设计工位
 
-给**不写代码、不用 git、不开终端**的产品经理用的 AI 协作工位。
+一个**可复用的产品设计工位框架**：给不写代码、不用 git、不开终端的产品经理，用 AI 同时维护 PRD 和可点原型，并保证两者的追溯关系与进度不说谎。
 
 仓库：https://github.com/Chee-0806/For_Jasmine
 
-打开方式只有一个：**双击根目录的 `工作台.html`**。
+## 先分清四个词
+
+| 词 | 指什么 |
+| --- | --- |
+| **模板工程** | 这个仓库。只负责生成工位，不承载具体产品。 |
+| **工位** | 每个产品一份的工作区，AI 在这里改 PRD 和原型。 |
+| **工作台** | 工位根目录的 `工作台.html`，唯一给人看的只读首页，自动生成。 |
+| **交付包** | 给研发的 zip，只含 PRD 和原型。 |
+
+打开方式只有一个：**双击工位根目录的 `工作台.html`**。工作台顶部会显示最近一次检查结果；如果变红，说明内容可能不是最新的，让 AI 修好再刷新。
 
 ## 她只需要做三件事
 
@@ -17,6 +26,8 @@
 ## 常用工作流：说一句话，AI 自己串技能
 
 **你不需要记技能名。** 按场景说人话，AI 会根据 `AGENTS.md` 的路由自动选技能、按顺序执行。
+
+> 默认只装 3 个核心技能（做页面、评审、变更同步）。下面带 Anthropic 方法名的步骤属于可选包 `pm-methods`：装了会按完整方法论走；没装也能做，AI 会用通用方法完成同样的事。
 
 ```text
 想法
@@ -46,14 +57,16 @@ review（跑一致性检查 + 产品评审）
 
 > 我有个想法：给宝妈做一个宝宝喂养记录工具。先别写方案，先问我几个关键问题。
 
-AI 会走：`product-brainstorming` → `write-spec` → `prototype` → `review`。  
+装了 `pm-methods` 时会走：`product-brainstorming` → `write-spec` → `prototype` → `review`；没装则由核心流程直接完成。
+
 你拿到：PRD 里的需求、可点原型、刷新后的工作台。
 
 **2. 改已有功能**
 
 > 首页太满了，只保留开始记录和最近三条。
 
-AI 会走：`change` → `write-spec`（需要时）→ `prototype` → `review`。  
+装了 `pm-methods` 时会走：`change` → `write-spec`（需要时）→ `prototype` → `review`；没装时 `change` 会直接把需求与原型一起改。
+
 你拿到：PRD 与原型同步更新，版本 +1，工作台刷新。
 
 **3. 评审 / 收尾**
@@ -79,6 +92,8 @@ AI 会走：`review`，先跑机器检查，再给你「必改 / 建议 / 无法
 | 排下个迭代 | `sprint-planning` | 迭代计划（可选） |
 
 不用背这张表；只要说清「现在是什么场景、你想得到什么」，AI 会选。选错了直接说「这不是我要的，换一个」。
+
+带 Anthropic 方法名的几行需要先安装 `pm-methods`；没装时 AI 会用核心流程和通用方法完成，只是输出没那么套框架。
 
 ## 给 AI 的第一句话
 
@@ -153,18 +168,13 @@ prototype/
   spikes/                 探索稿，不进入工作台
   assets/                 共享视觉样式
 
-skills/                   内置的产品工作流程
-  write-spec/             PRD 与验收（Anthropic）
-  roadmap-update/         范围与优先级（Anthropic）
-  synthesize-research/    研究归纳（Anthropic）
-  stakeholder-update/     汇报与公告（Anthropic）
-  product-brainstorming/  发散与挑战假设（Anthropic）
-  metrics-review/         指标复盘（Anthropic）
-  competitive-brief/      竞品分析（Anthropic）
-  sprint-planning/        迭代排期（Anthropic，可选）
+skills/                   默认安装的核心技能
   prototype/              做页面（本工位）
   review/                 评审一致性（本工位）
   change/                 变更同步（本工位）
+
+packs/                    可选内容包，默认不安装
+  pm-methods/             8 个 Anthropic 官方 PM 方法技能
 
 THIRD_PARTY_NOTICES.md    外部技能来源与修改说明
 LICENSES/                 第三方许可证原文
@@ -184,12 +194,19 @@ dist/                     导出的交付包（生成物，不提交）
 
 > 这一节给 AI 和维护者看，你不需要记。日常只看上面的「常用工作流」。
 
-`skills/` 里是 **8 个 Anthropic 官方 PM 技能 + 3 个本工位专用技能**：
+技能分两层，默认只装核心的 3 个：
 
-- **官方方法论**：`write-spec`（PRD）、`roadmap-update`（范围/优先级）、`synthesize-research`（研究归纳）、`stakeholder-update`（汇报）、`product-brainstorming`（发散）、`metrics-review`（指标）、`competitive-brief`（竞品）、`sprint-planning`（排期，可选）。
-- **本工位补齐**：`prototype`（做页面）、`review`（评审一致性）、`change`（改需求时两边同步）。
+- **核心技能（默认安装）**：`prototype`（做页面）、`review`（评审一致性）、`change`（改需求时两边同步）。它们负责本工位的 PRD ↔ 原型闭环。
+- **可选内容包 `pm-methods`（默认不安装）**：`write-spec`、`roadmap-update`、`synthesize-research`、`stakeholder-update`、`product-brainstorming`、`metrics-review`、`competitive-brief`、`sprint-planning`。需要时：
 
-来自 Anthropic 的 8 个技能采用 Apache-2.0，做了中文触发与文件落点适配；来源、固定 commit、修改点写在 `THIRD_PARTY_NOTICES.md`，许可证在 `LICENSES/Apache-2.0.txt`。技能目录说明见 `skills/README.md`。
+  ```bash
+  npm run pack:add -- pm-methods
+  npm run pack:remove -- pm-methods
+  ```
+
+  源文件在 `packs/pm-methods/skills/`，不安装时不参与路由，也不会被 Claude Code 发现。不需要可以整个删除 `packs/`。
+
+来自 Anthropic 的 8 个技能采用 Apache-2.0，做了中文触发与文件落点适配；来源、固定 commit、修改点写在 `THIRD_PARTY_NOTICES.md`，许可证在 `LICENSES/Apache-2.0.txt`。技能说明见 `skills/README.md`。
 
 产品经理不需要记这些名字；她只要说「帮我评审」「先问我几个问题」「把首页改简单点」，AI 会选技能。技能格式由 `npm run check:skills` 校验，也包含在 `npm run check` 里。
 
@@ -207,10 +224,10 @@ dist/                     导出的交付包（生成物，不提交）
 
 ## 维护者：第一次设置
 
-1. **复制整个文件夹**给她，或者放到她的工作目录。
+1. **生成一个工位**：运行 `npm run new -- ../她的项目 --name "产品名"`，或从 GitHub 用 `install.sh`。想先看示例，就直接打开本仓库。
 2. 确保电脑上有 **Node.js ≥ 18**（只用于 AI 运行检查；单纯看工作台不需要）。没有的话让 AI 帮你装，或从 [nodejs.org](https://nodejs.org) 安装 LTS。
 3. 用能读写本地文件的 AI 打开文件夹，粘贴上面的开场白。
-4. 让她先双击 `工作台.html` 熟悉一下，再开始改示例。
+4. 让她先双击 `工作台.html` 熟悉一下；如果是新工位，直接从第一条需求开始。
 5. **git 是可选的**：如果文件夹里有 `.git`，AI 可以在检查通过后自动提交留底，不需要她操作；没有 `.git` 也完全不影响使用。不要教她 git。
 
 常用命令（只给维护者/AI）：
@@ -219,7 +236,10 @@ dist/                     导出的交付包（生成物，不提交）
 | --- | --- |
 | `npm run sync` | 检查并重建 `工作台.html` |
 | `npm run check` | 严格检查，失败即退出（含技能格式） |
-| `npm run check:skills` | 只检查 `skills/` 格式 |
+| `npm run check:skills` | 检查已安装技能与可选包源的格式 |
+| `npm run pack:list` | 查看可选内容包与安装状态 |
+| `npm run pack:add -- pm-methods` | 安装 8 个官方 PM 方法技能 |
+| `npm run pack:remove -- pm-methods` | 移除该内容包（核心技能不动） |
 | `npm run new` | 从模板创建一个新项目 |
 | `npm run export` | 生成给研发的交付包和 zip |
 | `npm run dev` | 可选：本地预览，默认 http://localhost:4173 |
@@ -246,6 +266,7 @@ curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.
 
 - `--name "产品名"`：PRD 和工作台显示的名字；默认用目录名；
 - `--git`：新目录初始化 git（不自动提交）；
+- `--with-pack pm-methods`：同时安装 8 个官方 PM 方法技能（默认不装）；
 - `--ref v0.2.0`：固定使用某个分支、标签或 commit。
 
 介意 `curl | bash` 的话，可以先下载 `install.sh` 看一遍再执行。
@@ -273,14 +294,15 @@ npm run new
 - 新的 `product/PRD.md`（`0.1.0`、空需求、待补充的摘要与指标）；
 - 新的 `STATE.md`（`discovery` 阶段 + 下一步）；
 - 空的 `prototype/screens/`，没有示例页面；
-- 复制 `AGENTS.md`、`skills/`、`docs/`、脚本、样式和许可证说明；
+- 复制 `AGENTS.md`、核心 `skills/`、可选 `packs/`、`docs/`、脚本、样式和许可证说明；
 - 自动生成 `工作台.html`，并通过一致性检查；
 - 不复制示例 PRD、示例原型、`.git` 历史和 `dist/`。
 
 可选参数：
 
 - `--name "产品名"`：PRD 和工作台显示的名字；默认用目录名；
-- `--git`：新目录初始化 git（不自动提交）。
+- `--git`：新目录初始化 git（不自动提交）；
+- `--with-pack pm-methods`：同时安装 8 个官方 PM 方法技能（默认不装）。
 
 **不要在模板目录里面创建项目**，目标目录必须在模板之外（例如 `../项目名`）。生成后，用 AI 打开新目录，粘贴新 `README.md` 里的开场白即可。
 
@@ -292,6 +314,8 @@ npm run new
 
 - **工作台是唯一入口**：产品经理不需要记目录、命令或文件格式。
 - **PRD 与原型各管一种真相**：PRD 管要做什么和验收，原型管界面与交互；覆盖关系自动推导。
+- **核心与内容包分离**：默认只装 3 个一致性技能；8 个 PM 方法技能按需安装，避免每个工位都背一整套方法论。
+- **构建状态可见**：工作台顶部显示检查结果；检查失败时明确标红，不静默保留旧页面。
 - **原型用静态 HTML**：双击可开、可 diff、AI 能直接改；代价是复杂交互验证不了。
 - **不做第二份进度表**：进度只写在需求状态里，工作台由脚本生成。
 - **不要求 git**：git 只作为 AI 的隐形留底，不作为使用门槛。
@@ -309,5 +333,6 @@ npm run new
 ## 已知限制
 
 - 语义一致性（文案、边界、交互是否符合验收）无法全自动判断，需人工评审。
+- 工作台显示的是最近一次生成时的检查结果；AI 没运行刷新时，它不会自己更新。
 - 工作台缩略图只内联 `assets/app.css` 与页面自身；外部图片/字体会在缩略图里缺失，但打开页面正常。
 - 需要 AI 能读写本地文件夹；纯网页版聊天工具改不了文件。

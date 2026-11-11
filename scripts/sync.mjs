@@ -66,6 +66,15 @@ function readText(file) {
   }
 }
 
+/** 样式缺失时仍要能生成失败页，不让工作台生成本身崩掉。 */
+function readAsset(file) {
+  try {
+    return fs.readFileSync(file, 'utf8');
+  } catch {
+    return '';
+  }
+}
+
 /** 解析极简 YAML front matter：只支持 key: value 与 # 注释。 */
 function parseFrontMatter(text, file) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
@@ -237,7 +246,7 @@ function validateState(state, prd) {
     fail(`STATE.md：stage 只能是 ${STAGES.join(' | ')}（当前「${state.stage}」）`);
   }
   if (!state.spec_version) fail('STATE.md：front matter 缺少 spec_version');
-  else if (state.spec_version !== prd.version) {
+  else if (prd.version && state.spec_version !== prd.version) {
     fail(`版本不一致：PRD 是 ${prd.version}，STATE.md 是 ${state.spec_version}。改 PRD 必须同步 STATE.md`);
   }
   if (!state.updated) fail('STATE.md：front matter 缺少 updated');
@@ -297,9 +306,10 @@ function screenPreviewHtml(file, tokens, appCss) {
   return html;
 }
 
-function renderGallery(prd, state, reqs, screens, covered) {
-  const tokens = fs.readFileSync(path.join(ROOT, 'prototype/assets/tokens.css'), 'utf8');
-  const appCss = fs.readFileSync(path.join(ROOT, 'prototype/assets/app.css'), 'utf8');
+function renderGallery(prd, state, reqs, screens, covered, build = { errors: [], warnings: [] }) {
+  const tokens = readAsset(path.join(ROOT, 'prototype/assets/tokens.css'));
+  const appCss = readAsset(path.join(ROOT, 'prototype/assets/app.css'));
+  const workbenchCss = readAsset(path.join(ROOT, 'prototype/assets/workbench.css'));
   const stageLabel = STAGE_LABELS[state.stage] || state.stage || '未设置';
   const nextAction = state.next_action || '先读一遍 PRD，确定下一步要做什么';
   const sortedReqs = [...reqs].sort((a, b) => cmp(a.id, b.id));
@@ -310,6 +320,35 @@ function renderGallery(prd, state, reqs, screens, covered) {
   );
   const active = sortedReqs.filter((r) => r.status !== 'dropped');
   const done = active.filter((r) => (covered.get(r.id) || []).length > 0);
+
+  const buildFailed = build.errors.length > 0;
+  const buildWarned = !buildFailed && build.warnings.length > 0;
+  const buildClass = buildFailed ? 'fail' : buildWarned ? 'warn' : 'ok';
+  const buildIcon = buildFailed
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/></svg>'
+    : buildWarned
+      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 21 20H3L12 3.5Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>'
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>';
+  const buildTitle = buildFailed
+    ? `检查没通过（${build.errors.length} 个问题），工作台可能不是最新的`
+    : buildWarned
+      ? `检查通过，有 ${build.warnings.length} 条提醒`
+      : '检查通过，PRD 和原型对得上';
+  const buildNote = buildFailed
+    ? '把这句话发给 AI：「检查没通过，请修好再刷新工作台」。修好前，下面的内容可能不完整。'
+    : buildWarned
+      ? '不影响查看，建议让 AI 处理这些提醒。'
+      : '需求状态、页面覆盖和版本都一致。';
+  const buildMessages = [
+    ...build.errors.map((message) => `错误：${message}`),
+    ...build.warnings.map((message) => `提醒：${message}`),
+  ];
+  const buildDetail = buildMessages.length
+    ? `<details class="build__detail">
+        <summary>给 AI 看的技术细节（${buildMessages.length}）</summary>
+        <ul>${buildMessages.map((message) => `<li>${esc(message)}</li>`).join('')}</ul>
+      </details>`
+    : '';
 
   const groups = new Map();
   for (const screen of sortedScreens) {
@@ -379,82 +418,8 @@ function renderGallery(prd, state, reqs, screens, covered) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(prd.product || '产品')} · 工作台</title>
 <style>
-  :root {
-    --bg: #f4f5f9; --surface: #fff; --text: #16181d; --muted: #6b7280;
-    --line: #e4e6ef; --brand: #4f46e5; --brand-weak: #eef0ff;
-    --green: #0f7b5f; --green-weak: #e7f7f1; --amber: #9a6700; --amber-weak: #fff6e0;
-    --red: #b42318; --red-weak: #fdecea; --gray-weak: #eef0f4;
-    --radius: 18px; --shadow: 0 1px 2px rgba(16,24,40,.04), 0 12px 32px rgba(16,24,40,.06);
-    --font: -apple-system, BlinkMacSystemFont, "SF Pro SC", "PingFang SC", "Segoe UI", sans-serif;
-  }
-  * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font); line-height: 1.55; }
-  .wrap { max-width: 1320px; margin: 0 auto; padding: 48px 28px 80px; }
-  .eyebrow { margin: 0 0 8px; font-size: 12px; font-weight: 700; letter-spacing: .12em; color: var(--brand); }
-  h1 { margin: 0; font-size: 40px; line-height: 1.15; letter-spacing: -.02em; }
-  .sub { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
-  .generated { margin: 18px 0 0; font-size: 12px; color: var(--muted); }
-  .generated code { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
-  .next { margin: 26px 0 0; padding: 20px 22px; border-radius: 18px; background: linear-gradient(135deg, #4f46e5, #4338ca); color: #fff; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; box-shadow: 0 14px 34px rgba(79,70,229,.24); }
-  .next__label { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .14em; color: rgba(255,255,255,.7); }
-  .next h2 { margin: 7px 0 0; font-size: 20px; line-height: 1.45; letter-spacing: -.01em; color: #fff; font-weight: 650; }
-  .next__version { flex: none; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .howto { margin: 16px 0 0; padding: 18px 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
-  .howto h2 { margin: 0 0 8px; font-size: 15px; }
-  .howto ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13.5px; color: var(--text); }
-  .howto__note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
-  .handoff { margin: 16px 0 0; padding: 18px 20px; border: 1px solid var(--brand-weak); border-radius: 18px; background: linear-gradient(135deg, #eef0ff, #f8f9fd); }
-  .handoff h2 { margin: 0 0 6px; font-size: 15px; }
-  .handoff p { margin: 0; font-size: 13px; color: var(--text); }
-  .handoff .handoff__note { margin-top: 8px; font-size: 12px; color: var(--muted); }
-  .prompt { margin-top: 12px; }
-  .prompt summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--brand); }
-  .prompt pre { margin: 10px 0 0; padding: 12px 14px; border-radius: 12px; background: #f7f8fc; border: 1px solid var(--line); white-space: pre-wrap; word-break: break-word; font-family: var(--font); font-size: 12.5px; line-height: 1.6; color: var(--text); }
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 28px 0 36px; }
-  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
-  .stat b { display: block; font-size: 26px; letter-spacing: -.02em; }
-  .stat span { font-size: 12px; color: var(--muted); }
-  h2 { margin: 40px 0 14px; font-size: 18px; letter-spacing: -.01em; }
-  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; font-size: 14px; }
-  th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { font-size: 12px; color: var(--muted); font-weight: 600; background: #fafbfe; }
-  tr:last-child td { border-bottom: 0; }
-  tr.is-dropped td { color: var(--muted); text-decoration: line-through; }
-  tr.is-dropped td:last-child { text-decoration: none; }
-  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; background: var(--gray-weak); border-radius: 5px; padding: 2px 6px; }
-  td a { color: var(--brand); text-decoration: none; }
-  td a:hover { text-decoration: underline; }
-  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
-  .pill--draft { background: var(--gray-weak); color: var(--muted); }
-  .pill--prototyped { background: var(--brand-weak); color: var(--brand); }
-  .pill--approved { background: var(--green-weak); color: var(--green); }
-  .pill--delivered { background: var(--green-weak); color: var(--green); }
-  .pill--dropped { background: var(--red-weak); color: var(--red); }
-  .flow-group { margin-top: 28px; }
-  .flow-title { margin: 0 0 12px; font-size: 14px; color: var(--muted); font-weight: 600; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
-  .card__frame { display: block; aspect-ratio: 390 / 760; background: #e9eaf2; overflow: hidden; }
-  .card__frame iframe { width: 100%; height: 100%; border: 0; display: block; pointer-events: none; }
-  .card__body { padding: 14px 16px 16px; }
-  .card__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-  .card__head h3 { margin: 0; font-size: 15px; }
-  .flow { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
-  .card__hint { margin: 4px 0 10px; font-size: 12px; color: var(--brand); font-weight: 600; }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
-  .muted { color: var(--muted); }
-  .empty { padding: 28px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); }
-  footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-  @media (max-width: 640px) {
-    .wrap { padding: 32px 16px 60px; }
-    h1 { font-size: 30px; }
-    .next { flex-direction: column; gap: 10px; }
-    .next__version { align-self: flex-start; }
-    table { font-size: 12px; }
-    th, td { padding: 9px 10px; }
-    th:nth-child(1), td:nth-child(1), th:nth-child(3), td:nth-child(3) { display: none; }
-  }
+${tokens}
+${workbenchCss}
 </style>
 </head>
 <body>
@@ -467,6 +432,11 @@ function renderGallery(prd, state, reqs, screens, covered) {
     }</p>
     <p class="generated">这个页面由 AI 自动生成，不用手改。</p>
   </header>
+
+  <section class="build build--${buildClass}">
+    <p class="build__title"><span class="build__icon">${buildIcon}</span>${esc(buildTitle)}</p>
+    <p class="build__note">${esc(buildNote)}</p>${buildDetail}
+  </section>
 
   <section class="next">
     <div>
@@ -481,7 +451,7 @@ function renderGallery(prd, state, reqs, screens, covered) {
     <ol>
       <li>把想要的功能直接说给 AI，不用先写文档。</li>
       <li>点下面的页面看原型，把不满意的地方告诉 AI。</li>
-      <li>每次改完让 AI「刷新工作台」，它会自己检查两边是否一致。</li>
+      <li>每次改完让 AI「刷新工作台」，它会自己检查两边是否一致；顶部会显示检查结果。</li>
     </ol>
     <p class="howto__note">不需要 git，不需要命令行，也不需要懂代码。不要自己改这个页面。</p>
     <p class="howto__note">常用说法：「我有个想法……先问我几个关键问题」「把首页改简单点」「帮我评审，看看哪里不一致」。</p>
@@ -532,18 +502,16 @@ function renderGallery(prd, state, reqs, screens, covered) {
 
 function main() {
   const prdText = readText(PRD);
-  if (!prdText) return report();
+  const prd = prdText ? parseFrontMatter(prdText, PRD) : {};
+  if (prdText) validatePrd(prd);
 
-  const prd = parseFrontMatter(prdText, PRD);
-  validatePrd(prd);
-
-  const body = prdText.replace(/^---\r?\n[\s\S]*?\r?\n---/, '');
+  const body = prdText ? prdText.replace(/^---\r?\n[\s\S]*?\r?\n---/, '') : '';
   const reqs = parseRequirements(body, PRD);
   const reqMap = validateRequirements(reqs);
 
   const stateText = readText(STATE);
   const state = stateText ? parseFrontMatter(stateText, STATE) : {};
-  validateState(state, prd);
+  if (stateText) validateState(state, prd);
 
   const screens = walkHtml(SCREENS_DIR).map(parseScreen);
   if (screens.length === 0 && [...reqMap.values()].some((r) => ['prototyped', 'approved', 'delivered'].includes(r.status))) {
@@ -552,20 +520,19 @@ function main() {
   const covered = validateScreens(screens, reqMap);
   validateCoverage(reqMap, covered);
 
-  if (errors.length === 0) {
-    const html = renderGallery(prd, state, reqs, screens, covered);
-    let current = null;
-    try {
-      current = fs.readFileSync(GALLERY, 'utf8');
-    } catch {
-      current = null;
-    }
-    if (current !== html) {
-      if (CHECK_ONLY) {
-        fail('工作台.html 已过期：运行 npm run sync 重新生成');
-      } else {
-        fs.writeFileSync(GALLERY, html);
-      }
+  // 即使检查失败也要生成工作台：把失败状态直接显示给人看，而不是静默保留旧页面。
+  const html = renderGallery(prd, state, reqs, screens, covered, { errors, warnings });
+  let current = null;
+  try {
+    current = fs.readFileSync(GALLERY, 'utf8');
+  } catch {
+    current = null;
+  }
+  if (current !== html) {
+    if (CHECK_ONLY) {
+      fail('工作台.html 已过期：运行 npm run sync 重新生成');
+    } else {
+      fs.writeFileSync(GALLERY, html);
     }
   }
 

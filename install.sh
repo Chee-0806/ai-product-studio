@@ -7,6 +7,7 @@
 # 选项：
 #   --name "产品名"   显示在产品 PRD / 工作台里的名字
 #   --git             新目录初始化 git（不自动提交）
+#   --with-pack <包>  同时安装可选内容包，例如 pm-methods
 #   --ref <ref>       使用指定分支/标签/commit（默认 main）
 set -euo pipefail
 
@@ -16,7 +17,7 @@ REF="${FOR_JASMINE_REF:-main}"
 usage() {
   cat <<'EOF'
 用法：
-  bash install.sh install <目录> [--name "产品名"] [--git] [--ref <分支/标签>]
+  bash install.sh install <目录> [--name "产品名"] [--git] [--with-pack pm-methods] [--ref <分支/标签>]
 
 示例：
   bash install.sh install ../宝宝喂养 --name "宝宝喂养"

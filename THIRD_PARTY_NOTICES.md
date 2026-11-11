@@ -1,6 +1,6 @@
 # 第三方与来源说明
 
-本仓库的 `skills/` 中有 8 个技能来自 Anthropic 官方开源仓库，做了本地化适配；其余技能为本工位自有。
+本仓库的 `packs/pm-methods/skills/` 中有 8 个可选技能来自 Anthropic 官方开源仓库，做了本地化适配；其余技能为本工位自有。内容包默认不安装。
 
 ## Anthropic knowledge-work-plugins
 
@@ -15,14 +15,14 @@
 
 | 本仓库文件 | 上游路径 |
 | --- | --- |
-| `skills/write-spec/SKILL.md` | `product-management/skills/write-spec/SKILL.md` |
-| `skills/roadmap-update/SKILL.md` | `product-management/skills/roadmap-update/SKILL.md` |
-| `skills/synthesize-research/SKILL.md` | `product-management/skills/synthesize-research/SKILL.md` |
-| `skills/stakeholder-update/SKILL.md` | `product-management/skills/stakeholder-update/SKILL.md` |
-| `skills/product-brainstorming/SKILL.md` | `product-management/skills/product-brainstorming/SKILL.md` |
-| `skills/metrics-review/SKILL.md` | `product-management/skills/metrics-review/SKILL.md` |
-| `skills/competitive-brief/SKILL.md` | `product-management/skills/competitive-brief/SKILL.md` |
-| `skills/sprint-planning/SKILL.md` | `product-management/skills/sprint-planning/SKILL.md` |
+| `packs/pm-methods/skills/write-spec/SKILL.md` | `product-management/skills/write-spec/SKILL.md` |
+| `packs/pm-methods/skills/roadmap-update/SKILL.md` | `product-management/skills/roadmap-update/SKILL.md` |
+| `packs/pm-methods/skills/synthesize-research/SKILL.md` | `product-management/skills/synthesize-research/SKILL.md` |
+| `packs/pm-methods/skills/stakeholder-update/SKILL.md` | `product-management/skills/stakeholder-update/SKILL.md` |
+| `packs/pm-methods/skills/product-brainstorming/SKILL.md` | `product-management/skills/product-brainstorming/SKILL.md` |
+| `packs/pm-methods/skills/metrics-review/SKILL.md` | `product-management/skills/metrics-review/SKILL.md` |
+| `packs/pm-methods/skills/competitive-brief/SKILL.md` | `product-management/skills/competitive-brief/SKILL.md` |
+| `packs/pm-methods/skills/sprint-planning/SKILL.md` | `product-management/skills/sprint-planning/SKILL.md` |
 
 ### 修改说明
 

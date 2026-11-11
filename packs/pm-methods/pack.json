@@ -1,0 +1,17 @@
+{
+  "name": "pm-methods",
+  "version": "1.0.0",
+  "description": "Anthropic 官方产品管理方法：写 PRD、定范围、研究归纳、汇报、发散、指标、竞品、排期。可选安装，不参与一致性闭环。",
+  "source": "https://github.com/anthropics/knowledge-work-plugins/tree/877a617b435ee2edfb002d9a3703c0a1a03aa1ba/product-management",
+  "license": "Apache-2.0",
+  "skills": [
+    "write-spec",
+    "roadmap-update",
+    "synthesize-research",
+    "stakeholder-update",
+    "product-brainstorming",
+    "metrics-review",
+    "competitive-brief",
+    "sprint-planning"
+  ]
+}

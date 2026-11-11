@@ -19,10 +19,13 @@
 
   --danger: #d92d20;
   --danger-weak: #fef3f2;
+  --danger-line: #f4c7c3;
   --success: #067647;
   --success-weak: #ecfdf3;
+  --success-line: #bfe8d9;
   --warn: #b54708;
   --warn-weak: #fffaeb;
+  --warn-line: #f0d9a8;
 
   --radius-xs: 8px;
   --radius-sm: 12px;

@@ -20,20 +20,22 @@ const args = process.argv.slice(2);
 const opts = parseArgs(args);
 if (opts.help) {
   console.log(`用法：
-  npm run new -- <目录> [--name "产品名"] [--git]
+  npm run new -- <目录> [--name "产品名"] [--git] [--with-pack pm-methods]
 
 不传参数时进入交互模式。
-目标目录必须在模板目录之外；推荐放在 ../项目名。`);
+目标目录必须在模板目录之外；推荐放在 ../项目名。
+--with-pack 会在新工位里安装可选内容包；默认不安装。`);
   process.exit(0);
 }
 
 function parseArgs(argv) {
-  const parsed = { target: '', name: '', git: false, help: false };
+  const parsed = { target: '', name: '', git: false, help: false, withPack: '' };
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === '--help' || arg === '-h') parsed.help = true;
     else if (arg === '--git') parsed.git = true;
     else if (arg === '--name') parsed.name = argv[++index] || '';
+    else if (arg === '--with-pack') parsed.withPack = argv[++index] || '';
     else if (!arg.startsWith('--') && !parsed.target) parsed.target = arg;
   }
   return parsed;
@@ -96,7 +98,7 @@ async function main() {
   for (const file of ['AGENTS.md', 'CLAUDE.md', '.gitignore', 'package.json', 'THIRD_PARTY_NOTICES.md']) {
     copyFile(file);
   }
-  for (const dir of ['skills', 'scripts', 'docs', 'LICENSES', 'prototype/assets', 'prototype/spikes']) {
+  for (const dir of ['skills', 'packs', 'scripts', 'docs', 'LICENSES', 'prototype/assets', 'prototype/spikes']) {
     copyDir(dir);
   }
 
@@ -256,16 +258,42 @@ next_action: 先找 3 位目标用户聊一聊，把问题定义写清楚
 - 「帮我评审，看看 PRD 和原型哪里不一致」
 - 「改现有页面 / 改文案」
 
+## 可选方法包
+
+默认只装 3 个核心技能：\`prototype\`、\`review\`、\`change\`。需要访谈归纳、竞品、指标、汇报、发散、排期等官方方法时：
+
+\`\`\`bash
+npm run pack:list
+npm run pack:add -- pm-methods
+npm run pack:remove -- pm-methods
+\`\`\`
+
+\`packs/\` 是内容包源文件，不安装时不参与路由；不需要可以整个删除。
+
 ## 命令（给维护者/AI）
 
 - \`npm run check\`：检查 PRD、原型、技能格式
 - \`npm run sync\`：刷新工作台
 - \`npm run export\`：生成给研发的交付包（\`dist/\` 下的文件夹和 zip）
+- \`npm run pack:add -- <包名>\`：安装可选方法包
 - \`npm run dev\`：可选，本地预览
 
 完整规则见 \`AGENTS.md\`，工作流见 \`docs/workflow.md\`。
 `;
   fs.writeFileSync(path.join(target, 'README.md'), readme);
+
+  if (opts.withPack) {
+    const pack = spawnSync(process.execPath, ['scripts/pack.mjs', 'add', opts.withPack], {
+      cwd: target,
+      encoding: 'utf8',
+    });
+    if (pack.status !== 0) {
+      console.error(pack.stdout);
+      console.error(pack.stderr);
+      fail(`内容包安装失败：${opts.withPack}`);
+    }
+    console.log(pack.stdout.trim());
+  }
 
   const sync = spawnSync(process.execPath, ['scripts/sync.mjs'], { cwd: target, encoding: 'utf8' });
   if (sync.status !== 0) {
