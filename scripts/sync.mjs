@@ -462,7 +462,9 @@ function renderGallery(prd, state, reqs, screens, covered) {
   <header>
     <p class="eyebrow">产品工作台</p>
     <h1>${esc(prd.product || '未命名产品')}</h1>
-    <p class="sub">当前阶段：${esc(stageLabel)} · 规格 v${esc(prd.version || '0.0.0')} · 更新于 ${esc(prd.updated || '—')} · ${done.length}/${active.length} 个需求已有原型</p>
+    <p class="sub">当前阶段：${esc(stageLabel)} · 规格 v${esc(prd.version || '0.0.0')} · 更新于 ${esc(prd.updated || '—')} · ${
+      active.length ? `${done.length}/${active.length} 个需求已有原型` : '还没有需求'
+    }</p>
     <p class="generated">这个页面由 AI 自动生成，不用手改。</p>
   </header>
 
@@ -570,7 +572,7 @@ function main() {
   const active = reqs.filter((r) => r.status !== 'dropped');
   const done = active.filter((r) => (covered.get(r.id) || []).length > 0);
   console.log(`PRD v${prd.version || '?'} · ${reqs.length} 个需求 · ${screens.length} 个页面`);
-  console.log(`覆盖：${done.length}/${active.length} 个有效需求已出原型`);
+  console.log(active.length ? `覆盖：${done.length}/${active.length} 个有效需求已出原型` : '覆盖：还没有需求');
   report();
 }
 

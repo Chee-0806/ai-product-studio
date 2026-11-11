@@ -215,6 +215,8 @@ THIRD_PARTY_NOTICES.md    外部技能来源、许可证与修改说明
 LICENSES/                 第三方许可证原文
 scripts/sync.mjs          一致性校验 + 工作台生成
 scripts/check-skills.mjs  技能格式校验
+scripts/export.mjs        生成研发交付包
+scripts/new.mjs           从模板创建新项目
 docs/                     工作流、一致性模型、原型规范、评审清单
 dist/                     导出的交付包，生成物，不提交
 STATE.md                  会话交接板

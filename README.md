@@ -169,6 +169,8 @@ LICENSES/                 第三方许可证原文
 scripts/
   sync.mjs                一致性检查 + 生成工作台
   check-skills.mjs        技能格式检查
+  export.mjs              生成研发交付包
+  new.mjs                 从模板创建新项目
   serve.mjs               可选的本地预览服务
 
 docs/                     工作流、一致性模型、原型规范、评审清单
@@ -215,20 +217,47 @@ dist/                     导出的交付包（生成物，不提交）
 | `npm run sync` | 检查并重建 `工作台.html` |
 | `npm run check` | 严格检查，失败即退出（含技能格式） |
 | `npm run check:skills` | 只检查 `skills/` 格式 |
+| `npm run new` | 从模板创建一个新项目 |
 | `npm run export` | 生成给研发的交付包和 zip |
 | `npm run dev` | 可选：本地预览，默认 http://localhost:4173 |
 
 不需要 `npm install`，没有运行时依赖。
 
-## 换成她自己的产品
+## 开新项目
 
-1. 改 `product/PRD.md` 的 front matter：产品名、`version: 0.1.0`、日期、负责人。
-2. 清空示例需求与变更记录，留一条她自己的需求（或全部删掉，空 PRD 也能通过检查）。
-3. 改 `STATE.md`：`stage: discovery`、`spec_version` 与 PRD 一致、写清 `next_action`。
-4. 删除或替换 `prototype/screens/*.html`，保留 `assets/` 的样式；运行 `npm run sync`。
-5. 双击 `工作台.html`，应该看到她的产品名和「下一步」。
+模板目录保留不动；每个产品单独生成一个工位：
 
-示例内容建议先留着跑通一遍，再删。它演示了「待做原型 / 原型已完成 / 已砍」三种状态。
+```bash
+npm run new -- ../宝宝喂养 --name "宝宝喂养"
+```
+
+这类做法参考了 [Vite 的 `npm create`](https://vite.dev/guide/#scaffolding-your-first-vite-project)、[Spec Kit 的 `specify init`](https://github.github.com/spec-kit/installation.html) 和 [Spring CLI 的 `boot new`](https://docs.spring.io/spring-cli/reference/ref/project/comments-on-the-approach.html)：**从一份可运行的骨架复制**，而不是让用户从空目录拼模板。区别是这里不发布 npm 包，只保留一个本地脚本，够用且没有额外依赖。
+
+不带参数会进入交互模式：
+
+```bash
+npm run new
+```
+
+新工位会得到一套干净的骨架：
+
+- 新的 `product/PRD.md`（`0.1.0`、空需求、待补充的摘要与指标）；
+- 新的 `STATE.md`（`discovery` 阶段 + 下一步）；
+- 空的 `prototype/screens/`，没有示例页面；
+- 复制 `AGENTS.md`、`skills/`、`docs/`、脚本、样式和许可证说明；
+- 自动生成 `工作台.html`，并通过一致性检查；
+- 不复制示例 PRD、示例原型、`.git` 历史和 `dist/`。
+
+可选参数：
+
+- `--name "产品名"`：PRD 和工作台显示的名字；默认用目录名；
+- `--git`：新目录初始化 git（不自动提交）。
+
+**不要在模板目录里面创建项目**，目标目录必须在模板之外（例如 `../项目名`）。生成后，用 AI 打开新目录，粘贴新 `README.md` 里的开场白即可。
+
+### 不想用命令
+
+也可以手动复制整个文件夹，然后删除示例内容：清空 `product/PRD.md` 的需求、重置 `STATE.md`、删除 `prototype/screens/*.html` 和 `.git`，最后运行 `npm run sync`。不推荐——容易漏掉示例文件，也容易把模板的 git 历史带过去。
 
 ## 设计取舍
 
