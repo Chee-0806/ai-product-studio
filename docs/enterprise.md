@@ -86,7 +86,7 @@ basis_required: true
 - 复制 `product/PRD.md` 为 `PRD.md`；需要可读版时生成 `PRD.html` 或 PDF；
 - 多页：复制 `prototype/screens/` 与 `prototype/assets/`；
 - SPA：复制入口、脚本、数据与样式；`screens.json`、`external.json`、`previews/`、`spikes/` 不进入交付包；
-- 生成 `index.html` 与 `README.md`，列出包内文件、需求→页面表、外部资源域名；
+- 生成 `prototype/index.html` 作为原型目录，根 `index.html` 链接 PRD 与原型目录；`README.md` 列出包内文件、需求→页面表、外部资源域名；
 - 把原型里的 `工作台.html` 回链改成交付包内的原型目录；
 - 内部工作台、`STATE.md`、`AGENTS.md`、`skills/`、`docs/`、`scripts/`、调研与决策不进入交付包；
 - `zip -r` 打包后，用 `file://` 抽查入口、PRD 与原型。

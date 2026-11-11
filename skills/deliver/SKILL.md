@@ -39,7 +39,8 @@ description: 当用户要导出交付包、评审材料、Word/PPT、发给研�
    - 复制 `product/PRD.md` 为 `PRD.md`；需要可读版时用 `pandoc` 或直接生成 `PRD.html`，没有工具就只交付 Markdown 并说明；
    - 多页原型复制 `prototype/screens/` 与 `prototype/assets/`；SPA 复制入口及其依赖的脚本/样式/数据，排除 `screens.json`、`external.json`、`previews/`、`spikes/`；
    - 把复制后原型里的 `工作台.html` 回链改成指向交付包内的原型目录（多页 `../index.html`，SPA 根入口 `index.html`）；
-   - 生成 `index.html` 与 `README.md`：产品、版本、日期、包内文件、需求→页面表、外部资源说明；
+   - 生成 `prototype/index.html` 作为原型目录（多页列页面，SPA 列路由），根 `index.html` 链接 PRD 与 `prototype/index.html`；
+   - 生成 `README.md`：产品、版本、日期、包内文件、需求→页面表、外部资源说明；
    - 用 `zip -r` 打包；检查包内没有 `STATE.md`、`AGENTS.md`、`skills/`、`docs/`、`scripts/`、`discovery/`、`decisions/`、`工作台.html`；
    - 用 `file://` 抽查 `index.html`、`PRD.html` 或 `PRD.md`、原型入口。
    - 如果对方要求不同目录或字段，按对方模板调整；不要为了一个项目新增脚本。
