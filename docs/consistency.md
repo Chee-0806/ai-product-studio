@@ -29,7 +29,7 @@
 
 ## 4. 校验规则
 
-`npm run check` 等价于 `node scripts/sync.mjs --check --strict`。
+`npm run check` = `node scripts/check-skills.mjs && node scripts/sync.mjs --check --strict`。
 
 ### PRD
 
@@ -67,6 +67,14 @@
 - `stage` ∈ `discovery | prd | prototype | review | handoff`；
 - `spec_version` === PRD `version`；
 - `工作台.html` 必须与脚本生成结果逐字一致。
+
+### 技能
+
+- `skills/<name>/SKILL.md` 必须有 `name`、`description`；
+- `name` 必须与目录名一致，且只含小写英文/数字/短横线；
+- 必须有「## 什么时候用」；
+- 不能留 `TODO` / `FIXME`；
+- 正文超过 120 行会告警。
 
 ## 5. 报错怎么修
 

@@ -59,12 +59,36 @@ prototype/
   spikes/                 探索稿，不进入工作台
   assets/                 共享视觉样式
 
+skills/                   内置的产品工作流程
+  discovery/              把模糊需求问清
+  scope/                  收敛一期范围
+  prd/                    写/改 PRD
+  prototype/              做页面
+  review/                 评审与查一致性
+  change/                 改需求时两边同步
+
 scripts/
   sync.mjs                一致性检查 + 生成工作台
+  check-skills.mjs        技能格式检查
   serve.mjs               可选的本地预览服务
 
 docs/                     工作流、一致性模型、原型规范、评审清单
 ```
+
+## 内置技能
+
+`skills/` 里放了 6 个产品工作流程，AI 会根据任务自己读：
+
+| 技能 | 解决什么 |
+| --- | --- |
+| `discovery` | 只有模糊想法或访谈材料时，先问清问题与证据 |
+| `scope` | 范围太大时，给出可解释的一期取舍 |
+| `prd` | 新增/修改需求，保证 ID、验收、版本、变更记录齐全 |
+| `prototype` | 把需求做成可点页面，并标好追溯关系 |
+| `review` | 先跑检查，再输出必改/建议/无法验证 |
+| `change` | 改已有需求时，找到所有受影响位置并两边同步 |
+
+产品经理不需要记这些名字；她只要说「帮我评审」「先问我几个问题」「把首页改简单点」，AI 会选技能。技能格式由 `npm run check:skills` 校验，也包含在 `npm run check` 里。
 
 ## 一致性是怎么保证的
 
@@ -91,7 +115,8 @@ docs/                     工作流、一致性模型、原型规范、评审清
 | 命令 | 作用 |
 | --- | --- |
 | `npm run sync` | 检查并重建 `工作台.html` |
-| `npm run check` | 严格检查，失败即退出 |
+| `npm run check` | 严格检查，失败即退出（含技能格式） |
+| `npm run check:skills` | 只检查 `skills/` 格式 |
 | `npm run dev` | 可选：本地预览，默认 http://localhost:4173 |
 
 不需要 `npm install`，没有运行时依赖。

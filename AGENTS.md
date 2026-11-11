@@ -38,6 +38,21 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 
 然后用一句话复述：**当前阶段 + 你准备做什么 + 会改哪些需求/页面**。如果用户请求与 PRD 冲突，先指出冲突，不要默默改需求。
 
+### 技能路由
+
+任务匹配时，先读对应的 `skills/<name>/SKILL.md`，再动手：
+
+| 任务 | 技能 |
+| --- | --- |
+| 模糊想法、访谈材料、需求澄清 | `skills/discovery/SKILL.md` |
+| 范围太大、定一期做什么 | `skills/scope/SKILL.md` |
+| 新增/修改 PRD 需求 | `skills/prd/SKILL.md` |
+| 做页面、改界面 | `skills/prototype/SKILL.md` |
+| 评审、查一致性 | `skills/review/SKILL.md` |
+| 改已有需求/页面/文案 | `skills/change/SKILL.md` |
+
+技能只写流程，不写产品需求；与 `AGENTS.md` 冲突时以本文件为准。
+
 ## 4. 工作流与门禁
 
 | 阶段 | 进入条件 | 产物 | 退出条件 |
@@ -86,7 +101,7 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 ### 5.4 生成物
 
 - **禁止手改 `工作台.html`**，它由 `node scripts/sync.mjs` 生成。
-- 每次改动结束都跑 `npm run sync` 和 `npm run check`；必须通过。不要要求用户代跑。
+- 每次改动结束都跑 `npm run sync` 和 `npm run check`；必须通过。不要要求用户代跑。`npm run check` 同时校验 PRD/原型一致性与技能格式。
 
 ## 6. 一次变更的标准动作
 
@@ -179,7 +194,9 @@ product/decisions/        ADR：一次决策一个文件，只增不改
 prototype/screens/        正式原型，进入工作台，必须带 data-req
 prototype/spikes/         探索稿，不进入工作台，不得被正式页面链接
 prototype/assets/         共享 tokens 与组件样式
+skills/                   可复用的产品工作流程（SKILL.md）
 scripts/sync.mjs          一致性校验 + 工作台生成
+scripts/check-skills.mjs  技能格式校验
 docs/                     工作流、一致性模型、原型规范、评审清单
 STATE.md                  会话交接板
 ```

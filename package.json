@@ -4,7 +4,8 @@
   "type": "module",
   "description": "AI 协作产品设计工位：PRD 与 HTML 原型保持结构、进度一致的模板工程",
   "scripts": {
-    "check": "node scripts/sync.mjs --check --strict",
+    "check": "node scripts/check-skills.mjs && node scripts/sync.mjs --check --strict",
+    "check:skills": "node scripts/check-skills.mjs",
     "sync": "node scripts/sync.mjs",
     "dev": "node scripts/serve.mjs"
   },
