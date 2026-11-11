@@ -134,6 +134,15 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 6. npm run sync（重建工作台）→ npm run check
 ```
 
+### 6.1 交付给研发
+
+- 不要把整个工作区打包发；内部工作台、`STATE.md`、脚本、调研与决策不属于交付物。
+- 用户说「发给研发」「导出交付包」时，运行 `npm run export`；它会先跑 `npm run check`。
+- 产物：`dist/<产品>-v<版本>/` 与同名 `.zip`。入口是 `index.html`，PRD 是 `PRD.html` / `PRD.md`，原型是 `prototype/index.html`。
+- **只发 zip**；系统没有 `zip` 命令时，发 `dist/<产品>-v<版本>/` 文件夹。
+- `dist/` 是生成物，不手改、不提交。
+- 评审通过后，主动问用户是否要导出交付包。
+
 ## 7. 状态语义
 
 | 状态 | 含义 | 校验行为 |
@@ -207,5 +216,6 @@ LICENSES/                 第三方许可证原文
 scripts/sync.mjs          一致性校验 + 工作台生成
 scripts/check-skills.mjs  技能格式校验
 docs/                     工作流、一致性模型、原型规范、评审清单
+dist/                     导出的交付包，生成物，不提交
 STATE.md                  会话交接板
 ```

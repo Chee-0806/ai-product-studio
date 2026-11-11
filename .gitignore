@@ -2,3 +2,4 @@
 node_modules/
 *.log
 prototype/spikes/**/*.local.*
+dist/

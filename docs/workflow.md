@@ -113,7 +113,8 @@ draft ──► prototyped ──► approved ──► delivered
 
 评审通过后：
 
-- 工作台链接直接发给参会人；
+- 运行 `npm run export`，生成 `dist/<产品>-v<版本>/` 与同名 zip；**只把 zip 发给研发**，不要发整个工作区。
+- 目录页链接可以发给参会人看原型；研发以交付包里的 `PRD.html` + `prototype/index.html` 为准。
 - 需要文档时从 PRD 导出，不另写一份「精简版需求」（会变成第二份真相）；
 - `prototype/spikes/` 里未被采纳的探索，在阶段结束时删除或移到归档分支；
 - 新决策追加 ADR，旧 ADR 标记 `superseded by`。

@@ -7,6 +7,7 @@
     "check": "node scripts/check-skills.mjs && node scripts/sync.mjs --check --strict",
     "check:skills": "node scripts/check-skills.mjs",
     "sync": "node scripts/sync.mjs",
+    "export": "npm run sync && npm run check && node scripts/export.mjs",
     "dev": "node scripts/serve.mjs"
   },
   "engines": {
