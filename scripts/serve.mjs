@@ -26,7 +26,7 @@ const server = http.createServer((req, res) => {
   const url = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
   let pathname = decodeURIComponent(url.pathname);
   if (pathname === '/') {
-    res.writeHead(302, { location: '/prototype/index.html' }).end();
+    res.writeHead(302, { location: encodeURI('/工作台.html') }).end();
     return;
   }
 

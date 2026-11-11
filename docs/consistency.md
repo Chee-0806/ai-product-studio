@@ -17,7 +17,7 @@
 | 需求、行为、验收 | `product/PRD.md` | 页面注释、STATE、README |
 | 界面结构、交互、视觉 | `prototype/screens/*.html` | PRD 的布局描述 |
 | 是否做到 | REQ 的 `状态` | 单独的进度表 |
-| 需求 ↔ 页面 | 由 `data-req` 推导 | 手工映射表、目录页 |
+| 需求 ↔ 页面 | 由 `data-req` 推导 | 手工映射表（工作台由脚本生成） |
 | 为什么 | `product/decisions/*.md` | PRD 的长篇理由 |
 | 本次协作到哪 | `STATE.md` | 聊天记录 |
 
@@ -25,7 +25,7 @@
 
 1. **原型不能发明需求**：每个 `data-req` 必须指向 PRD 中存在的 REQ。
 2. **状态不能虚报**：`prototyped` / `approved` / `delivered` 必须有页面覆盖；`dropped` 不得有页面。
-3. **版本不能分叉**：`STATE.md` 的 `spec_version` 必须等于 PRD 的 `version`；目录页必须是最新生成物。
+3. **版本不能分叉**：`STATE.md` 的 `spec_version` 必须等于 PRD 的 `version`；工作台必须是最新生成物。
 
 ## 4. 校验规则
 
@@ -66,7 +66,7 @@
 - `STATE.md` 必须有 `stage`、`spec_version`、`updated`、`next_action`；
 - `stage` ∈ `discovery | prd | prototype | review | handoff`；
 - `spec_version` === PRD `version`；
-- `prototype/index.html` 必须与脚本生成结果逐字一致。
+- `工作台.html` 必须与脚本生成结果逐字一致。
 
 ## 5. 报错怎么修
 
@@ -85,13 +85,13 @@
 
 改 PRD 后同步 `STATE.md`。版本只存在于 PRD，STATE 是镜像。
 
-### `prototype/index.html 已过期`
+### `工作台.html 已过期`
 
 ```bash
 npm run sync
 ```
 
-不要手改生成物。CI 会在 PR 上拦截过期目录页。
+不要手改生成物。检查由 AI 在每次改动后自动运行，用户不需要执行命令。
 
 ### `需求 ID 重复` / `页面 ID 重复`
 
@@ -103,11 +103,11 @@ ID 永不复用。删除需求用 `dropped`；页面改名时同时改 `screen:i
 
 ### `PRD 里还没有需求`
 
-空 PRD 是合法初始状态，不报错。新增第一条 REQ 后目录页会更新。
+空 PRD 是合法初始状态，不报错。新增第一条 REQ 后工作台会更新。
 
 ## 6. 为什么不做自动修复
 
-脚本只自动生成目录页，不自动改状态或补 `data-req`。这些动作包含判断：
+脚本只自动生成工作台，不自动改状态或补 `data-req`。这些动作包含判断：
 
 - 页面到底实现了哪条需求；
 - 需求到底做没做；
@@ -115,11 +115,11 @@ ID 永不复用。删除需求用 `dropped`；页面改名时同时改 `screen:i
 
 自动猜会让错误变得「看起来已修复」。脚本负责**让矛盾可见**，判断留给人。
 
-## 7. 接入 CI 与提交钩子
+## 7. 谁负责运行检查
 
-- GitHub Actions：`.github/workflows/spec-sync.yml`，push / PR 跑 `npm run check`。
-- 本地钩子：`npm run hooks` 后，涉及 `product/`、`prototype/`、`docs/`、`STATE.md` 的提交会先校验。
-- 不建议用 `git commit --no-verify` 绕过；如果确实要紧急提交，先记录在 `STATE.md` 的待办里，下一次会话补。
+- **AI**：每次改动结束都运行 `npm run sync && npm run check`，失败自己修；不要把命令推给用户。
+- **用户**：不需要运行任何命令，只需要双击 `工作台.html` 看结果。
+- **维护者（可选）**：如果仓库放在 git 里，agent 可以在检查通过后自动提交留底；不要求用户理解或操作 git，也不配置 CI / 提交钩子。
 
 ## 8. 已知限制
 
@@ -127,6 +127,7 @@ ID 永不复用。删除需求用 `dropped`；页面改名时同时改 `screen:i
 - 无法判断页面文案与 PRD 中「」引用是否逐字一致；
 - 无法判断验收标准是否真的覆盖了所有边界态；
 - 无法判断原型交互是否符合真实业务规则；
-- 页面嵌套目录只校验文件，不校验链接是否可达。
+- 页面嵌套目录只校验文件，不校验链接是否可达；
+- 工作台缩略图只内联 `assets/app.css` 与页面自身；页面若引用外部图片/字体，缩略图可能不显示，但直接打开页面正常。
 
 这些由 `docs/review-checklist.md` 覆盖。评审时明确写出「无法验证」的项，不要默认通过。

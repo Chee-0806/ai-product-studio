@@ -6,8 +6,7 @@
   "scripts": {
     "check": "node scripts/sync.mjs --check --strict",
     "sync": "node scripts/sync.mjs",
-    "dev": "node scripts/serve.mjs",
-    "hooks": "git config core.hooksPath .githooks"
+    "dev": "node scripts/serve.mjs"
   },
   "engines": {
     "node": ">=18"

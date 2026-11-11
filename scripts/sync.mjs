@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * 校验 PRD 与原型的一致性，并生成 prototype/index.html 目录页。
+ * 校验 PRD 与原型的一致性，并生成根目录的「工作台.html」。
  *
- *   node scripts/sync.mjs           校验 + 重建目录页
- *   node scripts/sync.mjs --check   只校验（CI 用，目录页过期即失败）
+ *   node scripts/sync.mjs           校验 + 重建工作台
+ *   node scripts/sync.mjs --check   只校验（工作台过期即失败）
  *   node scripts/sync.mjs --strict  把警告也视为失败（npm run check 默认开启）
  */
 import fs from 'node:fs';
@@ -17,7 +17,7 @@ const STRICT = process.argv.includes('--strict');
 const PRD = path.join(ROOT, 'product/PRD.md');
 const STATE = path.join(ROOT, 'STATE.md');
 const SCREENS_DIR = path.join(ROOT, 'prototype/screens');
-const GALLERY = path.join(ROOT, 'prototype/index.html');
+const GALLERY = path.join(ROOT, '工作台.html');
 
 const errors = [];
 const warnings = [];
@@ -31,8 +31,8 @@ const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 const STATUS = {
-  draft: { label: '草稿', cls: 'draft' },
-  prototyped: { label: '已出原型', cls: 'prototyped' },
+  draft: { label: '待做原型', cls: 'draft' },
+  prototyped: { label: '原型已完成', cls: 'prototyped' },
   approved: { label: '已评审', cls: 'approved' },
   delivered: { label: '已交付', cls: 'delivered' },
   dropped: { label: '已砍', cls: 'dropped' },
@@ -49,6 +49,13 @@ const STATUS_ALIASES = {
   不做: 'dropped',
 };
 const STAGES = ['discovery', 'prd', 'prototype', 'review', 'handoff'];
+const STAGE_LABELS = {
+  discovery: '调研问题',
+  prd: '写需求',
+  prototype: '做原型',
+  review: '评审',
+  handoff: '交接研发',
+};
 
 function readText(file) {
   try {
@@ -246,7 +253,7 @@ function validateScreens(screens, reqMap) {
   for (const screen of screens) {
     if (!screen.id) fail(`${screen.relFile}：缺少 <meta name="screen:id">`);
     if (!screen.title) fail(`${screen.relFile}：缺少 <meta name="screen:title">`);
-    if (!screen.flow) warn(`${screen.relFile}：缺少 <meta name="screen:flow">，目录页会归入「未分组」`);
+    if (!screen.flow) warn(`${screen.relFile}：缺少 <meta name="screen:flow">，工作台会归入「未分组」`);
     if (screen.id) {
       if (ids.has(screen.id)) fail(`页面 ID 重复：${screen.id}（${screen.relFile} 与 ${ids.get(screen.id)}）`);
       else ids.set(screen.id, screen.relFile);
@@ -282,7 +289,19 @@ function validateCoverage(reqMap, covered) {
   }
 }
 
-function renderGallery(prd, reqs, screens, covered) {
+function screenPreviewHtml(file, tokens, appCss) {
+  let html = fs.readFileSync(file, 'utf8');
+  const css = `${tokens}\n${appCss.replace(/@import url\("\.\/tokens\.css"\);\s*/, '')}`;
+  html = html.replace(/<link[^>]+href=["']\.\.\/assets\/app\.css["'][^>]*>/i, `<style>\n${css}\n</style>`);
+  html = html.replace(/\s*<a class="proto-link"[\s\S]*?<\/a>/, '');
+  return html;
+}
+
+function renderGallery(prd, state, reqs, screens, covered) {
+  const tokens = fs.readFileSync(path.join(ROOT, 'prototype/assets/tokens.css'), 'utf8');
+  const appCss = fs.readFileSync(path.join(ROOT, 'prototype/assets/app.css'), 'utf8');
+  const stageLabel = STAGE_LABELS[state.stage] || state.stage || '未设置';
+  const nextAction = state.next_action || '先读一遍 PRD，确定下一步要做什么';
   const sortedReqs = [...reqs].sort((a, b) => cmp(a.id, b.id));
   const reqOrder = (screen) =>
     screen.reqs.length ? Math.min(...screen.reqs.map((id) => Number(id.slice(4)))) : 9999;
@@ -309,7 +328,7 @@ function renderGallery(prd, reqs, screens, covered) {
       const screensForReq = covered.get(req.id) || [];
       const links = screensForReq.length
         ? screensForReq
-            .map((s) => `<a href="${esc(s.relFile.replace(/^prototype\//, ''))}">${esc(s.title || s.id)}</a>`)
+            .map((s) => `<a href="${esc(s.relFile)}">${esc(s.title || s.id)}</a>`)
             .join('、')
         : '<span class="muted">—</span>';
       return `<tr class="${req.status === 'dropped' ? 'is-dropped' : ''}">
@@ -330,15 +349,15 @@ function renderGallery(prd, reqs, screens, covered) {
         ${list
           .map(
             (screen) => `<article class="card">
-          <a class="card__frame" href="${esc(screen.relFile.replace(/^prototype\//, ''))}" aria-label="打开 ${esc(screen.title)}">
-            <iframe src="${esc(screen.relFile.replace(/^prototype\//, ''))}" title="${esc(screen.title)}" loading="lazy" tabindex="-1"></iframe>
+          <a class="card__frame" href="${esc(screen.relFile)}" aria-label="打开 ${esc(screen.title)}">
+            <iframe srcdoc="${esc(screenPreviewHtml(screen.file, tokens, appCss))}" title="${esc(screen.title)}" loading="lazy" tabindex="-1"></iframe>
           </a>
           <div class="card__body">
             <div class="card__head">
               <h3>${esc(screen.title || screen.id)}</h3>
               <span class="flow">${esc(screen.flow || '未分组')}</span>
             </div>
-            <p class="card__path">${esc(screen.relFile)}</p>
+            <p class="card__hint">点击打开可交互原型 →</p>
             <div class="tags">${
               screen.reqs.length
                 ? screen.reqs.map((r) => `<code>${esc(r)}</code>`).join('')
@@ -358,7 +377,7 @@ function renderGallery(prd, reqs, screens, covered) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${esc(prd.product || '原型')} · 原型目录</title>
+<title>${esc(prd.product || '产品')} · 工作台</title>
 <style>
   :root {
     --bg: #f4f5f9; --surface: #fff; --text: #16181d; --muted: #6b7280;
@@ -377,6 +396,17 @@ function renderGallery(prd, reqs, screens, covered) {
   .sub { margin: 10px 0 0; color: var(--muted); font-size: 15px; }
   .generated { margin: 18px 0 0; font-size: 12px; color: var(--muted); }
   .generated code { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; }
+  .next { margin: 26px 0 0; padding: 20px 22px; border-radius: 18px; background: linear-gradient(135deg, #4f46e5, #4338ca); color: #fff; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; box-shadow: 0 14px 34px rgba(79,70,229,.24); }
+  .next__label { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: .14em; color: rgba(255,255,255,.7); }
+  .next h2 { margin: 7px 0 0; font-size: 20px; line-height: 1.45; letter-spacing: -.01em; color: #fff; font-weight: 650; }
+  .next__version { flex: none; padding: 3px 10px; border-radius: 999px; background: rgba(255,255,255,.16); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .howto { margin: 16px 0 0; padding: 18px 20px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+  .howto h2 { margin: 0 0 8px; font-size: 15px; }
+  .howto ol { margin: 0; padding-left: 20px; display: grid; gap: 4px; font-size: 13.5px; color: var(--text); }
+  .howto__note { margin: 10px 0 0; font-size: 12px; color: var(--muted); }
+  .prompt { margin-top: 12px; }
+  .prompt summary { cursor: pointer; font-size: 12px; font-weight: 600; color: var(--brand); }
+  .prompt pre { margin: 10px 0 0; padding: 12px 14px; border-radius: 12px; background: #f7f8fc; border: 1px solid var(--line); white-space: pre-wrap; word-break: break-word; font-family: var(--font); font-size: 12.5px; line-height: 1.6; color: var(--text); }
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 28px 0 36px; }
   .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
   .stat b { display: block; font-size: 26px; letter-spacing: -.02em; }
@@ -407,48 +437,80 @@ function renderGallery(prd, reqs, screens, covered) {
   .card__head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
   .card__head h3 { margin: 0; font-size: 15px; }
   .flow { font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
-  .card__path { margin: 4px 0 10px; font-size: 11px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .card__hint { margin: 4px 0 10px; font-size: 12px; color: var(--brand); font-weight: 600; }
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
   .muted { color: var(--muted); }
   .empty { padding: 28px; text-align: center; color: var(--muted); background: var(--surface); border: 1px dashed var(--line); border-radius: var(--radius); }
   footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-  @media (max-width: 640px) { .wrap { padding: 32px 16px 60px; } h1 { font-size: 30px; } }
+  @media (max-width: 640px) {
+    .wrap { padding: 32px 16px 60px; }
+    h1 { font-size: 30px; }
+    .next { flex-direction: column; gap: 10px; }
+    .next__version { align-self: flex-start; }
+    table { font-size: 12px; }
+    th, td { padding: 9px 10px; }
+    th:nth-child(1), td:nth-child(1), th:nth-child(3), td:nth-child(3) { display: none; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">PROTOTYPE GALLERY</p>
+    <p class="eyebrow">产品工作台</p>
     <h1>${esc(prd.product || '未命名产品')}</h1>
-    <p class="sub">PRD v${esc(prd.version || '0.0.0')} · 更新于 ${esc(prd.updated || '—')} · ${done.length}/${active.length} 个有效需求已出原型</p>
-    <p class="generated">本页由 <code>npm run sync</code> 根据 PRD 与 screens 自动生成，请勿手改。</p>
+    <p class="sub">当前阶段：${esc(stageLabel)} · 规格 v${esc(prd.version || '0.0.0')} · 更新于 ${esc(prd.updated || '—')} · ${done.length}/${active.length} 个需求已有原型</p>
+    <p class="generated">这个页面由 AI 自动生成，不用手改。</p>
   </header>
+
+  <section class="next">
+    <div>
+      <p class="next__label">下一步</p>
+      <h2>${esc(nextAction)}</h2>
+    </div>
+    <span class="next__version">v${esc(prd.version || '0.0.0')}</span>
+  </section>
+
+  <section class="howto">
+    <h2>怎么用这个工位</h2>
+    <ol>
+      <li>把想要的功能直接说给 AI，不用先写文档。</li>
+      <li>点下面的页面看原型，把不满意的地方告诉 AI。</li>
+      <li>每次改完让 AI「刷新工作台」，它会自己检查两边是否一致。</li>
+    </ol>
+    <p class="howto__note">不需要 git，不需要命令行，也不需要懂代码。不要自己改这个页面。</p>
+    <details class="prompt">
+      <summary>给 AI 的开场白（点开）</summary>
+      <pre>你是我的产品搭档。先读 AGENTS.md、STATE.md 和 product/PRD.md，用一句话告诉我现在做到哪、下一步做什么。
+然后按我说的改。改完自己运行 npm run sync 和 npm run check，刷新工作台，再告诉我：改了哪些需求、哪些页面、还有什么没定。
+不要要求我运行命令，也不要让我碰 git。</pre>
+    </details>
+  </section>
 
   <section class="stats">
     <div class="stat"><b>${sortedReqs.length}</b><span>需求总数</span></div>
-    <div class="stat"><b>${done.length}</b><span>已出原型（不含已砍）</span></div>
+    <div class="stat"><b>${done.length}</b><span>已有原型（不含已砍）</span></div>
     <div class="stat"><b>${sortedScreens.length}</b><span>原型页面</span></div>
-    <div class="stat"><b>${sortedReqs.filter((r) => r.status === 'draft').length}</b><span>待原型</span></div>
+    <div class="stat"><b>${sortedReqs.filter((r) => r.status === 'draft').length}</b><span>待做原型</span></div>
   </section>
 
   <section>
-    <h2>需求覆盖</h2>
+    <h2>需求进度</h2>
     ${
       sortedReqs.length
         ? `<table>
-      <thead><tr><th>ID</th><th>需求</th><th>优先级</th><th>状态</th><th>覆盖页面</th></tr></thead>
+      <thead><tr><th>ID</th><th>需求</th><th>优先级</th><th>状态</th><th>在哪个页面</th></tr></thead>
       <tbody>${reqRows}</tbody>
     </table>`
-        : '<p class="empty">PRD 里还没有需求。用「### REQ-001 标题」新增第一条。</p>'
+        : '<p class="empty">还没有需求。把想法告诉 AI，它会先帮你写第一条。</p>'
     }
   </section>
 
   <section>
-    <h2>页面</h2>
-    ${sortedScreens.length ? cardsByFlow : '<p class="empty">还没有原型页面。在 prototype/screens/ 下新增 HTML，并带上 screen:id 与 data-req。</p>'}
+    <h2>原型页面</h2>
+    ${sortedScreens.length ? cardsByFlow : '<p class="empty">还没有原型页面。让 AI 先做一个首页。</p>'}
   </section>
 
-  <footer>${esc(prd.product || '')} · ${sortedScreens.length} 个页面 · 规格版本 ${esc(prd.version || '—')} · 由 scripts/sync.mjs 生成</footer>
+  <footer>${esc(prd.product || '')} · ${sortedScreens.length} 个页面 · 规格版本 ${esc(prd.version || '—')} · 由 AI 自动生成</footer>
 </div>
 </body>
 </html>
@@ -478,7 +540,7 @@ function main() {
   validateCoverage(reqMap, covered);
 
   if (errors.length === 0) {
-    const html = renderGallery(prd, reqs, screens, covered);
+    const html = renderGallery(prd, state, reqs, screens, covered);
     let current = null;
     try {
       current = fs.readFileSync(GALLERY, 'utf8');
@@ -487,7 +549,7 @@ function main() {
     }
     if (current !== html) {
       if (CHECK_ONLY) {
-        fail('prototype/index.html 已过期：运行 npm run sync 重新生成');
+        fail('工作台.html 已过期：运行 npm run sync 重新生成');
       } else {
         fs.writeFileSync(GALLERY, html);
       }
