@@ -55,14 +55,15 @@ for (const dir of dirs) {
   else if (description.length < 20) warnings.push(`skills/${dir}/SKILL.md：description 太短，写清触发场景`);
 
   const body = match[2];
+  const vendored = text.includes('来源：Anthropic');
   if (!/^##\s+什么时候用/m.test(body)) {
     errors.push(`skills/${dir}/SKILL.md：缺少「## 什么时候用」`);
   }
-  if (!/^##\s+不要做/m.test(body)) {
+  if (!vendored && !/^##\s+不要做/m.test(body)) {
     warnings.push(`skills/${dir}/SKILL.md：建议补「## 不要做」`);
   }
   const lines = body.split(/\r?\n/).length;
-  if (lines > 120) warnings.push(`skills/${dir}/SKILL.md：正文 ${lines} 行，建议控制在 120 行内`);
+  if (!vendored && lines > 120) warnings.push(`skills/${dir}/SKILL.md：正文 ${lines} 行，建议控制在 120 行内`);
   if (/\bTODO\b|\bFIXME\b/.test(text)) {
     errors.push(`skills/${dir}/SKILL.md：不要留 TODO/FIXME`);
   }

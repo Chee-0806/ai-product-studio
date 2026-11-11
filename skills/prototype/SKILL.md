@@ -20,7 +20,7 @@ description: 当需求已存在、需要做成可点击页面或调整现有界�
 
 ## 步骤
 
-1. 确认 REQ 已存在且不是 `dropped`；没有就先走 `prd` 技能。
+1. 确认 REQ 已存在且不是 `dropped`；没有就先走 `write-spec` 技能。
 2. 选一个稳定的 `screen:id`（小写英文/数字/短横线），确定 `screen:title` 与 `screen:flow`。
 3. 复制一个现有页面作为骨架，保留状态栏、手机壳、底部导航。
 4. 写 meta：

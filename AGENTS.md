@@ -44,14 +44,21 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 
 | 任务 | 技能 |
 | --- | --- |
-| 模糊想法、访谈材料、需求澄清 | `skills/discovery/SKILL.md` |
-| 范围太大、定一期做什么 | `skills/scope/SKILL.md` |
-| 新增/修改 PRD 需求 | `skills/prd/SKILL.md` |
-| 做页面、改界面 | `skills/prototype/SKILL.md` |
-| 评审、查一致性 | `skills/review/SKILL.md` |
-| 改已有需求/页面/文案 | `skills/change/SKILL.md` |
+| 模糊想法、探索机会、挑战假设 | `product-brainstorming` |
+| 访谈/问卷/反馈归纳 | `synthesize-research` |
+| 写/改 PRD、用户故事、验收 | `write-spec` |
+| 定范围、排优先级、砍需求 | `roadmap-update` |
+| 竞品与定位分析 | `competitive-brief` |
+| 指标复盘 | `metrics-review` |
+| 周报、汇报、发布公告 | `stakeholder-update` |
+| 排研发迭代（可选） | `sprint-planning` |
+| 做页面、改界面 | `prototype` |
+| 评审、查一致性 | `review` |
+| 改已有需求/页面/文案 | `change` |
 
-技能只写流程，不写产品需求；与 `AGENTS.md` 冲突时以本文件为准。
+前 8 个来自 Anthropic 官方 `product-management` 插件（Apache-2.0），已做本地化适配；后 3 个是本工位的原型一致性流程。来源与修改说明见 `THIRD_PARTY_NOTICES.md`。技能只写流程，不写产品需求；与 `AGENTS.md` 冲突时以本文件为准。
+
+技能正文多为英文；执行时用中文与用户交流、用中文输出，保留原框架名（如 RICE、JTBD）。
 
 ## 4. 工作流与门禁
 
@@ -195,6 +202,8 @@ prototype/screens/        正式原型，进入工作台，必须带 data-req
 prototype/spikes/         探索稿，不进入工作台，不得被正式页面链接
 prototype/assets/         共享 tokens 与组件样式
 skills/                   可复用的产品工作流程（SKILL.md）
+THIRD_PARTY_NOTICES.md    外部技能来源、许可证与修改说明
+LICENSES/                 第三方许可证原文
 scripts/sync.mjs          一致性校验 + 工作台生成
 scripts/check-skills.mjs  技能格式校验
 docs/                     工作流、一致性模型、原型规范、评审清单

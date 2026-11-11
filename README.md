@@ -60,12 +60,20 @@ prototype/
   assets/                 共享视觉样式
 
 skills/                   内置的产品工作流程
-  discovery/              把模糊需求问清
-  scope/                  收敛一期范围
-  prd/                    写/改 PRD
-  prototype/              做页面
-  review/                 评审与查一致性
-  change/                 改需求时两边同步
+  write-spec/             PRD 与验收（Anthropic）
+  roadmap-update/         范围与优先级（Anthropic）
+  synthesize-research/    研究归纳（Anthropic）
+  stakeholder-update/     汇报与公告（Anthropic）
+  product-brainstorming/  发散与挑战假设（Anthropic）
+  metrics-review/         指标复盘（Anthropic）
+  competitive-brief/      竞品分析（Anthropic）
+  sprint-planning/        迭代排期（Anthropic，可选）
+  prototype/              做页面（本工位）
+  review/                 评审一致性（本工位）
+  change/                 变更同步（本工位）
+
+THIRD_PARTY_NOTICES.md    外部技能来源与修改说明
+LICENSES/                 第三方许可证原文
 
 scripts/
   sync.mjs                一致性检查 + 生成工作台
@@ -77,16 +85,12 @@ docs/                     工作流、一致性模型、原型规范、评审清
 
 ## 内置技能
 
-`skills/` 里放了 6 个产品工作流程，AI 会根据任务自己读：
+`skills/` 里是 **8 个 Anthropic 官方 PM 技能 + 3 个本工位专用技能**：
 
-| 技能 | 解决什么 |
-| --- | --- |
-| `discovery` | 只有模糊想法或访谈材料时，先问清问题与证据 |
-| `scope` | 范围太大时，给出可解释的一期取舍 |
-| `prd` | 新增/修改需求，保证 ID、验收、版本、变更记录齐全 |
-| `prototype` | 把需求做成可点页面，并标好追溯关系 |
-| `review` | 先跑检查，再输出必改/建议/无法验证 |
-| `change` | 改已有需求时，找到所有受影响位置并两边同步 |
+- **官方方法论**：`write-spec`（PRD）、`roadmap-update`（范围/优先级）、`synthesize-research`（研究归纳）、`stakeholder-update`（汇报）、`product-brainstorming`（发散）、`metrics-review`（指标）、`competitive-brief`（竞品）、`sprint-planning`（排期，可选）。
+- **本工位补齐**：`prototype`（做页面）、`review`（评审一致性）、`change`（改需求时两边同步）。
+
+来自 Anthropic 的 8 个技能采用 Apache-2.0，做了中文触发与文件落点适配；来源、固定 commit、修改点写在 `THIRD_PARTY_NOTICES.md`，许可证在 `LICENSES/Apache-2.0.txt`。技能目录说明见 `skills/README.md`。
 
 产品经理不需要记这些名字；她只要说「帮我评审」「先问我几个问题」「把首页改简单点」，AI 会选技能。技能格式由 `npm run check:skills` 校验，也包含在 `npm run check` 里。
 
