@@ -204,6 +204,7 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 
 ```text
 工作台.html               自动生成的一页式入口，禁止手改
+install.sh                远程安装入口（下载模板并调用 new.mjs）
 product/PRD.md            需求与验收的唯一事实源
 product/discovery/        问题定义与证据；不写解决方案细节
 product/decisions/        ADR：一次决策一个文件，只增不改

@@ -135,6 +135,7 @@ dist/
 
 ```text
 工作台.html               唯一入口，自动生成，禁止手改
+install.sh               远程安装入口
 AGENTS.md                 AI 的工作契约
 CLAUDE.md                 Claude Code 入口，指向 AGENTS.md
 STATE.md                  当前阶段、版本、下一步
@@ -225,13 +226,37 @@ dist/                     导出的交付包（生成物，不提交）
 
 ## 开新项目
 
+### 从 GitHub 一条命令
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.sh) install ../宝宝喂养 --name "宝宝喂养"
+```
+
+也可以走管道：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.sh | bash -s -- install ../宝宝喂养 --name "宝宝喂养"
+```
+
+`install` 后面是目标目录；脚本会下载模板、生成干净工位、自动检查，并打印入口。要求 **Node.js ≥ 18**。
+
+可选参数：
+
+- `--name "产品名"`：PRD 和工作台显示的名字；默认用目录名；
+- `--git`：新目录初始化 git（不自动提交）；
+- `--ref v0.2.0`：固定使用某个分支、标签或 commit。
+
+介意 `curl | bash` 的话，可以先下载 `install.sh` 看一遍再执行。
+
+### 在本地模板目录
+
 模板目录保留不动；每个产品单独生成一个工位：
 
 ```bash
 npm run new -- ../宝宝喂养 --name "宝宝喂养"
 ```
 
-这类做法参考了 [Vite 的 `npm create`](https://vite.dev/guide/#scaffolding-your-first-vite-project)、[Spec Kit 的 `specify init`](https://github.github.com/spec-kit/installation.html) 和 [Spring CLI 的 `boot new`](https://docs.spring.io/spring-cli/reference/ref/project/comments-on-the-approach.html)：**从一份可运行的骨架复制**，而不是让用户从空目录拼模板。区别是这里不发布 npm 包，只保留一个本地脚本，够用且没有额外依赖。
+这类做法参考了 [Vite 的 `npm create`](https://vite.dev/guide/#scaffolding-your-first-vite-project)、[Spec Kit 的 `specify init`](https://github.github.com/spec-kit/installation.html) 和 [Spring CLI 的 `boot new`](https://docs.spring.io/spring-cli/reference/ref/project/comments-on-the-approach.html)：**从一份可运行的骨架复制**，而不是让用户从空目录拼模板。区别是这里不发布 npm 包，只保留本地脚本；远程分发用 `install.sh`。
 
 不带参数会进入交互模式：
 
