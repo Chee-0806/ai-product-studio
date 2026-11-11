@@ -69,11 +69,11 @@ html {
 
 body {
   margin: 0;
-  background: var(--bg);
+  background: var(--surface);
   color: var(--ink);
   font-family: var(--font);
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -91,73 +91,53 @@ a {
 
 a:hover {
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
 }
 
-:where(a, summary, button):focus-visible {
+:where(a, summary):focus-visible {
   outline: 2px solid var(--brand);
-  outline-offset: 2px;
-  border-radius: var(--radius-xs);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .wrap {
-  max-width: 1280px;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 48px 32px 80px;
+  padding: 56px 40px 72px;
 }
 
-.eyebrow {
-  margin-bottom: 8px;
-  color: var(--brand-ink);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-}
+/* ---------- 页头 ---------- */
 
-h1 {
-  font-size: clamp(30px, 4.2vw, 40px);
+.head h1 {
+  font-size: 32px;
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
-.sub {
-  margin-top: 12px;
+.meta {
+  margin-top: 10px;
   color: var(--ink-2);
-  font-size: 16px;
-}
-
-.generated {
-  margin-top: 16px;
-  color: var(--ink-2);
-  font-size: 12.5px;
+  font-size: 13.5px;
 }
 
 /* ---------- 检查状态 ---------- */
 
 .build {
-  margin-top: 24px;
-  padding: 16px 20px;
-  border: 1px solid var(--build-line);
-  border-radius: var(--radius-sm);
-  background: var(--build-bg);
+  margin-top: 28px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
 }
 
 .build--ok {
-  --build-bg: var(--success-weak);
-  --build-line: var(--success-line);
   --build-ink: var(--success);
 }
 
 .build--warn {
-  --build-bg: var(--warn-weak);
-  --build-line: var(--warn-line);
   --build-ink: var(--warn);
 }
 
 .build--fail {
-  --build-bg: var(--danger-weak);
-  --build-line: var(--danger-line);
   --build-ink: var(--danger);
 }
 
@@ -165,9 +145,17 @@ h1 {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--build-ink);
+  color: var(--ink-2);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
+}
+
+.build--warn .build__title {
+  color: var(--warn);
+}
+
+.build--fail .build__title {
+  color: var(--danger);
 }
 
 .build__icon {
@@ -175,6 +163,7 @@ h1 {
   flex: none;
   width: 16px;
   height: 16px;
+  color: var(--build-ink);
 }
 
 .build__icon svg {
@@ -186,19 +175,18 @@ h1 {
 .build__note {
   margin-top: 6px;
   color: var(--ink-2);
-  font-size: 13.5px;
+  font-size: 13px;
 }
 
 .build__detail {
   margin-top: 8px;
   color: var(--ink-2);
-  font-size: 13px;
+  font-size: 12.5px;
 }
 
 .build__detail summary {
-  color: var(--build-ink);
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .build__detail ul {
@@ -211,147 +199,52 @@ h1 {
 /* ---------- 下一步 ---------- */
 
 .next {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-top: 24px;
-  padding: 24px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
+  margin-top: 40px;
 }
 
 .next__label {
-  color: var(--brand-ink);
+  color: var(--ink-2);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
 }
 
 .next h2 {
+  max-width: 34em;
   margin-top: 8px;
-  max-width: 60ch;
   color: var(--ink);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 600;
-  line-height: 1.5;
+  line-height: 1.45;
   letter-spacing: -0.01em;
 }
 
-.next__version {
-  flex: none;
-  padding: 4px 10px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--surface-2);
-  color: var(--ink-2);
-  font-size: 12.5px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-/* ---------- 使用说明 ---------- */
-
-.howto,
-.handoff {
-  margin-top: 16px;
-  padding: 20px 24px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-}
-
-.handoff {
-  background: var(--surface-2);
-}
-
-.howto h2,
-.handoff h2 {
-  color: var(--ink);
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: 0;
-}
-
-.howto h2 {
-  margin-bottom: 8px;
-}
-
-.howto ol {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding-left: 20px;
-  color: var(--ink);
-  font-size: 15px;
-}
-
-.howto__note {
-  margin-top: 12px;
-  color: var(--ink-2);
-  font-size: 13px;
-}
-
-.handoff h2 {
-  margin-bottom: 6px;
-}
-
-.handoff p {
-  color: var(--ink);
-  font-size: 14.5px;
-}
-
-.handoff .handoff__note {
-  margin-top: 8px;
-  color: var(--ink-2);
-  font-size: 13px;
-}
-
-.prompt {
-  margin-top: 16px;
-}
-
-.prompt summary {
-  color: var(--brand-ink);
-  cursor: pointer;
-  font-size: 13.5px;
-  font-weight: 600;
-}
-
-.prompt pre {
-  margin-top: 12px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  color: var(--ink);
-  font-family: var(--font);
-  font-size: 13.5px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* ---------- 统计 ---------- */
+/* ---------- 概览 ---------- */
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
-  margin: 32px 0 40px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 40px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
 }
 
 .stat {
-  padding: 16px 18px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  padding: 16px 24px 16px 0;
+}
+
+.stat + .stat {
+  padding-left: 24px;
+  border-left: 1px solid var(--line);
+}
+
+.stat:last-child {
+  padding-right: 0;
 }
 
 .stat b {
   display: block;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.02em;
@@ -368,7 +261,7 @@ h1 {
 /* ---------- 区块标题 ---------- */
 
 h2 {
-  margin: 40px 0 16px;
+  margin: 48px 0 16px;
   font-size: 18px;
   font-weight: 600;
   letter-spacing: -0.01em;
@@ -378,12 +271,7 @@ h2 {
 
 table {
   width: 100%;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-collapse: separate;
-  border-spacing: 0;
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  border-collapse: collapse;
   font-size: 16px;
 }
 
@@ -395,10 +283,20 @@ td {
   vertical-align: top;
 }
 
+th:first-child,
+td:first-child {
+  padding-left: 0;
+}
+
+th:last-child,
+td:last-child {
+  padding-right: 0;
+}
+
 th {
-  background: var(--surface-2);
+  border-bottom-color: var(--line-strong);
   color: var(--ink-2);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.02em;
   white-space: nowrap;
@@ -418,30 +316,24 @@ tr.is-dropped td:last-child {
 }
 
 code {
-  font-family: var(--mono);
-  font-size: 12px;
-}
-
-td code {
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--surface-3);
   color: var(--ink-2);
+  font-family: var(--mono);
+  font-size: 12.5px;
 }
 
 td a:hover {
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
 }
 
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 12.5px;
-  font-weight: 600;
+  gap: 7px;
+  padding: 2px 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -451,34 +343,32 @@ td a:hover {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: currentColor;
+  background: var(--status, var(--ink-3));
 }
 
 .pill--draft {
-  background: var(--surface-3);
+  --status: var(--ink-3);
   color: var(--ink-2);
 }
 
 .pill--prototyped {
-  background: var(--brand-weak);
-  color: var(--brand-ink);
+  --status: var(--brand);
 }
 
 .pill--approved,
 .pill--delivered {
-  background: var(--success-weak);
-  color: var(--success);
+  --status: var(--success);
 }
 
 .pill--dropped {
-  background: var(--danger-weak);
-  color: var(--danger);
+  --status: var(--danger);
+  color: var(--ink-2);
 }
 
-/* ---------- 原型卡片 ---------- */
+/* ---------- 原型索引 ---------- */
 
 .flow-group {
-  margin-top: 32px;
+  margin-top: 28px;
 }
 
 .flow-group:first-of-type {
@@ -486,151 +376,254 @@ td a:hover {
 }
 
 .flow-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin: 0 0 12px;
   color: var(--ink-2);
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.02em;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+.flow-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
 }
 
-.card {
+.count {
+  color: var(--ink-3);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.index {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 32px;
+}
+
+.proto {
+  margin: 0;
+}
+
+.proto__link {
+  display: flex;
+  gap: 16px;
+  padding: 10px 0;
+  color: var(--ink);
+}
+
+.proto__link:hover {
+  text-decoration: none;
+}
+
+.proto__frame {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 128px;
+  aspect-ratio: 390 / 760;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
-  transition:
-    border-color 0.18s var(--ease),
-    transform 0.18s var(--ease);
-}
-
-@media (hover: hover) {
-  .card:hover {
-    border-color: var(--line-strong);
-    transform: translateY(-2px);
-  }
-
-  .card:hover .card__hint {
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-}
-
-.card__frame {
-  display: block;
-  overflow: hidden;
-  aspect-ratio: 390 / 760;
-  border-bottom: 1px solid var(--line);
+  border-radius: var(--radius-xs);
   background: var(--surface-3);
+  transition: border-color 0.18s var(--ease);
 }
 
-.card__frame iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
+.proto__link:hover .proto__frame {
+  border-color: var(--line-strong);
+}
+
+.proto__frame iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 390px;
+  height: 760px;
   border: 0;
   pointer-events: none;
+  transform: scale(0.3282);
+  transform-origin: top left;
 }
 
-.card__body {
-  padding: 16px;
-}
-
-.card__head {
+.proto__body {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
+  flex-direction: column;
+  min-width: 0;
+  padding: 2px 0;
 }
 
-.card__head h3 {
-  min-width: 0;
-  margin: 0;
+.proto__title {
+  color: var(--ink);
   font-size: 15px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
-.flow {
-  flex: none;
-  padding: 2px 8px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
+.proto__link:hover .proto__title {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.proto__meta {
+  margin-top: 4px;
   color: var(--ink-2);
-  font-size: 11.5px;
-  font-weight: 500;
-  white-space: nowrap;
+  font-size: 12.5px;
+  line-height: 1.5;
 }
 
-.card__hint {
-  margin: 4px 0 12px;
+.proto__hint {
+  margin-top: auto;
+  padding-top: 12px;
   color: var(--brand-ink);
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
 }
 
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.tags code {
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--surface-3);
-  color: var(--ink-2);
-}
-
-/* ---------- 其他 ---------- */
+/* ---------- 说明 ---------- */
 
 .muted {
   color: var(--ink-2);
 }
 
 .empty {
-  padding: 32px;
-  border: 1px dashed var(--line-strong);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  padding: 32px 0;
+  border-top: 1px solid var(--line);
   color: var(--ink-2);
-  text-align: center;
+  font-size: 14px;
+}
+
+.help {
+  margin-top: 56px;
+  border-top: 1px solid var(--line);
+}
+
+.help > summary {
+  padding: 16px 0;
+  color: var(--ink-2);
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.help > summary::marker {
+  color: var(--ink-3);
+}
+
+.help__body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 40px;
+  padding: 8px 0 32px;
+}
+
+.help__block h3 {
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.help__block ol {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.help__block p {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.note {
+  margin-top: 10px;
+  color: var(--ink-2);
+  font-size: 12.5px;
+}
+
+.prompt {
+  margin-top: 16px;
+}
+
+.prompt summary {
+  color: var(--brand-ink);
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.prompt pre {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 12.5px;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 footer {
-  margin-top: 48px;
-  padding-top: 20px;
+  margin-top: 40px;
+  padding-top: 16px;
   border-top: 1px solid var(--line);
   color: var(--ink-2);
   font-size: 12.5px;
 }
 
-@media (max-width: 720px) {
+/* ---------- 窄屏 ---------- */
+
+@media (max-width: 760px) {
   .wrap {
-    padding: 32px 20px 64px;
+    padding: 40px 24px 56px;
   }
 
-  h1 {
-    font-size: 32px;
+  .head h1 {
+    font-size: 28px;
   }
 
-  .next {
-    flex-direction: column;
-    gap: 12px;
+  .next h2 {
+    font-size: 21px;
   }
 
-  .next__version {
-    align-self: flex-start;
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .howto,
-  .handoff {
-    padding: 18px 20px;
+  .stat {
+    padding: 14px 0;
+  }
+
+  .stat + .stat {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .stat:nth-child(even) {
+    padding-left: 16px;
+    border-left: 1px solid var(--line);
+  }
+
+  .stat:nth-child(n + 3) {
+    border-top: 1px solid var(--line);
+  }
+
+  .index {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .help__body {
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
 
   table {
@@ -639,7 +632,7 @@ footer {
 
   th,
   td {
-    padding: 10px 12px;
+    padding: 10px 10px;
   }
 
   th:nth-child(1),
@@ -648,23 +641,23 @@ footer {
   td:nth-child(3) {
     display: none;
   }
-
-  .grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 480px) {
   .wrap {
-    padding: 24px 16px 56px;
+    padding: 32px 16px 48px;
   }
 
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
+  .stat b {
+    font-size: 24px;
   }
 
-  .build {
-    padding: 14px 16px;
+  .proto__frame {
+    width: 112px;
+  }
+
+  .proto__frame iframe {
+    transform: scale(0.2872);
   }
 }
 
@@ -677,57 +670,25 @@ footer {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
   }
-
-  .card:hover {
-    transform: none;
-  }
 }
 
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <p class="eyebrow">产品工作台</p>
+  <header class="head">
     <h1>回声纪要</h1>
-    <p class="sub">当前阶段：做原型 · 规格 v0.2.0 · 更新于 2026-11-11 · 4/5 个需求已有原型</p>
-    <p class="generated">这个页面由 AI 自动生成，不用手改。</p>
+    <p class="meta">产品工作台 · 做原型 · 规格 v0.2.0 · 更新于 2026-11-11 · 4/5 个需求已有原型</p>
   </header>
 
-  <section class="build build--ok">
-    <p class="build__title"><span class="build__icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg></span>检查通过，PRD 和原型对得上</p>
-    <p class="build__note">需求状态、页面覆盖和版本都一致。</p>
+  <section class="build build--ok" aria-label="检查状态">
+    <p class="build__title"><span class="build__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg></span>检查通过，PRD 和原型对得上</p>
+    
   </section>
 
   <section class="next">
-    <div>
-      <p class="next__label">下一步</p>
-      <h2>先评审纪要详情页的三段式结构和分享面板；确认后再把「历史搜索」补进原型</h2>
-    </div>
-    <span class="next__version">v0.2.0</span>
-  </section>
-
-  <section class="howto">
-    <h2>怎么用这个工位</h2>
-    <ol>
-      <li>把想要的功能直接说给 AI，不用先写文档。</li>
-      <li>点下面的页面看原型，把不满意的地方告诉 AI。</li>
-      <li>每次改完让 AI「刷新工作台」，它会自己检查两边是否一致；顶部会显示检查结果。</li>
-    </ol>
-    <p class="howto__note">不需要 git，不需要命令行，也不需要懂代码。不要自己改这个页面。</p>
-    <p class="howto__note">常用说法：「我有个想法……先问我几个关键问题」「把首页改简单点」「帮我评审，看看哪里不一致」。</p>
-    <details class="prompt">
-      <summary>给 AI 的开场白（点开）</summary>
-      <pre>你是我的产品搭档。先读 AGENTS.md、STATE.md 和 product/PRD.md，用一句话告诉我现在做到哪、下一步做什么。
-然后按我说的改。改完自己运行 npm run sync 和 npm run check，刷新工作台，再告诉我：改了哪些需求、哪些页面、还有什么没定。
-不要要求我运行命令，也不要让我碰 git。</pre>
-    </details>
-  </section>
-
-  <section class="handoff">
-    <h2>要发给研发？</h2>
-    <p>不要发整个工作区。对 AI 说「导出交付包」，它会生成只含 PRD 和原型的 zip。</p>
-    <p class="handoff__note">产物在 dist/ 下：同名文件夹 + 同名 .zip。</p>
+    <p class="next__label">下一步</p>
+    <h2>先评审纪要详情页的三段式结构和分享面板；确认后再把「历史搜索」补进原型</h2>
   </section>
 
   <section class="stats">
@@ -789,11 +750,12 @@ footer {
   <section>
     <h2>原型页面</h2>
     <section class="flow-group">
-      <h3 class="flow-title">记录 <span class="muted">2</span></h3>
-      <div class="grid">
-        <article class="card">
-          <a class="card__frame" href="prototype/screens/home.html" aria-label="打开 首页 · 一键开录">
-            <iframe srcdoc="&lt;!doctype html&gt;
+      <h3 class="flow-title">记录 <span class="count">2</span></h3>
+      <div class="index">
+        <article class="proto">
+          <a class="proto__link" href="prototype/screens/home.html" aria-label="打开 首页 · 一键开录">
+            <span class="proto__frame">
+              <iframe srcdoc="&lt;!doctype html&gt;
 &lt;html lang=&quot;zh-CN&quot;&gt;
 &lt;head&gt;
 &lt;meta charset=&quot;utf-8&quot;&gt;
@@ -2067,19 +2029,18 @@ a.list-item:hover {
 &lt;/body&gt;
 &lt;/html&gt;
 " title="首页 · 一键开录" loading="lazy" tabindex="-1"></iframe>
+            </span>
+            <span class="proto__body">
+              <span class="proto__title">首页 · 一键开录</span>
+              <span class="proto__meta">REQ-001</span>
+              <span class="proto__hint">打开原型 →</span>
+            </span>
           </a>
-          <div class="card__body">
-            <div class="card__head">
-              <h3>首页 · 一键开录</h3>
-              <span class="flow">记录</span>
-            </div>
-            <p class="card__hint">点击打开可交互原型 →</p>
-            <div class="tags"><code>REQ-001</code></div>
-          </div>
         </article>
-<article class="card">
-          <a class="card__frame" href="prototype/screens/recording.html" aria-label="打开 录音中 · 实时转写">
-            <iframe srcdoc="&lt;!doctype html&gt;
+<article class="proto">
+          <a class="proto__link" href="prototype/screens/recording.html" aria-label="打开 录音中 · 实时转写">
+            <span class="proto__frame">
+              <iframe srcdoc="&lt;!doctype html&gt;
 &lt;html lang=&quot;zh-CN&quot;&gt;
 &lt;head&gt;
 &lt;meta charset=&quot;utf-8&quot;&gt;
@@ -3384,23 +3345,22 @@ a.list-item:hover {
 &lt;/body&gt;
 &lt;/html&gt;
 " title="录音中 · 实时转写" loading="lazy" tabindex="-1"></iframe>
+            </span>
+            <span class="proto__body">
+              <span class="proto__title">录音中 · 实时转写</span>
+              <span class="proto__meta">REQ-002</span>
+              <span class="proto__hint">打开原型 →</span>
+            </span>
           </a>
-          <div class="card__body">
-            <div class="card__head">
-              <h3>录音中 · 实时转写</h3>
-              <span class="flow">记录</span>
-            </div>
-            <p class="card__hint">点击打开可交互原型 →</p>
-            <div class="tags"><code>REQ-002</code></div>
-          </div>
         </article>
       </div>
     </section><section class="flow-group">
-      <h3 class="flow-title">纪要 <span class="muted">1</span></h3>
-      <div class="grid">
-        <article class="card">
-          <a class="card__frame" href="prototype/screens/note.html" aria-label="打开 纪要详情 · 编辑与分享">
-            <iframe srcdoc="&lt;!doctype html&gt;
+      <h3 class="flow-title">纪要 <span class="count">1</span></h3>
+      <div class="index">
+        <article class="proto">
+          <a class="proto__link" href="prototype/screens/note.html" aria-label="打开 纪要详情 · 编辑与分享">
+            <span class="proto__frame">
+              <iframe srcdoc="&lt;!doctype html&gt;
 &lt;html lang=&quot;zh-CN&quot;&gt;
 &lt;head&gt;
 &lt;meta charset=&quot;utf-8&quot;&gt;
@@ -4847,21 +4807,46 @@ a.list-item:hover {
 &lt;/body&gt;
 &lt;/html&gt;
 " title="纪要详情 · 编辑与分享" loading="lazy" tabindex="-1"></iframe>
+            </span>
+            <span class="proto__body">
+              <span class="proto__title">纪要详情 · 编辑与分享</span>
+              <span class="proto__meta">REQ-004 · REQ-003</span>
+              <span class="proto__hint">打开原型 →</span>
+            </span>
           </a>
-          <div class="card__body">
-            <div class="card__head">
-              <h3>纪要详情 · 编辑与分享</h3>
-              <span class="flow">纪要</span>
-            </div>
-            <p class="card__hint">点击打开可交互原型 →</p>
-            <div class="tags"><code>REQ-004</code><code>REQ-003</code></div>
-          </div>
         </article>
       </div>
     </section>
   </section>
 
-  <footer>回声纪要 · 3 个页面 · 规格版本 0.2.0 · 由 AI 自动生成</footer>
+  <details class="help">
+    <summary>使用说明与交付</summary>
+    <div class="help__body">
+      <section class="help__block">
+        <h3>怎么用这个工位</h3>
+        <ol>
+          <li>把想要的功能直接说给 AI，不用先写文档。</li>
+          <li>点上面的页面看原型，把不满意的地方告诉 AI。</li>
+          <li>每次改完让 AI「刷新工作台」，它会自己检查两边是否一致；顶部会显示检查结果。</li>
+        </ol>
+        <p class="note">不需要 git，不需要命令行，也不需要懂代码。不要自己改这个页面。</p>
+        <p class="note">常用说法：「我有个想法……先问我几个关键问题」「把首页改简单点」「帮我评审，看看哪里不一致」。</p>
+        <details class="prompt">
+          <summary>给 AI 的开场白</summary>
+          <pre>你是我的产品搭档。先读 AGENTS.md、STATE.md 和 product/PRD.md，用一句话告诉我现在做到哪、下一步做什么。
+然后按我说的改。改完自己运行 npm run sync 和 npm run check，刷新工作台，再告诉我：改了哪些需求、哪些页面、还有什么没定。
+不要要求我运行命令，也不要让我碰 git。</pre>
+        </details>
+      </section>
+      <section class="help__block">
+        <h3>要发给研发？</h3>
+        <p>不要发整个工作区。对 AI 说「导出交付包」，它会生成只含 PRD 和原型的 zip。</p>
+        <p class="note">产物在 dist/ 下：同名文件夹 + 同名 .zip。</p>
+      </section>
+    </div>
+  </details>
+
+  <footer>回声纪要 · 3 个页面 · 规格版本 0.2.0 · 由 AI 自动生成，不用手改</footer>
 </div>
 </body>
 </html>

@@ -349,6 +349,8 @@ function renderGallery(prd, state, reqs, screens, covered, build = { errors: [],
         <ul>${buildMessages.map((message) => `<li>${esc(message)}</li>`).join('')}</ul>
       </details>`
     : '';
+  const buildNoteHtml =
+    buildFailed || buildWarned ? `<p class="build__note">${esc(buildNote)}</p>` : '';
 
   const groups = new Map();
   for (const screen of sortedScreens) {
@@ -383,26 +385,23 @@ function renderGallery(prd, state, reqs, screens, covered, build = { errors: [],
   const cardsByFlow = [...groups.entries()]
     .map(
       ([flow, list]) => `<section class="flow-group">
-      <h3 class="flow-title">${esc(flow)} <span class="muted">${list.length}</span></h3>
-      <div class="grid">
+      <h3 class="flow-title">${esc(flow)} <span class="count">${list.length}</span></h3>
+      <div class="index">
         ${list
           .map(
-            (screen) => `<article class="card">
-          <a class="card__frame" href="${esc(screen.relFile)}" aria-label="打开 ${esc(screen.title)}">
-            <iframe srcdoc="${esc(screenPreviewHtml(screen.file, tokens, appCss))}" title="${esc(screen.title)}" loading="lazy" tabindex="-1"></iframe>
+            (screen) => `<article class="proto">
+          <a class="proto__link" href="${esc(screen.relFile)}" aria-label="打开 ${esc(screen.title)}">
+            <span class="proto__frame">
+              <iframe srcdoc="${esc(screenPreviewHtml(screen.file, tokens, appCss))}" title="${esc(screen.title)}" loading="lazy" tabindex="-1"></iframe>
+            </span>
+            <span class="proto__body">
+              <span class="proto__title">${esc(screen.title || screen.id)}</span>
+              <span class="proto__meta">${
+                screen.reqs.length ? screen.reqs.map((r) => esc(r)).join(' · ') : '未标注需求'
+              }</span>
+              <span class="proto__hint">打开原型 →</span>
+            </span>
           </a>
-          <div class="card__body">
-            <div class="card__head">
-              <h3>${esc(screen.title || screen.id)}</h3>
-              <span class="flow">${esc(screen.flow || '未分组')}</span>
-            </div>
-            <p class="card__hint">点击打开可交互原型 →</p>
-            <div class="tags">${
-              screen.reqs.length
-                ? screen.reqs.map((r) => `<code>${esc(r)}</code>`).join('')
-                : '<span class="muted">未标注 data-req</span>'
-            }</div>
-          </div>
         </article>`,
           )
           .join('\n')}
@@ -424,49 +423,21 @@ ${workbenchCss}
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <p class="eyebrow">产品工作台</p>
+  <header class="head">
     <h1>${esc(prd.product || '未命名产品')}</h1>
-    <p class="sub">当前阶段：${esc(stageLabel)} · 规格 v${esc(prd.version || '0.0.0')} · 更新于 ${esc(prd.updated || '—')} · ${
+    <p class="meta">产品工作台 · ${esc(stageLabel)} · 规格 v${esc(prd.version || '0.0.0')} · 更新于 ${esc(prd.updated || '—')} · ${
       active.length ? `${done.length}/${active.length} 个需求已有原型` : '还没有需求'
     }</p>
-    <p class="generated">这个页面由 AI 自动生成，不用手改。</p>
   </header>
 
-  <section class="build build--${buildClass}">
-    <p class="build__title"><span class="build__icon">${buildIcon}</span>${esc(buildTitle)}</p>
-    <p class="build__note">${esc(buildNote)}</p>${buildDetail}
+  <section class="build build--${buildClass}" aria-label="检查状态">
+    <p class="build__title"><span class="build__icon" aria-hidden="true">${buildIcon}</span>${esc(buildTitle)}</p>
+    ${buildNoteHtml}${buildDetail}
   </section>
 
   <section class="next">
-    <div>
-      <p class="next__label">下一步</p>
-      <h2>${esc(nextAction)}</h2>
-    </div>
-    <span class="next__version">v${esc(prd.version || '0.0.0')}</span>
-  </section>
-
-  <section class="howto">
-    <h2>怎么用这个工位</h2>
-    <ol>
-      <li>把想要的功能直接说给 AI，不用先写文档。</li>
-      <li>点下面的页面看原型，把不满意的地方告诉 AI。</li>
-      <li>每次改完让 AI「刷新工作台」，它会自己检查两边是否一致；顶部会显示检查结果。</li>
-    </ol>
-    <p class="howto__note">不需要 git，不需要命令行，也不需要懂代码。不要自己改这个页面。</p>
-    <p class="howto__note">常用说法：「我有个想法……先问我几个关键问题」「把首页改简单点」「帮我评审，看看哪里不一致」。</p>
-    <details class="prompt">
-      <summary>给 AI 的开场白（点开）</summary>
-      <pre>你是我的产品搭档。先读 AGENTS.md、STATE.md 和 product/PRD.md，用一句话告诉我现在做到哪、下一步做什么。
-然后按我说的改。改完自己运行 npm run sync 和 npm run check，刷新工作台，再告诉我：改了哪些需求、哪些页面、还有什么没定。
-不要要求我运行命令，也不要让我碰 git。</pre>
-    </details>
-  </section>
-
-  <section class="handoff">
-    <h2>要发给研发？</h2>
-    <p>不要发整个工作区。对 AI 说「导出交付包」，它会生成只含 PRD 和原型的 zip。</p>
-    <p class="handoff__note">产物在 dist/ 下：同名文件夹 + 同名 .zip。</p>
+    <p class="next__label">下一步</p>
+    <h2>${esc(nextAction)}</h2>
   </section>
 
   <section class="stats">
@@ -493,7 +464,34 @@ ${workbenchCss}
     ${sortedScreens.length ? cardsByFlow : '<p class="empty">还没有原型页面。让 AI 先做一个首页。</p>'}
   </section>
 
-  <footer>${esc(prd.product || '')} · ${sortedScreens.length} 个页面 · 规格版本 ${esc(prd.version || '—')} · 由 AI 自动生成</footer>
+  <details class="help">
+    <summary>使用说明与交付</summary>
+    <div class="help__body">
+      <section class="help__block">
+        <h3>怎么用这个工位</h3>
+        <ol>
+          <li>把想要的功能直接说给 AI，不用先写文档。</li>
+          <li>点上面的页面看原型，把不满意的地方告诉 AI。</li>
+          <li>每次改完让 AI「刷新工作台」，它会自己检查两边是否一致；顶部会显示检查结果。</li>
+        </ol>
+        <p class="note">不需要 git，不需要命令行，也不需要懂代码。不要自己改这个页面。</p>
+        <p class="note">常用说法：「我有个想法……先问我几个关键问题」「把首页改简单点」「帮我评审，看看哪里不一致」。</p>
+        <details class="prompt">
+          <summary>给 AI 的开场白</summary>
+          <pre>你是我的产品搭档。先读 AGENTS.md、STATE.md 和 product/PRD.md，用一句话告诉我现在做到哪、下一步做什么。
+然后按我说的改。改完自己运行 npm run sync 和 npm run check，刷新工作台，再告诉我：改了哪些需求、哪些页面、还有什么没定。
+不要要求我运行命令，也不要让我碰 git。</pre>
+        </details>
+      </section>
+      <section class="help__block">
+        <h3>要发给研发？</h3>
+        <p>不要发整个工作区。对 AI 说「导出交付包」，它会生成只含 PRD 和原型的 zip。</p>
+        <p class="note">产物在 dist/ 下：同名文件夹 + 同名 .zip。</p>
+      </section>
+    </div>
+  </details>
+
+  <footer>${esc(prd.product || '')} · ${sortedScreens.length} 个页面 · 规格版本 ${esc(prd.version || '—')} · 由 AI 自动生成，不用手改</footer>
 </div>
 </body>
 </html>
