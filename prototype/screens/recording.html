@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="screen:id" content="recording">
+<meta name="screen:title" content="录音中 · 实时转写">
+<meta name="screen:flow" content="记录">
+<title>录音中 · 回声纪要</title>
+<link rel="stylesheet" href="../assets/app.css">
+</head>
+<body>
+<main class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="statusbar__right">
+      <svg viewBox="0 0 18 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="4.5" y="6" width="3" height="6" rx="1"/><rect x="9" y="3.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="1" width="3" height="11" rx="1"/></svg>
+      <svg viewBox="0 0 18 13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M1 4.5a11 11 0 0 1 16 0"/><path d="M4 7.8a6.6 6.6 0 0 1 10 0"/><path d="M7 11a2.6 2.6 0 0 1 4 0"/></svg>
+      <svg viewBox="0 0 25 12" fill="none" aria-hidden="true"><rect x="1" y="1" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.3"/><rect x="3" y="3" width="14" height="6" rx="1.6" fill="currentColor"/><path d="M23 4.5v3a2 2 0 0 0 0-3Z" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div class="app-scroll">
+    <header class="topbar">
+      <a class="icon-btn" href="home.html" aria-label="返回首页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.5 5-7 7 7 7"/></svg>
+      </a>
+      <div class="topbar__title">
+        Q4 增长复盘
+        <span class="topbar__sub">4 位参与者 · 线下会议</span>
+      </div>
+    </header>
+
+    <section class="recorder" id="recorder" data-req="REQ-002">
+      <div class="recorder__head">
+        <p class="recorder__timer" id="timer">00:12:48</p>
+        <p class="recorder__status" id="rec-status">正在录音</p>
+      </div>
+
+      <div class="wave" id="wave" aria-hidden="true"></div>
+
+      <div class="transcript">
+        <div class="transcript__head">
+          <h2>实时转写</h2>
+          <span class="live">转写中</span>
+        </div>
+
+        <div class="utterance">
+          <span class="speaker speaker--a">林</span>
+          <div class="utterance__body">
+            <p class="utterance__meta"><strong>林然</strong>10:32</p>
+            <p>这季度留存的主要问题不在拉新，而是新用户第一周没有形成使用习惯。</p>
+          </div>
+        </div>
+
+        <div class="utterance">
+          <span class="speaker">周</span>
+          <div class="utterance__body">
+            <p class="utterance__meta"><strong>周野</strong>10:33</p>
+            <p>同意。首周流失用户里，有 62% 只打开过一次，而且没有完成激活动作。</p>
+          </div>
+        </div>
+
+        <div class="utterance">
+          <span class="speaker speaker--a">林</span>
+          <div class="utterance__body">
+            <p class="utterance__meta"><strong>林然</strong>10:34</p>
+            <p>那我们先把激活路径收敛成三步，别再让用户自己找功能。</p>
+          </div>
+        </div>
+
+        <div class="utterance utterance--live">
+          <span class="speaker">许</span>
+          <div class="utterance__body">
+            <p class="utterance__meta"><strong>许知远</strong>10:35</p>
+            <p>我可以负责把这周埋点补齐，然后对照激活漏斗看是哪一步断掉</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="recorder__controls">
+        <button class="btn" id="pause" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5v14"/><path d="M15 5v14"/></svg>
+          <span id="pause-label">暂停</span>
+        </button>
+        <a class="btn btn--primary" href="note.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.5h12v15l-6-4-6 4v-15Z"/></svg>
+          结束并生成
+        </a>
+      </div>
+
+      <p class="privacy-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10" rx="2.5"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg>
+        录音仅用于生成纪要，不会公开
+      </p>
+    </section>
+  </div>
+
+  <a class="proto-link" href="../index.html">← 原型目录</a>
+</main>
+
+<script>
+  const wave = document.getElementById('wave');
+  for (let i = 0; i < 44; i += 1) {
+    const bar = document.createElement('i');
+    bar.style.setProperty('--h', String(0.28 + ((i * 37) % 70) / 100));
+    bar.style.animationDelay = `${(i % 9) * 80}ms`;
+    wave.append(bar);
+  }
+
+  const recorder = document.getElementById('recorder');
+  const timer = document.getElementById('timer');
+  const status = document.getElementById('rec-status');
+  const pause = document.getElementById('pause');
+  const pauseLabel = document.getElementById('pause-label');
+
+  let seconds = 12 * 60 + 48;
+  let paused = false;
+
+  const render = () => {
+    const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    timer.textContent = `${h}:${m}:${s}`;
+  };
+
+  setInterval(() => {
+    if (!paused) {
+      seconds += 1;
+      render();
+    }
+  }, 1000);
+
+  pause.addEventListener('click', () => {
+    paused = !paused;
+    recorder.classList.toggle('is-paused', paused);
+    status.textContent = paused ? '已暂停' : '正在录音';
+    pauseLabel.textContent = paused ? '继续' : '暂停';
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="screen:id" content="note">
+<meta name="screen:title" content="纪要详情 · 编辑与分享">
+<meta name="screen:flow" content="纪要">
+<title>纪要详情 · 回声纪要</title>
+<link rel="stylesheet" href="../assets/app.css">
+</head>
+<body>
+<main class="phone">
+  <div class="statusbar">
+    <span>9:41</span>
+    <span class="statusbar__right">
+      <svg viewBox="0 0 18 12" fill="currentColor" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="4.5" y="6" width="3" height="6" rx="1"/><rect x="9" y="3.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="1" width="3" height="11" rx="1"/></svg>
+      <svg viewBox="0 0 18 13" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M1 4.5a11 11 0 0 1 16 0"/><path d="M4 7.8a6.6 6.6 0 0 1 10 0"/><path d="M7 11a2.6 2.6 0 0 1 4 0"/></svg>
+      <svg viewBox="0 0 25 12" fill="none" aria-hidden="true"><rect x="1" y="1" width="20" height="10" rx="3" stroke="currentColor" stroke-width="1.3"/><rect x="3" y="3" width="14" height="6" rx="1.6" fill="currentColor"/><path d="M23 4.5v3a2 2 0 0 0 0-3Z" fill="currentColor"/></svg>
+    </span>
+  </div>
+
+  <div class="app-scroll">
+    <header class="topbar">
+      <a class="icon-btn" href="home.html" aria-label="返回首页">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14.5 5-7 7 7 7"/></svg>
+      </a>
+      <div class="topbar__title">
+        纪要详情
+        <span class="topbar__sub">已生成 · 刚刚</span>
+      </div>
+      <div class="topbar__actions" data-req="REQ-004">
+        <button class="text-btn" id="edit" type="button">编辑</button>
+        <button class="text-btn text-btn--primary" id="share" type="button">分享</button>
+      </div>
+    </header>
+
+    <section class="note-head">
+      <h1>Q4 增长复盘</h1>
+      <div class="note-meta">
+        <span>2026-11-11</span>
+        <span class="dot"></span>
+        <span>42 分钟</span>
+        <span class="dot"></span>
+        <span>4 位参与者</span>
+        <span class="dot"></span>
+        <span class="chip">自动生成</span>
+      </div>
+    </section>
+
+    <div class="note-body" id="note-body" data-req="REQ-003">
+      <section class="note-section">
+        <div class="note-section__head">
+          <h2><span>摘</span>摘要</h2>
+          <span class="note-section__count">3 条</span>
+        </div>
+        <ul class="bullets">
+          <li>留存瓶颈在首周激活，不在拉新。</li>
+          <li>首周流失用户中 62% 只打开过一次应用。</li>
+          <li>下季度把激活路径从五步收敛为三步。</li>
+        </ul>
+      </section>
+
+      <section class="note-section">
+        <div class="note-section__head">
+          <h2><span>决</span>关键决议</h2>
+          <span class="note-section__count">2 条</span>
+        </div>
+        <div class="decision">
+          <strong>激活路径收敛为三步</strong>
+          <p>背景：新用户找不到核心功能，首周流失集中在第 2 天。</p>
+        </div>
+        <div class="decision">
+          <strong>埋点补齐后再定改版排期</strong>
+          <p>背景：当前漏斗在「首次创建」节点存在数据缺口。</p>
+        </div>
+      </section>
+
+      <section class="note-section">
+        <div class="note-section__head">
+          <h2><span>办</span>待办</h2>
+          <span class="note-section__count">3 项</span>
+        </div>
+
+        <div class="todo">
+          <button class="todo__check" type="button" aria-label="标记完成">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+          </button>
+          <div class="todo__body">
+            <strong>补齐首周激活漏斗埋点</strong>
+            <div class="todo__meta">
+              <span class="chip">许知远</span>
+              <span class="chip">11 月 14 日</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="todo">
+          <button class="todo__check" type="button" aria-label="标记完成">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+          </button>
+          <div class="todo__body">
+            <strong>输出三步激活路径方案</strong>
+            <div class="todo__meta">
+              <span class="chip">林然</span>
+              <span class="chip chip--warn">截止时间待确认</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="todo is-done">
+          <button class="todo__check" type="button" aria-label="取消完成">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+          </button>
+          <div class="todo__body">
+            <strong>约 3 位首周流失用户回访</strong>
+            <div class="todo__meta">
+              <span class="chip">周野</span>
+              <span class="chip">11 月 18 日</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <details class="transcript-full">
+        <summary>查看原始转写（42 分钟）</summary>
+        <div class="utterance">
+          <span class="speaker speaker--a">林</span>
+          <div class="utterance__body">
+            <p class="utterance__meta"><strong>林然</strong>10:32</p>
+            <p>这季度留存的主要问题不在拉新，而是新用户第一周没有形成使用习惯。</p>
+          </div>
+        </div>
+        <div class="utterance">
+          <span class="speaker">周</span>
+          <div class="utterance__body">
+            <p class="utterance__meta"><strong>周野</strong>10:33</p>
+            <p>同意。首周流失用户里，有 62% 只打开过一次，而且没有完成激活动作。</p>
+          </div>
+        </div>
+        <div class="utterance">
+          <span class="speaker speaker--a">林</span>
+          <div class="utterance__body">
+            <p class="utterance__meta"><strong>林然</strong>10:34</p>
+            <p>那我们先把激活路径收敛成三步，别再让用户自己找功能。</p>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <p class="note-foot">由回声纪要自动生成 · 内容可能有误，请核对后分享</p>
+  </div>
+
+  <dialog class="sheet" id="share-sheet">
+    <div class="sheet__body">
+      <div class="sheet__grab"></div>
+      <h2>分享纪要</h2>
+      <p class="sheet__hint">链接 7 天内有效，参会人可直接查看</p>
+      <div class="sheet__actions">
+        <button class="sheet__item" id="copy-link" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l2.6-2.6a4.5 4.5 0 0 0-6.4-6.4L11 6.6"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0L5 12.6a4.5 4.5 0 0 0 6.4 6.4l1.6-1.6"/></svg>
+          <span>
+            <strong>复制链接</strong>
+            <small>任何拿到链接的人都能查看</small>
+          </span>
+        </button>
+        <button class="sheet__item" id="export-md" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v12"/><path d="m7.5 11 4.5 4.5 4.5-4.5"/><path d="M5 20.5h14"/></svg>
+          <span>
+            <strong>导出 Markdown</strong>
+            <small>包含摘要、决议与待办</small>
+          </span>
+        </button>
+      </div>
+      <button class="btn" id="close-share" type="button">取消</button>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <a class="proto-link" href="../index.html">← 原型目录</a>
+</main>
+
+<script>
+  const noteBody = document.getElementById('note-body');
+  const edit = document.getElementById('edit');
+  const share = document.getElementById('share');
+  const sheet = document.getElementById('share-sheet');
+  const toast = document.getElementById('toast');
+  let editing = false;
+  let toastTimer;
+
+  const showToast = (message) => {
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('is-visible'), 1800);
+  };
+
+  edit.addEventListener('click', () => {
+    editing = !editing;
+    noteBody.contentEditable = editing ? 'true' : 'false';
+    edit.textContent = editing ? '完成' : '编辑';
+    edit.classList.toggle('text-btn--primary', editing);
+    showToast(editing ? '编辑中，点击「完成」保存' : '已保留本次修改');
+  });
+
+  noteBody.addEventListener('click', (event) => {
+    const check = event.target.closest('.todo__check');
+    if (!check) return;
+    const todo = check.closest('.todo');
+    todo.classList.toggle('is-done');
+  });
+
+  share.addEventListener('click', () => {
+    if (typeof sheet.showModal === 'function') sheet.showModal();
+  });
+
+  document.getElementById('close-share').addEventListener('click', () => sheet.close());
+  sheet.addEventListener('click', (event) => {
+    if (event.target === sheet) sheet.close();
+  });
+
+  const copyText = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.append(area);
+      area.select();
+      let ok = false;
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      area.remove();
+      return ok;
+    }
+  };
+
+  document.getElementById('copy-link').addEventListener('click', async () => {
+    const ok = await copyText('https://echo.example.com/n/q4-growth-review');
+    showToast(ok ? '链接已复制' : '复制失败，请检查浏览器权限');
+  });
+
+  document.getElementById('export-md').addEventListener('click', () => {
+    const markdown = [
+      '# Q4 增长复盘',
+      '',
+      '2026-11-11 · 42 分钟 · 4 位参与者',
+      '',
+      '## 摘要',
+      '- 留存瓶颈在首周激活，不在拉新。',
+      '- 首周流失用户中 62% 只打开过一次应用。',
+      '- 下季度把激活路径从五步收敛为三步。',
+      '',
+      '## 关键决议',
+      '- 激活路径收敛为三步。背景：新用户找不到核心功能，首周流失集中在第 2 天。',
+      '- 埋点补齐后再定改版排期。背景：漏斗在「首次创建」节点存在数据缺口。',
+      '',
+      '## 待办',
+      '- [ ] 补齐首周激活漏斗埋点 · 许知远 · 11 月 14 日',
+      '- [ ] 输出三步激活路径方案 · 林然 · 截止时间待确认',
+      '- [x] 约 3 位首周流失用户回访 · 周野 · 11 月 18 日',
+      '',
+      '> 由回声纪要自动生成，请核对后使用。',
+    ].join('\n');
+
+    const url = URL.createObjectURL(new Blob([markdown], { type: 'text/markdown;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Q4增长复盘.md';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    showToast('已导出 Markdown');
+  });
+</script>
+</body>
+</html>

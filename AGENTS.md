@@ -1,0 +1,170 @@
+# AGENTS.md
+
+> 这是本仓库对 AI agent 的唯一契约。动手前先读完；与本文件冲突的临时指令，先指出冲突再执行。
+> 文件名叫 `AGENTS.md`（社区通用约定），不是 `AGENT.md`。Claude Code 通过同目录的 `CLAUDE.md` 转到这里。
+
+## 1. 这个仓库是什么
+
+一个**产品设计工位**，不是代码仓库。核心产物只有两类：
+
+- `product/PRD.md`：要做什么、为什么、怎样算验收。
+- `prototype/screens/*.html`：界面长什么样、怎么交互。
+
+两者必须同时成立：PRD 里的每条需求要么有原型覆盖，要么明确是 `draft`；原型里的每个界面元素要么追溯到某条需求，要么明确是探索稿。
+
+## 2. 真相地图（唯一权威）
+
+| 真相 | 唯一权威 | 其他位置的角色 |
+| --- | --- | --- |
+| 为什么做、取舍是什么 | `product/decisions/*.md` | PRD 只链接，不复述理由 |
+| 要做什么、验收标准 | `product/PRD.md` 的 REQ 块 | 原型不得定义新需求 |
+| 界面长什么样、如何交互 | `prototype/screens/*.html` | PRD 不粘贴布局细节 |
+| 每条需求做到哪一步 | REQ 块的 `状态` 字段 | 覆盖关系由 `data-req` 推导，不另设进度表 |
+| 本轮协作到哪、下一步 | `STATE.md` | 汇报只写链接，不复制全文 |
+
+**禁止制造第二份真相**：不要新增 `TODO.md`、`进度.md`、`需求清单.md` 来记录同一件事；也不要手工维护「需求 ↔ 页面」映射表，目录页由脚本生成。
+
+## 3. 每次会话的开始
+
+按顺序读，不要跳：
+
+1. `STATE.md`：当前阶段、版本、下一步。
+2. `product/PRD.md`：至少读 front matter 与本次相关的 REQ 块。
+3. 涉及界面时读 `docs/prototype-guide.md`，并打开对应 `prototype/screens/*.html`。
+4. 需要判断「为什么」时读相关 `product/decisions/*.md`。
+
+然后用一句话复述：**当前阶段 + 你准备做什么 + 会改哪些需求/页面**。如果用户请求与 PRD 冲突，先指出冲突，不要默默改需求。
+
+## 4. 工作流与门禁
+
+| 阶段 | 进入条件 | 产物 | 退出条件 |
+| --- | --- | --- | --- |
+| discovery | 有一个待验证的问题 | `product/discovery/*.md` | 证据足够支撑一个方向 |
+| prd | 方向确定 | PRD 新增/修改 REQ 与验收 | 每条需求 ID、优先级、验收齐全 |
+| prototype | 需求已存在 | `screens/*.html` + `data-req` | 每个页面可打开、可走通主流程 |
+| review | PRD 与原型都完成 | 评审结论、修改项 | 人明确说「通过」 |
+| handoff | 评审通过 | 分享链接/导出物 | 研发可据此拆任务 |
+
+规则：
+
+- **先有 REQ，后有原型。** 没进 PRD 的想法只能放 `prototype/spikes/`，不得进入 `screens/`、不得出现在目录页。
+- `approved` 只能由人在评审中明确确认后设置；agent 不得自行把状态改成 `approved` 或 `delivered`。
+- 阶段可以回退：原型暴露了 PRD 的问题，就回 PRD 改需求并升版本，不要在原型里打补丁。
+
+## 5. 硬规则
+
+### 5.1 需求
+
+- ID 固定为 `REQ-001` 三位数字，**永不复用、永不重编号**。删除需求用 `dropped`，不删 ID。
+- 每条非 `dropped` 需求必须有：`状态`、`优先级`、`用户故事`、`行为`、至少一条 `- [ ]` 验收。
+- PRD 中引用界面文案时用「」标注，原型必须逐字一致；改文案时两边同改。
+- 行为变化必须升 `version` 并补「变更记录」；仅澄清措辞用 patch，行为/范围变化用 minor，方向重做用 major。
+
+### 5.2 原型
+
+- 每个页面必须有：
+  ```html
+  <meta name="screen:id" content="home">
+  <meta name="screen:title" content="首页 · 一键开录">
+  <meta name="screen:flow" content="记录">
+  ```
+- 实现某条需求的元素，必须带 `data-req="REQ-00x"`；标在**最小可定位容器**上，不要给整个 `<body>` 打标。
+- `data-req` 只能引用 PRD 中已存在的需求。原型不能发明行为；需要新行为就先加 REQ。
+- 页面之间用真实相对链接串起来，主流程必须能点通。
+- 只用 `prototype/assets/` 下的共享样式与原生 HTML/CSS/JS；不引 CDN、不引构建链、不装依赖。
+- 使用真实感的中文示例数据；禁止 lorem ipsum、`TODO`、空按钮、死链。
+- PRD 第 6 节列出的边界态，在对应页面要有可演示的呈现；不能演示的，在汇报里说明。
+
+### 5.3 工位状态
+
+- 每次改动结束都要更新 `STATE.md`：`stage`、`spec_version`（必须等于 PRD 版本）、`updated`、`next_action`。
+- `STATE.md` 只写「现在」和「下一步」，不复制需求正文。
+
+### 5.4 生成物
+
+- **禁止手改 `prototype/index.html`**，它由 `node scripts/sync.mjs` 生成。
+- 提交前跑 `npm run check`，必须通过（CI 使用 strict：警告也失败）。
+
+## 6. 一次变更的标准动作
+
+任何涉及产品的改动，按这个顺序做完，**在同一次改动里完成**：
+
+1. **定位影响面**：搜索相关 `REQ-`，找出所有 `data-req` 引用与 STATE 中的相关描述。
+2. **改 PRD**：新增/修改 REQ、验收、边界；更新 front matter 的 `version` 与 `updated`；补「变更记录」。
+3. **改原型**：更新受影响页面；新增页面时加 meta 与 `data-req`；同步文案。
+4. **改决策**：如果推翻了已有取舍，新增 ADR 并在 PRD 链接；不要改写旧 ADR。
+5. **更新 STATE**：阶段、版本、下一步。
+6. **跑校验**：`npm run check`；失败就修到通过，不要用 `--no-verify` 绕过。
+7. **汇报**：按第 8 节格式。
+
+新增一条需求的完整流程：
+
+```text
+1. PRD 加 ### REQ-007 标题 + 状态 draft + 优先级 + 用户故事 + 行为 + 验收
+2. 升 version（minor）+ 变更记录
+3. 做原型：页面加 meta，相关元素加 data-req="REQ-007"
+4. 把状态改为 prototyped
+5. 更新 STATE.md
+6. npm run sync（重建目录页）→ npm run check
+```
+
+## 7. 状态语义
+
+| 状态 | 含义 | 校验行为 |
+| --- | --- | --- |
+| `draft` | 只有 PRD，还没做原型 | 有页面覆盖时告警 |
+| `prototyped` | 至少一个页面覆盖 | 无覆盖直接报错 |
+| `approved` | 人已评审通过 | 必须有覆盖；只能人工设置 |
+| `delivered` | 已交给研发/上线 | 必须有覆盖；原型保留 |
+| `dropped` | 明确不做 | 不得有页面覆盖 |
+
+`draft` 与 `dropped` 都是合法终点：不要为了「看起来完整」把没做的事标成 `prototyped`。
+
+## 8. 完成的定义与汇报格式
+
+没有跑通 `npm run check` 就不算完成。最终回复必须包含：
+
+```text
+变更：REQ-003 摘要结构、REQ-004 分享面板（PRD v0.2.0 → v0.2.1）
+页面：prototype/screens/note.html
+校验：npm run check 通过（4/5 需求已出原型）
+未决：分享链接是否允许未登录访问（PRD 第 9 节）
+```
+
+要求：
+
+- 列出**受影响的需求 ID 与页面**；不要只说「优化了界面」。
+- 如实报告校验结果；有警告就贴出来。
+- 没做的事、不能演示的边界，明确写「未做/未验证」，不要用「基本完成」。
+- 不要粘贴大段 PRD 或 HTML，给路径和 ID。
+
+## 9. 什么时候问，什么时候做
+
+直接做：
+
+- 在当前 REQ 的实现范围内调整布局、组件、文案（文案同步 PRD）。
+- 补边界态、补链接、修一致性错误。
+- 为已有需求补验收标准。
+
+先问：
+
+- 新增/删除需求、改变范围或优先级。
+- 把状态改成 `approved` / `delivered`。
+- 与已有决策冲突，或需要推翻 PRD 的取舍。
+- 删除页面、重命名 REQ、改变目录结构。
+- 需要引入外部依赖、构建工具或联网资源。
+
+## 10. 目录职责
+
+```text
+product/PRD.md            需求与验收的唯一事实源
+product/discovery/        问题定义与证据；不写解决方案细节
+product/decisions/        ADR：一次决策一个文件，只增不改
+prototype/screens/        正式原型，进入目录页，必须带 data-req
+prototype/spikes/         探索稿，不进入目录页，不得被正式页面链接
+prototype/assets/         共享 tokens 与组件样式
+prototype/index.html      自动生成的目录页，禁止手改
+scripts/sync.mjs          一致性校验 + 目录页生成
+docs/                     工作流、一致性模型、原型规范、评审清单
+STATE.md                  会话交接板
+```
