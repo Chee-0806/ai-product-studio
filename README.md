@@ -140,7 +140,7 @@ AI 会走：`deliver`。研发包可以机械打包；Word、PPT、封面、审�
 
 平时整个文件夹是**工作区**，不要直接打包发——里面还有 `STATE.md`、脚本、内部工作台和调研记录。
 
-对 AI 说一句：**「导出交付包」**（维护者也可以运行 `npm run export` 做机械打包）。它会先检查一致性，再生成：
+对 AI 说一句：**「导出交付包」**。它会走 `deliver` 技能，先检查一致性，再直接组装（没有 `npm run export` 这个脚本）：
 
 ```text
 dist/
@@ -202,7 +202,6 @@ LICENSES/                 第三方许可证原文
 scripts/
   sync.mjs                一致性检查 + 生成工作台
   check-skills.mjs        技能格式检查
-  export.mjs              生成研发交付包
   new.mjs                 从模板创建新项目
   serve.mjs               可选的本地预览服务
   lib/screens.mjs         多页/SPA 页面读取与外部资源匹配
@@ -262,10 +261,9 @@ dist/                     导出的交付包（生成物，不提交）
 | `npm run pack:add -- pm-methods` | 安装 8 个官方 PM 方法技能 |
 | `npm run pack:remove -- pm-methods` | 移除该内容包（核心技能不动） |
 | `npm run new` | 从模板创建一个新项目 |
-| `npm run export` | 机械打包研发交付包和 zip；评审 Word/PPT 走 `deliver` 技能 |
 | `npm run dev` | 可选：本地预览，默认 http://localhost:4173 |
 
-不需要 `npm install`，没有运行时依赖。
+不需要 `npm install`，没有运行时依赖。交付包、评审 Word、PPT 没有单独命令，统一走 `deliver` 技能。
 
 ## 开新项目
 

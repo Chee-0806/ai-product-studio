@@ -121,7 +121,7 @@ draft ──► prototyped ──► approved ──► delivered
 
 评审通过后：
 
-- 用户说「导出交付包 / 做评审版 Word / 汇报 PPT」时，走 `deliver` 技能。研发包可以用 `npm run export` 做机械打包；评审 Word、PPT、甲方材料由 agent 生成，不要新增产物生成脚本。
+- 用户说「导出交付包 / 做评审版 Word / 汇报 PPT」时，走 `deliver` 技能。研发包、评审 Word、PPT、甲方材料都由 agent 按技能组装，不要新增产物生成脚本。
 - 研发包生成 `dist/<产品>-v<版本>/` 与同名 zip；**只把 zip 发给研发**，不要发整个工作区。多页导出 `prototype/screens/`；SPA 导出入口与依赖文件。
 - 目录页链接可以发给参会人看原型；研发以交付包里的 `PRD.html` + `prototype/index.html` 为准。
 - 需要文档时从 PRD 生成，不另写一份「精简版需求」（会变成第二份真相）；

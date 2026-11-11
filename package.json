@@ -13,7 +13,6 @@
     "pack:add": "node scripts/pack.mjs add",
     "pack:remove": "node scripts/pack.mjs remove",
     "new": "node scripts/new.mjs",
-    "export": "npm run sync && npm run check && node scripts/export.mjs",
     "dev": "node scripts/serve.mjs"
   },
   "engines": {

@@ -279,7 +279,7 @@ npm run pack:remove -- pm-methods
 
 - \`npm run check\`：检查 PRD、原型、技能格式
 - \`npm run sync\`：刷新工作台
-- \`npm run export\`：生成给研发的交付包（\`dist/\` 下的文件夹和 zip）
+- 对 AI 说「导出交付包 / 做评审版 Word」：走 \`deliver\` 技能，生成 \`dist/\` 下的产物（没有 \`npm run export\` 脚本）
 - \`npm run pack:add -- <包名>\`：安装可选方法包
 - \`npm run dev\`：可选，本地预览
 

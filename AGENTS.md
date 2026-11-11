@@ -159,9 +159,9 @@ npm run pack:remove -- pm-methods
 ### 6.1 交付与产物生成
 
 - 用户说「发给研发」「导出交付包」「做评审版」「做成 Word / PPT」「给甲方」时，先读 `skills/deliver/SKILL.md`，按受众组织产物。
-- **产物生成不写成脚本**：不要新增 `review.mjs`、`export --review` 或类似的硬编码生成器。Word、PPT、评审材料的结构与排版由 agent 按技能生成；需要新格式时改技能或模板，不改脚本。
-- 研发交付包可以运行 `npm run export` 做机械复制与压缩；它会先跑 `npm run check`。如果甲方要求不同目录或字段，按 `deliver` 技能直接组装，不要为一个项目改 `export.mjs`。
-- 不要把整个工作区打包发；内部工作台、`STATE.md`、脚本、调研与决策不属于交付物。
+- **产物生成不写成脚本**：不要新增 `review.mjs`、`export.mjs`、`export --review` 或类似的硬编码生成器。研发包、Word、PPT、评审材料的结构与内容由 agent 按技能生成；需要新格式时改技能或模板，不改脚本。
+- 研发交付包由 `deliver` 技能直接组装：先跑 `npm run sync && npm run check`，再建 `dist/<产品>-v<版本>/`，复制 PRD 与原型，生成交付首页/说明，最后打 zip。
+- 不要把整个工作区打包发；内部工作台、`STATE.md`、`AGENTS.md`、`skills/`、`docs/`、`scripts/`、调研与决策不属于交付物。
 - 产物：`dist/<产品>-v<版本>/` 与同名 `.zip`。入口是 `index.html`，PRD 是 `PRD.html` / `PRD.md`，原型是 `prototype/index.html`。
 - 多页原型导出 `prototype/screens/`；SPA 导出入口文件与它依赖的脚本/样式/数据，内部清单、预览图和 `external.json` 不进入交付包。
 - 交付包保留已声明白名单的外部资源；`README.md` 会列出域名。内网/离线交付时，提醒用户提前 vendor 或准备本地副本。
@@ -248,7 +248,6 @@ LICENSES/                 第三方许可证原文
 scripts/sync.mjs          一致性校验 + 工作台生成
 scripts/check-skills.mjs  技能格式校验（含可选包源）
 scripts/pack.mjs          安装/移除可选内容包
-scripts/export.mjs        生成研发交付包
 scripts/new.mjs           从模板创建新项目
 scripts/lib/screens.mjs   多页/SPA 页面读取与外部资源匹配
 docs/                     工作流、一致性模型、原型规范、评审清单、企业适配

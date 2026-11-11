@@ -34,7 +34,15 @@ description: 当用户要导出交付包、评审材料、Word/PPT、发给研�
 1. **先跑检查**：`npm run sync && npm run check`。有错误先修；不要带着红色状态导出。
 2. **读源材料**：完整读 PRD；提取 REQ、状态、验收、依据、开放问题、变更记录；读 STATE 与相关 ADR。
 3. **选格式**：研发包、评审 Word、汇报 PPT、甲方模板；先确认受众和必须包含的字段，不要套一个万能模板。
-4. **研发交付包**：可以运行 `npm run export` 做机械复制与压缩；如果对方要求不同目录或字段，直接按本技能在 `dist/` 下组装，不要为了一个项目改 `export.mjs`。
+4. **研发交付包**：不要调用产物生成脚本，直接由你组装：
+   - 建 `dist/<产品>-v<版本>/`；
+   - 复制 `product/PRD.md` 为 `PRD.md`；需要可读版时用 `pandoc` 或直接生成 `PRD.html`，没有工具就只交付 Markdown 并说明；
+   - 多页原型复制 `prototype/screens/` 与 `prototype/assets/`；SPA 复制入口及其依赖的脚本/样式/数据，排除 `screens.json`、`external.json`、`previews/`、`spikes/`；
+   - 把复制后原型里的 `工作台.html` 回链改成指向交付包内的原型目录（多页 `../index.html`，SPA 根入口 `index.html`）；
+   - 生成 `index.html` 与 `README.md`：产品、版本、日期、包内文件、需求→页面表、外部资源说明；
+   - 用 `zip -r` 打包；检查包内没有 `STATE.md`、`AGENTS.md`、`skills/`、`docs/`、`scripts/`、`discovery/`、`decisions/`、`工作台.html`；
+   - 用 `file://` 抽查 `index.html`、`PRD.html` 或 `PRD.md`、原型入口。
+   - 如果对方要求不同目录或字段，按对方模板调整；不要为了一个项目新增脚本。
 5. **评审 Word**：
    - 先生成结构化 Markdown/HTML 源，放在 `dist/review/<产品>-v<版本>/`；
    - 至少包含：封面（产品、版本、日期、编制/评审人）、修订记录、审批栏、需求表（ID、优先级、状态、依据）、未决问题、变更摘要、风险与依赖；
@@ -56,7 +64,7 @@ description: 当用户要导出交付包、评审材料、Word/PPT、发给研�
 
 ## 不要做
 
-- 不要把产物生成写成新的 `scripts/*.mjs`，也不要加 `export --review`；新格式改技能或模板，不改脚本。
+- 不要把产物生成写成新的 `scripts/*.mjs`，也不要保留 `export.mjs` / `export --review`；研发包、评审 Word、PPT 都由本技能组装，新格式改技能或模板，不改脚本。
 - 不要把 HTML 改后缀冒充 `.docx`；必须是真正的 Word 文件。
 - 不要虚构需求、依据、审批意见或修订记录。
 - 不要把内部工作台、`STATE.md`、脚本、调研原文、ADR 全文打进对外交付物。

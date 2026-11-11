@@ -79,18 +79,21 @@ basis_required: true
 
 依据要能核对：法规条款、标准编号、访谈日期与样本、数据看板链接、ADR 文件。不要写「业务要求」「领导要求」这类无法追溯的话。
 
-## 5. 导出交付包
+## 5. 导出研发交付包
 
-`npm run export` 只做机械打包，会自动识别多页或 SPA：
+产物生成走 `deliver` 技能，没有 `npm run export` 脚本。agent 在 `dist/<产品>-v<版本>/` 下直接组装：
 
-- 多页：导出 `prototype/screens/` 与共享样式；
-- SPA：导出入口、脚本、数据与样式；`screens.json`、`external.json`、`previews/` 不进入交付包；
-- 外部资源域名写进交付包 README；
-- 内部工作台、`STATE.md`、脚本、调研与决策不进入交付包。
+- 复制 `product/PRD.md` 为 `PRD.md`；需要可读版时生成 `PRD.html` 或 PDF；
+- 多页：复制 `prototype/screens/` 与 `prototype/assets/`；
+- SPA：复制入口、脚本、数据与样式；`screens.json`、`external.json`、`previews/`、`spikes/` 不进入交付包；
+- 生成 `index.html` 与 `README.md`，列出包内文件、需求→页面表、外部资源域名；
+- 把原型里的 `工作台.html` 回链改成交付包内的原型目录；
+- 内部工作台、`STATE.md`、`AGENTS.md`、`skills/`、`docs/`、`scripts/`、调研与决策不进入交付包；
+- `zip -r` 打包后，用 `file://` 抽查入口、PRD 与原型。
 
 ## 6. Word / PPT / 评审材料
 
-**产物生成走 `deliver` 技能，不走脚本。** 框架不内置 docx 生成器，也不新增 `review.mjs` / `export --review` 这类硬编码生成器。Word 的排版、目录、页眉页脚、审批栏由 agent 用自己擅长的工具完成；框架只负责 PRD、原型和检查结果这些源材料。
+**产物生成走 `deliver` 技能，不走脚本。** 框架不内置 docx 生成器，也不保留 `export.mjs`，不新增 `review.mjs` / `export --review` 这类硬编码生成器。Word 的排版、目录、页眉页脚、审批栏由 agent 用自己擅长的工具完成；框架只负责 PRD、原型和检查结果这些源材料。
 
 流程：
 
