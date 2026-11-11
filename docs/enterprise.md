@@ -81,29 +81,34 @@ basis_required: true
 
 ## 5. 导出交付包
 
-`npm run export` 会自动识别多页或 SPA：
+`npm run export` 只做机械打包，会自动识别多页或 SPA：
 
 - 多页：导出 `prototype/screens/` 与共享样式；
 - SPA：导出入口、脚本、数据与样式；`screens.json`、`external.json`、`previews/` 不进入交付包；
 - 外部资源域名写进交付包 README；
 - 内部工作台、`STATE.md`、脚本、调研与决策不进入交付包。
 
-## 6. Word 评审材料（v0.4 已定架构）
+## 6. Word / PPT / 评审材料
 
-框架**不内置 docx 生成器**。Word 的排版、目录、页眉页脚、审批栏由 agent 用自己擅长的工具完成；框架负责准备结构化源材料和验收标准。
+**产物生成走 `deliver` 技能，不走脚本。** 框架不内置 docx 生成器，也不新增 `review.mjs` / `export --review` 这类硬编码生成器。Word 的排版、目录、页眉页脚、审批栏由 agent 用自己擅长的工具完成；框架只负责 PRD、原型和检查结果这些源材料。
 
-计划中的流程：
+流程：
 
-1. 框架生成评审快照：封面、版本、修订记录、审批栏、未决问题、变更摘要、需求依据；
-2. agent 读取快照，用 `officecli` / `pandoc` / `python-docx` / LibreOffice 等可用工具生成 `.docx`；
-3. agent 自检：封面字段、标题层级、表格、页码、审批栏、无占位文本；
-4. 交付 `.docx`，同时保留 Markdown 源材料，便于下一版追踪变更。
+1. 先跑 `npm run sync && npm run check`，不要把红色状态带进交付物；
+2. agent 读 PRD、STATE、相关 ADR，提取需求、依据、开放问题、变更记录；
+3. 按受众生成结构化 Markdown/HTML 源，放在 `dist/review/<产品>-v<版本>/`；
+4. 用 `officecli` / `pandoc` / `python-docx` / LibreOffice 等可用工具生成真正的 `.docx`；
+5. 自检封面字段、标题层级、表格、页码、审批栏、无占位文本；
+6. 保留 Markdown 源，下一版才能做差异和修订记录。
+
+Word 至少包含：封面（产品、版本、日期、编制/评审人）、修订记录、审批栏、需求表（ID、优先级、状态、依据）、未决问题、变更摘要、风险与依赖。
 
 硬规则：
 
 - 必须是真正的 `.docx`，不能把 HTML 改后缀冒充；
 - 不虚构需求、依据或审批意见；
-- 版本号、修订记录、审批人与 PRD / STATE 一致。
+- 版本号、修订记录、审批人与 PRD / STATE 一致；
+- 需要新格式时改 `skills/deliver/SKILL.md` 或模板，不要加产物生成脚本。
 
 ## 7. 交付前检查
 

@@ -41,6 +41,7 @@
 - `skills/prototype/SKILL.md`
 - `skills/review/SKILL.md`
 - `skills/change/SKILL.md`
+- `skills/deliver/SKILL.md`
 - `scripts/`、`prototype/assets/`、`docs/` 与模板文档
 
 这些内容采用 MIT，只封装本工位的「PRD ↔ 静态 HTML 原型」一致性流程，不复制上面的 PM 方法论。

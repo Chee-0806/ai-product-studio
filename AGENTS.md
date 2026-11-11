@@ -49,6 +49,7 @@ PRD 与原型必须同时成立：PRD 里的每条需求要么有原型覆盖，
 | 做页面、改界面 | `prototype` |
 | 评审、查一致性 | `review` |
 | 改已有需求/页面/文案 | `change` |
+| 导出交付包、评审材料、Word/PPT、发给研发/甲方 | `deliver` |
 
 **可选内容包默认不安装**。只有当 `skills/` 下确实存在对应目录时才使用；不存在就按通用产品方法做，不要假装有这个技能，也不要自行创建：
 
@@ -83,7 +84,7 @@ npm run pack:remove -- pm-methods
 | prd | 方向确定 | PRD 新增/修改 REQ 与验收 | 每条需求 ID、优先级、验收齐全 |
 | prototype | 需求已存在 | `screens/*.html` + `data-req`，或 `screens.json` + 入口 | 每个页面/路由可打开、可走通主流程 |
 | review | PRD 与原型都完成 | 评审结论、修改项 | 人明确说「通过」 |
-| handoff | 评审通过 | 分享链接/导出物 | 研发可据此拆任务 |
+| handoff | 评审通过 | 分享链接/导出物/评审 Word | 研发可据此拆任务，评审方可归档 |
 
 规则：
 
@@ -155,16 +156,18 @@ npm run pack:remove -- pm-methods
 6. npm run sync（重建工作台）→ npm run check
 ```
 
-### 6.1 交付给研发
+### 6.1 交付与产物生成
 
+- 用户说「发给研发」「导出交付包」「做评审版」「做成 Word / PPT」「给甲方」时，先读 `skills/deliver/SKILL.md`，按受众组织产物。
+- **产物生成不写成脚本**：不要新增 `review.mjs`、`export --review` 或类似的硬编码生成器。Word、PPT、评审材料的结构与排版由 agent 按技能生成；需要新格式时改技能或模板，不改脚本。
+- 研发交付包可以运行 `npm run export` 做机械复制与压缩；它会先跑 `npm run check`。如果甲方要求不同目录或字段，按 `deliver` 技能直接组装，不要为一个项目改 `export.mjs`。
 - 不要把整个工作区打包发；内部工作台、`STATE.md`、脚本、调研与决策不属于交付物。
-- 用户说「发给研发」「导出交付包」时，运行 `npm run export`；它会先跑 `npm run check`。
 - 产物：`dist/<产品>-v<版本>/` 与同名 `.zip`。入口是 `index.html`，PRD 是 `PRD.html` / `PRD.md`，原型是 `prototype/index.html`。
 - 多页原型导出 `prototype/screens/`；SPA 导出入口文件与它依赖的脚本/样式/数据，内部清单、预览图和 `external.json` 不进入交付包。
 - 交付包保留已声明白名单的外部资源；`README.md` 会列出域名。内网/离线交付时，提醒用户提前 vendor 或准备本地副本。
 - **只发 zip**；系统没有 `zip` 命令时，发 `dist/<产品>-v<版本>/` 文件夹。
 - `dist/` 是生成物，不手改、不提交。
-- 评审通过后，主动问用户是否要导出交付包。
+- 评审通过后，主动问用户是否需要导出交付包、评审 Word 或汇报材料。
 
 ## 7. 状态语义
 
@@ -237,7 +240,7 @@ prototype/external.json   外部资源白名单；可选
 prototype/previews/       工作台静态预览图；可选，不进入交付包
 prototype/spikes/         探索稿，不进入工作台，不得被正式页面链接
 prototype/assets/         共享 tokens 与组件样式
-skills/                   已安装的核心技能：prototype / review / change
+skills/                   已安装的核心技能：prototype / review / change / deliver
 packs/                    可选内容包源，默认不安装（pm-methods）
 LICENSE                   自有代码与文档的 MIT 许可证
 THIRD_PARTY_NOTICES.md    外部技能来源、许可证与修改说明

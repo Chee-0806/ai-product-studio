@@ -8,7 +8,7 @@
 
 ## 两层：核心技能 + 可选内容包
 
-- **核心技能**默认安装，在 `skills/` 里，只有 3 个，负责本工位的 PRD ↔ 原型一致性流程。
+- **核心技能**默认安装，在 `skills/` 里，只有 4 个：3 个负责 PRD ↔ 原型一致性，1 个负责交付产物。
 - **可选内容包**放在 `packs/`，默认不安装，不参与路由，也不会被 `.claude/skills` 发现。需要时再装进 `skills/`。
 
 ```bash
@@ -24,6 +24,7 @@ npm run pack:remove -- pm-methods
 | [`prototype`](prototype/SKILL.md) | 把已有 REQ 做成可点页面 | `prototype/screens/*.html` 或 `screens.json` + SPA 入口 |
 | [`review`](review/SKILL.md) | 评审 PRD、原型或两者一致性 | 必改 / 建议 / 未验证 |
 | [`change`](change/SKILL.md) | 改已有需求、页面或文案 | 两边同步 + 版本 + 工作台 |
+| [`deliver`](deliver/SKILL.md) | 导出交付包、评审 Word、汇报 PPT | 按受众组织的产物 + 自检 |
 
 ## 可选内容包：pm-methods
 
@@ -81,4 +82,5 @@ npm run pack:remove -- pm-methods
 - 不要把 PRD 模板、竞品资料、会议记录塞进技能目录。
 - 不要让技能定义新的需求状态或文件格式；这些以 `AGENTS.md` 为准。
 - 不要抄一个技能却不记来源和许可证。
-- 不要默认安装一整套方法包；先保证核心 3 个技能稳定。
+- 不要默认安装一整套方法包；先保证核心 4 个技能稳定。
+- 不要把交付产物写成 `scripts/*.mjs`；Word/PPT/评审材料的生成走 `deliver` 技能。

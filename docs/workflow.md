@@ -90,6 +90,14 @@ agent 的开场动作固定：
 不要新增需求，不要改状态。
 ```
 
+### 导出评审 Word
+
+```text
+按 skills/deliver/SKILL.md 生成评审版 Word：封面、版本、修订记录、审批栏、需求表（含依据）、未决问题、变更摘要。
+先跑检查；用可用工具生成真正的 .docx，并自检封面、标题、表格、页码、审批栏。
+不要新增脚本，不要把 HTML 改后缀。
+```
+
 ## 5. 版本与状态
 
 版本遵循 SemVer，只存在于 `product/PRD.md`：
@@ -113,9 +121,10 @@ draft ──► prototyped ──► approved ──► delivered
 
 评审通过后：
 
-- 运行 `npm run export`，生成 `dist/<产品>-v<版本>/` 与同名 zip；**只把 zip 发给研发**，不要发整个工作区。多页导出 `prototype/screens/`；SPA 导出入口与依赖文件。
+- 用户说「导出交付包 / 做评审版 Word / 汇报 PPT」时，走 `deliver` 技能。研发包可以用 `npm run export` 做机械打包；评审 Word、PPT、甲方材料由 agent 生成，不要新增产物生成脚本。
+- 研发包生成 `dist/<产品>-v<版本>/` 与同名 zip；**只把 zip 发给研发**，不要发整个工作区。多页导出 `prototype/screens/`；SPA 导出入口与依赖文件。
 - 目录页链接可以发给参会人看原型；研发以交付包里的 `PRD.html` + `prototype/index.html` 为准。
-- 需要文档时从 PRD 导出，不另写一份「精简版需求」（会变成第二份真相）；
+- 需要文档时从 PRD 生成，不另写一份「精简版需求」（会变成第二份真相）；
 - `prototype/spikes/` 里未被采纳的探索，在阶段结束时删除或移到归档分支；
 - 新决策追加 ADR，旧 ADR 标记 `superseded by`。
 
