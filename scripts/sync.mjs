@@ -431,8 +431,7 @@ ${workbenchCss}
   </header>
 
   <section class="build build--${buildClass}" aria-label="检查状态">
-    <p class="build__title"><span class="build__icon" aria-hidden="true">${buildIcon}</span>${esc(buildTitle)}</p>
-    ${buildNoteHtml}${buildDetail}
+    <p class="build__title"><span class="build__icon" aria-hidden="true">${buildIcon}</span>${esc(buildTitle)}</p>${buildNoteHtml}${buildDetail}
   </section>
 
   <section class="next">
