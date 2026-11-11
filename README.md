@@ -2,6 +2,8 @@
 
 给**不写代码、不用 git、不开终端**的产品经理用的 AI 协作工位。
 
+仓库：https://github.com/Chee-0806/For_Jasmine
+
 打开方式只有一个：**双击根目录的 `工作台.html`**。
 
 ## 她只需要做三件事
@@ -247,6 +249,8 @@ curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.
 - `--ref v0.2.0`：固定使用某个分支、标签或 commit。
 
 介意 `curl | bash` 的话，可以先下载 `install.sh` 看一遍再执行。
+
+> GitHub 仓库已开启 Template；「Use this template」复制的是整份模板（含示例 PRD/原型）。要直接得到干净工位，用上面的 `install.sh`。
 
 ### 在本地模板目录
 
