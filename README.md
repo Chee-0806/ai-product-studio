@@ -1,4 +1,5 @@
 # 产品设计工位 · AI Product Studio
+**中文** · [English](README.en.md)
 
 **我太太是产品经理。她不写代码、不用 git、也不碰终端，所以这个工位是照着她做的。**
 
@@ -16,19 +17,7 @@
 
 A **workspace template for product managers who don't write code**. It was built for my wife — a PM who doesn't touch git or the terminal — because teaching her a toolchain was the wrong trade. You talk to an AI coding agent (Claude Code / Cursor / Codex) in plain language; the agent keeps a PRD and a clickable HTML prototype in sync, and regenerates one read-only dashboard you actually look at — next step, what changed last round, what needs your decision, requirement progress, prototype pages.
 
-The PM never touches git, the terminal, or file paths. Three mechanical rules keep the documents honest:
-
-1. every requirement has a stable ID (`REQ-001`), and prototype elements carry `data-req="REQ-001"`;
-2. a requirement marked "prototyped" must have a page, one marked "dropped" must not;
-3. the PRD version must equal the version in `STATE.md`.
-
-`npm run check` enforces all three; `npm run sync` regenerates the dashboard. No runtime dependencies, no `npm install`.
-
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/main/install.sh) install ../my-product --name "My Product"
-```
-
-**[Live demo](https://chee-0806.github.io/ai-product-studio/)** · MIT.
+[Full README in English →](README.en.md)
 
 ## 为什么做这个
 
