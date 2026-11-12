@@ -2,6 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
+<!-- station-meta {"version":"0.2.2","generatedAt":"2026-11-12T10:18:15.876Z"} -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>回声纪要 · 工作台</title>
 <style>
@@ -286,13 +287,17 @@ a:hover {
 
 .decisions li {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: baseline;
-  justify-content: space-between;
   padding: 12px 0;
   border-bottom: 1px solid var(--line);
   font-size: 15px;
   line-height: 1.55;
+}
+
+.decisions li > span:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .decisions li:last-child {
@@ -739,6 +744,259 @@ footer {
 
 /* ---------- 窄屏 ---------- */
 
+/* ---------- 身份行 ---------- */
+
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.identity span + span::before {
+  content: "·";
+  margin: 0 10px;
+  color: var(--ink-3);
+}
+
+.identity--fail {
+  border-color: var(--danger-line);
+  background: var(--danger-weak);
+  color: var(--danger);
+}
+
+/* ---------- 变更三档 ---------- */
+
+.change {
+  margin-top: 14px;
+}
+
+.change__kind {
+  color: var(--ink-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.change__kind span {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  color: var(--ink-2);
+  font-size: 11px;
+}
+
+.change--commitment .change__kind {
+  color: var(--danger);
+}
+
+.change--commitment .change__kind span {
+  background: var(--danger-weak);
+  color: var(--danger);
+}
+
+.change--structure .change__kind {
+  color: var(--warn);
+}
+
+.change--structure .change__kind span {
+  background: var(--warn-weak);
+  color: var(--warn);
+}
+
+.change__list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.change__list li + li {
+  margin-top: 2px;
+}
+
+/* 结构类改动下面那行：具体动了哪几个需求、文件在哪。 */
+.change__detail {
+  display: block;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* ---------- 等你处理 ---------- */
+
+.pending {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--danger-line);
+  border-radius: var(--radius-xs);
+  background: var(--danger-weak);
+}
+
+.pending__title {
+  color: var(--danger);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.pending .note {
+  margin-top: 4px;
+}
+
+.pending .change__list {
+  margin-top: 8px;
+}
+
+.structure {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius-xs);
+  background: var(--warn-weak);
+}
+
+.structure__title {
+  color: var(--warn);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.structure .note {
+  margin-top: 4px;
+}
+
+.structure .change__list {
+  margin-top: 8px;
+}
+
+.decisions__rounds {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--warn-weak);
+  color: var(--warn);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.decisions__rounds--stale {
+  background: var(--danger-weak);
+  color: var(--danger);
+}
+
+/* ---------- 承诺账本 ---------- */
+
+.ledger {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.ledger summary {
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ledger__list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ledger__list li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 2px 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+}
+
+.ledger__list li:last-child {
+  border-bottom: 0;
+}
+
+.ledger__kind {
+  grid-row: span 2;
+  align-self: start;
+  color: var(--ink-2);
+  font-size: 11.5px;
+}
+
+.ledger__kind--out {
+  color: var(--success);
+}
+
+.ledger__kind--no {
+  color: var(--danger);
+}
+
+.ledger__kind--open {
+  color: var(--warn);
+}
+
+.ledger__text {
+  color: var(--ink);
+}
+
+.ledger__detail {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+/* ---------- 参考区折叠 ---------- */
+
+.reference {
+  margin-top: 40px;
+  border-top: 1px solid var(--line-strong);
+  padding-top: 4px;
+}
+
+.reference > summary {
+  padding: 8px 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.reference > summary::-webkit-details-marker {
+  display: none;
+}
+
+.reference > summary::before {
+  content: "▸";
+  display: inline-block;
+  width: 16px;
+  color: var(--ink-3);
+  transition: transform 0.15s var(--ease);
+}
+
+.reference[open] > summary::before {
+  content: "▾";
+}
+
+.reference > summary:hover {
+  color: var(--ink);
+}
+
+.reference .stats {
+  margin-top: 4px;
+}
+
 @media (max-width: 760px) {
   .wrap {
     padding: 40px 24px 56px;
@@ -863,7 +1121,8 @@ footer {
 <div class="wrap">
   <header class="head">
     <h1>回声纪要</h1>
-    <p class="meta">产品工作台 · 做原型 · 规格 v0.2.1 · 更新于 2026-11-12 · 4/5 个需求已有原型</p>
+    <p class="meta">产品工作台 · 做原型</p>
+    <p class="identity"><span>依据 PRD v0.2.2（2026-11-12）</span><span>检查通过</span><span>生成于 2026-11-12 18:18</span><span>6 个需求 / 3 个页面</span></p>
   </header>
 
   <section class="build build--ok" aria-label="检查状态">
@@ -877,30 +1136,34 @@ footer {
 
   <section class="round" aria-label="本轮变更">
     <p class="round__label">本轮变更</p>
-    <p class="round__change">英文版 README 进仓库：顶部加中英切换，中文版的英文小节缩成一段；英文版里那句自我介绍按中文口径删掉，「四个词」改成「五个词」</p>
-    <p class="round__meta">为什么：英文版要跟中文版同一口径，不能留着中文版刚否定的说法；术语表本来就有五行</p>
+    <p class="round__change">工作台改成快照与账本：顶部一行身份，本轮变更按承诺类、结构类、重写类逐条列出，等你处理区合并了未确认改动、待定的事和承诺账本；承诺类改动要人确认，评审签字留痕、签完冻结</p>
+    <p class="round__meta">为什么：「AI 说改好了」不够用——要能看见它改了什么、谁认的；工作台不是操作入口，是留痕的地方</p>
     
+    <p class="round__meta">需求、页面和决定记录这一轮都没有变。</p>
   </section>
 
-  <section aria-label="需要你拍板">
-    <h2>需要你拍板</h2>
+  <section id="waiting" aria-label="等你处理">
+    <h2>等你处理</h2>
     <ol class="decisions">
-      <li><span>分享链接是否能被未登录用户打开？</span><span class="decisions__from">PRD 开放问题 · 产品</span></li>
-      <li><span>3 小时以上会议是否直接拒绝？</span><span class="decisions__from">PRD 开放问题 · 产品 / 研发</span></li>
-      <li><span>导出 Markdown 是否包含原始转写全文？</span><span class="decisions__from">PRD 开放问题 · 产品</span></li>
+      <li><span>分享链接是否能被未登录用户打开？</span><span class="decisions__rounds">已挂 2 轮</span><span class="decisions__from">PRD 开放问题 · 产品</span></li>
+      <li><span>3 小时以上会议是否直接拒绝？</span><span class="decisions__rounds">已挂 2 轮</span><span class="decisions__from">PRD 开放问题 · 产品 / 研发</span></li>
+      <li><span>导出 Markdown 是否包含原始转写全文？</span><span class="decisions__rounds">已挂 2 轮</span><span class="decisions__from">PRD 开放问题 · 产品</span></li>
       <li><span>4 条需求已有原型，等评审确认是否通过</span><span class="decisions__from">需求评审</span></li>
-    </ol>
+    </ol><details class="ledger">
+      <summary>承诺账本（5）</summary>
+      <ul class="ledger__list"><li><span class="ledger__kind ledger__kind--in">对内</span><span class="ledger__text">先评审纪要详情页的三段式结构和分享面板；确认后再把「历史搜索」补进原型</span><span class="ledger__detail">下一件要做的事（只会保留最新一条）</span></li><li><span class="ledger__kind ledger__kind--no">负向</span><span class="ledger__text">自建可写工作台（页面内评论、编辑控件）：harness 已经提供评论入口，重复投资；而且会引入第二套事实源。</span><span class="ledger__detail">来自 0003-workbench-is-a-snapshot-and-ledger.md</span></li><li><span class="ledger__kind ledger__kind--no">负向</span><span class="ledger__text">把工作台继续当成「唯一入口」：这个说法建立在不成立的前提上，留着会让后面的设计一直往错的方向走。</span><span class="ledger__detail">来自 0003-workbench-is-a-snapshot-and-ledger.md</span></li><li><span class="ledger__kind ledger__kind--no">负向</span><span class="ledger__text">独立的承诺清单文件：账本必须是推导物，否则需求和账本会各说各话。</span><span class="ledger__detail">来自 0003-workbench-is-a-snapshot-and-ledger.md</span></li><li><span class="ledger__kind ledger__kind--no">负向</span><span class="ledger__text">工作台深色模式：优先级下调。工作台是快照与账本，不做个性化。</span><span class="ledger__detail">来自 0003-workbench-is-a-snapshot-and-ledger.md</span></li></ul>
+    </details>
   </section>
 
-  <section class="stats">
+  <details class="reference" id="requirements">
+    <summary>需求进度（6 条 · 4/5 有原型）</summary>
+    <section class="stats">
     <div class="stat"><b>6</b><span>需求总数</span></div>
     <div class="stat"><b>4</b><span>已有原型（不含已砍）</span></div>
     <div class="stat"><b>3</b><span>原型页面</span></div>
     <div class="stat"><b>1</b><span>待做原型</span></div>
   </section>
 
-  <section id="requirements">
-    <h2>需求进度</h2>
     <table>
       <thead><tr><th>ID</th><th>需求</th><th>优先级</th><th>状态</th><th>在哪个页面</th></tr></thead>
       <tbody><tr id="req-REQ-001" class="">
@@ -946,10 +1209,10 @@ footer {
         <td><span class="muted">—</span></td>
       </tr></tbody>
     </table>
-  </section>
+  </details>
 
-  <section>
-    <h2>原型页面</h2>
+  <details class="reference" open>
+    <summary>原型页面（3）</summary>
     <section class="flow-group">
       <h3 class="flow-title">记录 <span class="count">2</span></h3>
       <div class="index">
@@ -5081,7 +5344,7 @@ a.list-item:hover {
         </article>
       </div>
     </section>
-  </section>
+  </details>
 
   <details class="help">
     <summary>使用说明与交付</summary>
@@ -5110,7 +5373,7 @@ a.list-item:hover {
     </div>
   </details>
 
-  <footer>回声纪要 · 3 个页面 · 规格版本 0.2.1 · 由 AI 自动生成，不用手改</footer>
+  <footer>回声纪要 · 3 个页面 · 规格版本 0.2.2 · 由 AI 自动生成，不用手改</footer>
 </div>
 </body>
 </html>

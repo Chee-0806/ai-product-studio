@@ -6,3 +6,8 @@ dist/
 /*.zip
 .upgrade-backups/
 .demo/
+# 机器状态：每次 sync 都会变，跟着工位所在的机器走。
+# 确认与评审记录（confirmations.jsonl / reviews.jsonl）不忽略：那是人的决定。
+.station/snapshot.json
+.station/base.json
+.station/round.json

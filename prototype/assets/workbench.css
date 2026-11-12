@@ -213,13 +213,17 @@ a:hover {
 
 .decisions li {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: baseline;
-  justify-content: space-between;
   padding: 12px 0;
   border-bottom: 1px solid var(--line);
   font-size: 15px;
   line-height: 1.55;
+}
+
+.decisions li > span:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 .decisions li:last-child {
@@ -665,6 +669,259 @@ footer {
 }
 
 /* ---------- 窄屏 ---------- */
+
+/* ---------- 身份行 ---------- */
+
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 0;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.identity span + span::before {
+  content: "·";
+  margin: 0 10px;
+  color: var(--ink-3);
+}
+
+.identity--fail {
+  border-color: var(--danger-line);
+  background: var(--danger-weak);
+  color: var(--danger);
+}
+
+/* ---------- 变更三档 ---------- */
+
+.change {
+  margin-top: 14px;
+}
+
+.change__kind {
+  color: var(--ink-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.change__kind span {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3);
+  color: var(--ink-2);
+  font-size: 11px;
+}
+
+.change--commitment .change__kind {
+  color: var(--danger);
+}
+
+.change--commitment .change__kind span {
+  background: var(--danger-weak);
+  color: var(--danger);
+}
+
+.change--structure .change__kind {
+  color: var(--warn);
+}
+
+.change--structure .change__kind span {
+  background: var(--warn-weak);
+  color: var(--warn);
+}
+
+.change__list {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--ink);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+.change__list li + li {
+  margin-top: 2px;
+}
+
+/* 结构类改动下面那行：具体动了哪几个需求、文件在哪。 */
+.change__detail {
+  display: block;
+  color: var(--ink-2);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+/* ---------- 等你处理 ---------- */
+
+.pending {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--danger-line);
+  border-radius: var(--radius-xs);
+  background: var(--danger-weak);
+}
+
+.pending__title {
+  color: var(--danger);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.pending .note {
+  margin-top: 4px;
+}
+
+.pending .change__list {
+  margin-top: 8px;
+}
+
+.structure {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid var(--warn-line);
+  border-radius: var(--radius-xs);
+  background: var(--warn-weak);
+}
+
+.structure__title {
+  color: var(--warn);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.structure .note {
+  margin-top: 4px;
+}
+
+.structure .change__list {
+  margin-top: 8px;
+}
+
+.decisions__rounds {
+  flex: none;
+  padding: 1px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--warn-weak);
+  color: var(--warn);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.decisions__rounds--stale {
+  background: var(--danger-weak);
+  color: var(--danger);
+}
+
+/* ---------- 承诺账本 ---------- */
+
+.ledger {
+  margin-top: 18px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.ledger summary {
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ledger__list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ledger__list li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 2px 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13.5px;
+}
+
+.ledger__list li:last-child {
+  border-bottom: 0;
+}
+
+.ledger__kind {
+  grid-row: span 2;
+  align-self: start;
+  color: var(--ink-2);
+  font-size: 11.5px;
+}
+
+.ledger__kind--out {
+  color: var(--success);
+}
+
+.ledger__kind--no {
+  color: var(--danger);
+}
+
+.ledger__kind--open {
+  color: var(--warn);
+}
+
+.ledger__text {
+  color: var(--ink);
+}
+
+.ledger__detail {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+/* ---------- 参考区折叠 ---------- */
+
+.reference {
+  margin-top: 40px;
+  border-top: 1px solid var(--line-strong);
+  padding-top: 4px;
+}
+
+.reference > summary {
+  padding: 8px 0;
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.reference > summary::-webkit-details-marker {
+  display: none;
+}
+
+.reference > summary::before {
+  content: "▸";
+  display: inline-block;
+  width: 16px;
+  color: var(--ink-3);
+  transition: transform 0.15s var(--ease);
+}
+
+.reference[open] > summary::before {
+  content: "▾";
+}
+
+.reference > summary:hover {
+  color: var(--ink);
+}
+
+.reference .stats {
+  margin-top: 4px;
+}
 
 @media (max-width: 760px) {
   .wrap {

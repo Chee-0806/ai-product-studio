@@ -19,7 +19,7 @@ description: 当用户要求评审 PRD、原型或检查两者是否一致时使
 
 ## 步骤
 
-1. **先跑机器检查**：`npm run sync && npm run check`。有错误先修，不要带着错误评审。
+1. **先跑评审检查**：`npm run check:deliver`（工作台必须最新、承诺类改动必须都已确认、P0 都有原型）。有错误先修，不要带着错误评审。评审结论定了之后用 `node scripts/sync.mjs --review --role <自评|内部评审|甲方评审> --conclusion <通过|有条件通过|不通过>` 落盘。
 2. **PRD 评审**：问题与证据、用户与场景、范围、REQ 完整性、验收可判断、边界态、指标、开放问题；`basis_required: true` 时逐条查依据。
 3. **原型评审**：主流程、页面 meta（含 `screen:form`）、`data-req` 位置、文案逐字一致、示例数据、空/错/权限态、死链；按形态检查宽度——`mobile` 360px、`desktop` 1440px + 1280/1024 断点、`responsive` 两端。
 4. **SPA 评审**：清单 `entry` 与每个 `route` 能打开、刷新后停在当前界面、每个界面的 `reqs` 正确、没有清单外的隐藏入口。
