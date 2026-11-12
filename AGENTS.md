@@ -132,6 +132,7 @@ npm run pack:remove -- pm-methods
 
 - 每次改动结束都要更新 `STATE.md`：`stage`、`spec_version`（必须等于 PRD 版本）、`updated`、`next_action`，以及上一轮的 `last_round`、`last_reason`、`last_reqs`。
 - `last_round` 用产品语言写「这一轮改了什么」，`last_reason` 写「为什么改」，`last_reqs` 只列真实存在的 REQ 编号（没有就写「无」）。三者会直接显示在工作台「本轮变更」里，写给不写代码的人看。
+- 值里带 `#`（例如「按 issue #1 修了…」）时，整个值要用引号包起来：`last_round: "按 issue #1 修了…"`。没包引号的 ` #` 会被当成 YAML 注释，`npm run check` 会直接报错拦下来。
 - `STATE.md` 只写「现在」「下一步」和「上一轮」，不复制需求正文。
 - 开放问题写进 PRD 的「开放问题」表；`STATE.md` 的「待确认 / 阻塞」只写当前卡住协作的事，不复述开放问题。
 

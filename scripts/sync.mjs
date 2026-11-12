@@ -86,7 +86,15 @@ function readAsset(file) {
   }
 }
 
-/** 解析极简 YAML front matter：只支持 key: value 与 # 注释。 */
+/**
+ * 解析极简 YAML front matter：只支持 key: value，整行 # 是注释。
+ *
+ * 值里的「#」不再被当成注释剥掉：以前那样会把
+ * `last_round: 按 issue #1 修了交付链路` 静默截成「按 issue」，
+ * 而这正是工作台要显示的内容。现在换成两条明确规则：
+ * - 整个值用引号包起来，引号内原样取用（可以含 #）；
+ * - 没包引号又出现「 #」的，报错让人加引号，不猜、不截断。
+ */
 function parseFrontMatter(text, file) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) {
@@ -103,14 +111,35 @@ function parseFrontMatter(text, file) {
       continue;
     }
     const key = trimmed.slice(0, colon).trim();
-    const value = trimmed
-      .slice(colon + 1)
-      .replace(/\s+#.*$/, '')
-      .trim()
-      .replace(/^["']|["']$/g, '');
-    data[key] = value;
+    data[key] = parseFrontMatterValue(trimmed.slice(colon + 1), key, file);
   }
   return data;
+}
+
+/** 解析单个 front matter 值，见 parseFrontMatter 的两条规则。 */
+function parseFrontMatterValue(raw, key, file) {
+  const text = raw.trim();
+  const quote = text[0];
+  if (quote === '"' || quote === "'") {
+    const end = text.indexOf(quote, 1);
+    if (end === -1) {
+      fail(`${rel(file)}：${key} 的引号没有闭合`);
+      return '';
+    }
+    const trailing = text.slice(end + 1).trim();
+    if (trailing && !trailing.startsWith('#')) {
+      warn(`${rel(file)}：${key} 的引号后面还有内容「${trailing}」，已忽略`);
+    }
+    return text.slice(1, end).trim();
+  }
+  if (/\s#/.test(text)) {
+    fail(
+      `${rel(file)}：${key} 里有空格外加「#」，直接写会被当成注释截断。` +
+        `请把整个值用引号包起来（${key}: "这里写完整内容"）`,
+    );
+    return '';
+  }
+  return text;
 }
 
 /** 解析 ### REQ-001 标题 及其元数据。 */

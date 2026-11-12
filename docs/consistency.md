@@ -79,6 +79,7 @@
 - `stage` ∈ `discovery | prd | prototype | review | handoff`；
 - `spec_version` === PRD `version`；
 - `last_round` / `last_reason` / `last_reqs` 必填，会显示在工作台「本轮变更」；`last_reqs` 里的 REQ 必须存在；
+- front matter 的值里带 `#` 时必须用引号包住（`last_round: "按 issue #1 修了…"`），否则 ` #` 会被当成注释截断，校验直接失败；
 - `工作台.html` 必须与脚本生成结果逐字一致。
 
 工作台里「需要你拍板」由三处汇总：`STATE.md` 的「待确认 / 阻塞」、PRD 的「开放问题」表（状态为已定/已解决的行不显示）、以及状态为 `prototyped` 的待评审需求。它只读，不产生新的进度状态。
