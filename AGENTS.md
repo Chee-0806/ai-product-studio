@@ -9,6 +9,8 @@
 
 一个**可复用的产品设计工位模板工程**。它可以生成多个工位；当前目录同时是模板和示例工位（回声纪要）。
 
+用户级启动技能（`launcher/product-studio`）负责把工位从空文件夹铺出来，并做升级和诊断；它不在工位里，工位只保留 `skills/`。
+
 每个工位是一个产品的工作区，不是代码仓库。核心产物只有三类：
 
 - `product/PRD.md`：要做什么、为什么、怎样算验收。
@@ -250,10 +252,12 @@ packs/                    可选内容包源，默认不安装（pm-methods）
 LICENSE                   自有代码与文档的 MIT 许可证
 THIRD_PARTY_NOTICES.md    外部技能来源、许可证与修改说明
 LICENSES/                 第三方许可证原文
+launcher/                 用户级启动技能源文件（仅模板工程有，不进入工位）
 scripts/sync.mjs          一致性校验 + 工作台生成
-scripts/check-skills.mjs  技能格式校验（含可选包源）
+scripts/check-skills.mjs  技能格式校验（含可选包源与启动技能）
 scripts/pack.mjs          安装/移除可选内容包
 scripts/new.mjs           从模板创建新项目
+scripts/upgrade.mjs       把工位升级到当前模板版本
 scripts/lib/screens.mjs   多页/SPA 页面读取与外部资源匹配
 docs/                     工作流、一致性模型、原型规范、评审清单、企业适配
 dist/                     导出的交付包，生成物，不提交

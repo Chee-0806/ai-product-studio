@@ -101,6 +101,8 @@ async function main() {
   for (const dir of ['skills', 'packs', 'scripts', 'docs', 'LICENSES', 'prototype/assets', 'prototype/spikes']) {
     copyDir(dir);
   }
+  // 启动技能的打包脚本只属于模板工程，不进入工位。
+  fs.rmSync(path.join(target, 'scripts', 'launcher.mjs'), { force: true });
 
   // 新项目从空开始，不复制示例需求、原型和决策
   fs.mkdirSync(path.join(target, 'prototype', 'screens'), { recursive: true });
@@ -232,6 +234,8 @@ last_reqs: 无
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
   packageJson.name = slugify(product);
   packageJson.description = `${product} 产品设计工位`;
+  delete packageJson.scripts['launcher:build'];
+  delete packageJson.scripts['launcher:install'];
   fs.writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
 
   const readme = `# ${product}

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /**
  * 校验技能格式：
- *   - skills/ 里已安装的技能；
- *   - packs/<name>/skills/ 里可选内容包的源文件。
+ *   - skills/ 里已安装到工位的技能；
+ *   - packs/<name>/skills/ 里可选内容包的源文件；
+ *   - launcher/ 里用户级启动技能的源文件。
  *
- * 两处分开校验，避免「内容包已安装」时同一技能被当成重复。
+ * 三处分开校验，避免「内容包已安装」时同一技能被当成重复。
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -13,6 +14,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKILLS = path.join(ROOT, 'skills');
 const PACKS = path.join(ROOT, 'packs');
+const LAUNCHER = path.join(ROOT, 'launcher');
 const errors = [];
 const warnings = [];
 
@@ -92,6 +94,8 @@ function validateRoot(dir, prefix, label) {
 
 const installed = validateRoot(SKILLS, 'skills', '已安装');
 
+const launchers = fs.existsSync(LAUNCHER) ? validateRoot(LAUNCHER, 'launcher', '启动技能') : { count: 0 };
+
 const packs = [];
 if (fs.existsSync(PACKS)) {
   for (const entry of fs.readdirSync(PACKS, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
@@ -116,6 +120,7 @@ if (fs.existsSync(PACKS)) {
 }
 
 console.log(`已安装技能：${installed.count} 个`);
+if (launchers.count) console.log(`启动技能：${launchers.count} 个`);
 if (packs.length) {
   console.log(`可选内容包：${packs.map((pack) => `${pack.name}（${pack.count} 个技能）`).join('、')}`);
 }
