@@ -199,6 +199,9 @@ stage: discovery
 spec_version: 0.1.0
 updated: ${today}
 next_action: 先找 3 位目标用户聊一聊，把问题定义写清楚
+last_round: 从模板初始化
+last_reason: 新建产品工位
+last_reqs: 无
 ---
 
 # 工位状态

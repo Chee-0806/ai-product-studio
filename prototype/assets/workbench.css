@@ -166,6 +166,73 @@ a:hover {
   letter-spacing: -0.01em;
 }
 
+/* ---------- 本轮变更 ---------- */
+
+.round {
+  margin-top: 28px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+}
+
+.round__label {
+  color: var(--ink-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.round__change {
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.round__meta {
+  margin-top: 6px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.round__meta a {
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+/* ---------- 需要你拍板 ---------- */
+
+.decisions {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+
+.decisions li {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.decisions li:last-child {
+  border-bottom: 0;
+}
+
+.decisions__from {
+  flex: none;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
 /* ---------- 概览 ---------- */
 
 .stats {
@@ -610,6 +677,15 @@ footer {
 
   .next h2 {
     font-size: 21px;
+  }
+
+  .decisions li {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+
+  .decisions__from {
+    white-space: normal;
   }
 
   .stats {

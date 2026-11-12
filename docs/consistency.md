@@ -20,6 +20,8 @@
 | 需求 ↔ 页面 | 由 `data-req` 或 SPA 路由 `reqs` 推导 | 手工映射表（工作台由脚本生成） |
 | 为什么 | `product/decisions/*.md` | PRD 的长篇理由 |
 | 本次协作到哪 | `STATE.md` | 聊天记录 |
+| 上一轮改了什么、为什么 | `STATE.md` 的 `last_round` / `last_reason` / `last_reqs` | 单独的变更日志 |
+| 还要人拍板什么 | PRD「开放问题」+ `STATE.md`「待确认 / 阻塞」 | 单独的问题清单 |
 
 ## 3. 三个机械不变量
 
@@ -72,7 +74,10 @@
 - `STATE.md` 必须有 `stage`、`spec_version`、`updated`、`next_action`；
 - `stage` ∈ `discovery | prd | prototype | review | handoff`；
 - `spec_version` === PRD `version`；
+- `last_round` / `last_reason` / `last_reqs` 可选，写了就展示在工作台「本轮变更」；`last_reqs` 里的 REQ 必须存在；
 - `工作台.html` 必须与脚本生成结果逐字一致。
+
+工作台里「需要你拍板」由三处汇总：`STATE.md` 的「待确认 / 阻塞」、PRD 的「开放问题」表（状态为已定/已解决的行不显示）、以及状态为 `prototyped` 的待评审需求。它只读，不产生新的进度状态。
 
 ### 技能
 

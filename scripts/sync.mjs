@@ -292,7 +292,7 @@ function validateRequirements(reqs, prd) {
   return seen;
 }
 
-function validateState(state, prd) {
+function validateState(state, prd, reqMap) {
   if (!state) return;
   if (!state.stage) fail('STATE.md：front matter 缺少 stage');
   else if (!STAGES.includes(state.stage)) {
@@ -307,6 +307,88 @@ function validateState(state, prd) {
     fail(`STATE.md：updated 必须是 YYYY-MM-DD（当前「${state.updated}」）`);
   }
   if (!state.next_action) fail('STATE.md：front matter 缺少 next_action（下一件具体要做的事）');
+  if (state.last_reqs) {
+    for (const id of reqIdsIn(state.last_reqs)) {
+      if (reqMap && !reqMap.has(id)) {
+        fail(`STATE.md：last_reqs 引用了 PRD 中不存在的需求 ${id}`);
+      }
+    }
+  }
+}
+
+/** 把 last_reqs 这类字段里的需求编号抽出来。 */
+function reqIdsIn(value) {
+  return [...new Set(String(value || '').match(/REQ-\d{3}/g) || [])];
+}
+
+/** 取某个二级标题下的正文；没有该标题时返回空串。 */
+function sectionOf(markdown, headingPattern) {
+  const lines = String(markdown || '').split(/\r?\n/);
+  const out = [];
+  let inside = false;
+  for (const line of lines) {
+    if (/^##\s+/.test(line)) {
+      if (inside) break;
+      if (headingPattern.test(line)) inside = true;
+      continue;
+    }
+    if (inside) out.push(line);
+  }
+  return inside ? out.join('\n') : '';
+}
+
+/** 取段落里的列表项，忽略「暂无」占位。 */
+function bulletsOf(text) {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.match(/^\s*[-*]\s+(.+?)\s*$/))
+    .filter(Boolean)
+    .map((match) => match[1].replace(/^\[[ xX]\]\s*/, '').trim())
+    .filter((item) => item && !/^暂无/.test(item));
+}
+
+const RESOLVED_QUESTION = /已定|已决|已解决|已关闭|关闭|已确认|不做|resolved|closed|done/i;
+
+/** 解析 PRD「开放问题」表格：只保留还没定论的。 */
+function parseOpenQuestions(prdBody) {
+  const section = sectionOf(prdBody, /^##\s*(?:\d+[.、]\s*)?开放问题/);
+  const questions = [];
+  for (const line of section.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed.startsWith('|')) continue;
+    if (/^\|[\s:|-]+\|$/.test(trimmed)) continue;
+    const cells = trimmed.replace(/^\||\|$/g, '').split('|').map((cell) => cell.trim());
+    if (cells.length < 2) continue;
+    if (/^(问题|事项|issue|question)$/i.test(cells[0])) continue;
+    const question = cells[0].replace(/\*\*/g, '').trim();
+    const status = cells[cells.length - 1];
+    if (!question || RESOLVED_QUESTION.test(status)) continue;
+    questions.push({ question, owner: cells.length >= 3 ? cells[1] : '' });
+  }
+  return questions;
+}
+
+const MAX_DECISIONS = 8;
+
+/** 工作台「需要你拍板」：交接板阻塞 + PRD 开放问题 + 待评审需求。 */
+function collectDecisions(stateBody, prdBody, reqs) {
+  const items = [];
+  for (const text of bulletsOf(sectionOf(stateBody, /^##\s*待确认/))) {
+    if (/^(见|详见)\s*PRD/.test(text)) continue;
+    items.push({ text, from: '交接板' });
+  }
+  for (const row of parseOpenQuestions(prdBody)) {
+    items.push({ text: row.question, from: row.owner ? `PRD 开放问题 · ${row.owner}` : 'PRD 开放问题' });
+  }
+  const waiting = reqs.filter((req) => req.status === 'prototyped');
+  if (waiting.length) {
+    items.push({
+      text: `${waiting.length} 条需求已有原型，等评审确认是否通过`,
+      from: '需求评审',
+      href: '#requirements',
+    });
+  }
+  return items;
 }
 
 function validateCoverage(reqMap, covered) {
@@ -335,7 +417,16 @@ function screenPreviewHtml(file, tokens, appCss) {
   return html;
 }
 
-function renderGallery(prd, state, reqs, screens, covered, build = { errors: [], warnings: [] }, mode = 'multi') {
+function renderGallery(
+  prd,
+  state,
+  reqs,
+  screens,
+  covered,
+  build = { errors: [], warnings: [] },
+  mode = 'multi',
+  ctx = {},
+) {
   const tokens = readAsset(path.join(ROOT, 'prototype/assets/tokens.css'));
   const appCss = readAsset(path.join(ROOT, 'prototype/assets/app.css'));
   const workbenchCss = readAsset(path.join(ROOT, 'prototype/assets/workbench.css'));
@@ -351,6 +442,48 @@ function renderGallery(prd, state, reqs, screens, covered, build = { errors: [],
   );
   const active = sortedReqs.filter((r) => r.status !== 'dropped');
   const done = active.filter((r) => (covered.get(r.id) || []).length > 0);
+
+  const round = {
+    change: String(state.last_round || '').trim(),
+    reason: String(state.last_reason || '').trim(),
+    reqs: reqIdsIn(state.last_reqs),
+  };
+  const decisions = collectDecisions(ctx.stateBody || '', ctx.prdBody || '', sortedReqs);
+  const shownDecisions = decisions.slice(0, MAX_DECISIONS);
+  const decisionHtml = shownDecisions.length
+    ? `<ol class="decisions">
+      ${shownDecisions
+        .map(
+          (item) => `<li><span>${esc(item.text)}</span><span class="decisions__from">${esc(item.from)}</span></li>`,
+        )
+        .join('\n      ')}
+    </ol>${
+      decisions.length > shownDecisions.length
+        ? `<p class="note">还有 ${decisions.length - shownDecisions.length} 条在 PRD 的「开放问题」里。</p>`
+        : ''
+    }`
+    : '<p class="empty">目前没有需要你决定的事。</p>';
+  const roundHtml = round.change
+    ? `<section class="round" aria-label="本轮变更">
+    <p class="round__label">本轮变更</p>
+    <p class="round__change">${esc(round.change)}</p>
+    ${
+      round.reason
+        ? `<p class="round__meta">为什么：${esc(round.reason)}</p>`
+        : ''
+    }
+    ${
+      round.reqs.length
+        ? `<p class="round__meta">影响需求：${round.reqs
+            .map((id) => `<a href="#req-${esc(id)}">${esc(id)}</a>`)
+            .join('、')}</p>`
+        : ''
+    }
+  </section>`
+    : `<section class="round" aria-label="本轮变更">
+    <p class="round__label">本轮变更</p>
+    <p class="round__meta">这一轮还没有变更记录。</p>
+  </section>`;
 
   const buildFailed = build.errors.length > 0;
   const buildWarned = !buildFailed && build.warnings.length > 0;
@@ -406,7 +539,7 @@ function renderGallery(prd, state, reqs, screens, covered, build = { errors: [],
       const basisCell = showBasis
         ? `<td class="basis" title="${esc(req.basis || '')}">${esc(req.basis || '—')}</td>`
         : '';
-      return `<tr class="${req.status === 'dropped' ? 'is-dropped' : ''}">
+      return `<tr id="req-${esc(req.id)}" class="${req.status === 'dropped' ? 'is-dropped' : ''}">
         <td><code>${esc(req.id)}</code></td>
         <td>${esc(req.title)}</td>
         <td>${esc(req.priority || '—')}</td>
@@ -484,6 +617,13 @@ ${workbenchCss}
     <h2>${esc(nextAction)}</h2>
   </section>
 
+  ${roundHtml}
+
+  <section aria-label="需要你拍板">
+    <h2>需要你拍板</h2>
+    ${decisionHtml}
+  </section>
+
   <section class="stats">
     <div class="stat"><b>${sortedReqs.length}</b><span>需求总数</span></div>
     <div class="stat"><b>${done.length}</b><span>已有原型（不含已砍）</span></div>
@@ -491,7 +631,7 @@ ${workbenchCss}
     <div class="stat"><b>${sortedReqs.filter((r) => r.status === 'draft').length}</b><span>待做原型</span></div>
   </section>
 
-  <section>
+  <section id="requirements">
     <h2>需求进度</h2>
     ${
       sortedReqs.length
@@ -553,7 +693,7 @@ function main() {
 
   const stateText = readText(STATE);
   const state = stateText ? parseFrontMatter(stateText, STATE) : {};
-  if (stateText) validateState(state, prd);
+  if (stateText) validateState(state, prd, reqMap);
 
   const loaded = loadScreens({ root: ROOT, screensDir: SCREENS_DIR, manifestFile: SCREEN_MANIFEST });
   errors.push(...loaded.errors);
@@ -570,7 +710,10 @@ function main() {
   validateExternal(screens, loaded, externalPolicy);
 
   // 即使检查失败也要生成工作台：把失败状态直接显示给人看，而不是静默保留旧页面。
-  const html = renderGallery(prd, state, reqs, screens, covered, { errors, warnings }, loaded.mode);
+  const html = renderGallery(prd, state, reqs, screens, covered, { errors, warnings }, loaded.mode, {
+    prdBody: body,
+    stateBody: stateText ? stateText.replace(/^---\r?\n[\s\S]*?\r?\n---/, '') : '',
+  });
   let current = null;
   try {
     current = fs.readFileSync(GALLERY, 'utf8');

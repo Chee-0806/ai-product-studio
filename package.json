@@ -1,7 +1,7 @@
 {
   "name": "ai-product-studio",
   "private": true,
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "license": "MIT",
   "description": "AI 协作产品设计工位：PRD 与 HTML 原型保持结构、进度一致的模板工程",

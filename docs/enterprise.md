@@ -93,7 +93,7 @@ basis_required: true
 
 ## 6. Word / PPT / 评审材料
 
-**产物生成走 `deliver` 技能，不走脚本。** 框架不内置 docx 生成器，也不保留 `export.mjs`，不新增 `review.mjs` / `export --review` 这类硬编码生成器。Word 的排版、目录、页眉页脚、审批栏由 agent 用自己擅长的工具完成；框架只负责 PRD、原型和检查结果这些源材料。
+**产物生成走 `deliver` 技能，不走脚本。** 模板工程不内置 docx 生成器，也不保留 `export.mjs`，不新增 `review.mjs` / `export --review` 这类硬编码生成器。Word 的排版、目录、页眉页脚、审批栏由 agent 用自己擅长的工具完成；模板工程只负责 PRD、原型和检查结果这些源材料。
 
 流程：
 

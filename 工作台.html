@@ -219,6 +219,73 @@ a:hover {
   letter-spacing: -0.01em;
 }
 
+/* ---------- 本轮变更 ---------- */
+
+.round {
+  margin-top: 28px;
+  padding: 16px 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
+  background: var(--surface-2);
+}
+
+.round__label {
+  color: var(--ink-2);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.round__change {
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.round__meta {
+  margin-top: 6px;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.round__meta a {
+  font-family: var(--mono);
+  font-size: 12.5px;
+}
+
+/* ---------- 需要你拍板 ---------- */
+
+.decisions {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+
+.decisions li {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.decisions li:last-child {
+  border-bottom: 0;
+}
+
+.decisions__from {
+  flex: none;
+  color: var(--ink-3);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+
 /* ---------- 概览 ---------- */
 
 .stats {
@@ -665,6 +732,15 @@ footer {
     font-size: 21px;
   }
 
+  .decisions li {
+    flex-wrap: wrap;
+    gap: 4px 16px;
+  }
+
+  .decisions__from {
+    white-space: normal;
+  }
+
   .stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -779,6 +855,23 @@ footer {
     <h2>先评审纪要详情页的三段式结构和分享面板；确认后再把「历史搜索」补进原型</h2>
   </section>
 
+  <section class="round" aria-label="本轮变更">
+    <p class="round__label">本轮变更</p>
+    <p class="round__change">工作台新增「本轮变更」和「需要你拍板」两块；README 与 AGENTS 里「框架」的说法收窄为「模板工程」</p>
+    <p class="round__meta">为什么：定位讨论确认，AI 协作下产品经理的瓶颈在判断与验证；工作台要把判断点摆到人面前，不能只展示进度</p>
+    
+  </section>
+
+  <section aria-label="需要你拍板">
+    <h2>需要你拍板</h2>
+    <ol class="decisions">
+      <li><span>分享链接是否能被未登录用户打开？</span><span class="decisions__from">PRD 开放问题 · 产品</span></li>
+      <li><span>3 小时以上会议是否直接拒绝？</span><span class="decisions__from">PRD 开放问题 · 产品 / 研发</span></li>
+      <li><span>导出 Markdown 是否包含原始转写全文？</span><span class="decisions__from">PRD 开放问题 · 产品</span></li>
+      <li><span>4 条需求已有原型，等评审确认是否通过</span><span class="decisions__from">需求评审</span></li>
+    </ol>
+  </section>
+
   <section class="stats">
     <div class="stat"><b>6</b><span>需求总数</span></div>
     <div class="stat"><b>4</b><span>已有原型（不含已砍）</span></div>
@@ -786,46 +879,46 @@ footer {
     <div class="stat"><b>1</b><span>待做原型</span></div>
   </section>
 
-  <section>
+  <section id="requirements">
     <h2>需求进度</h2>
     <table>
       <thead><tr><th>ID</th><th>需求</th><th>优先级</th><th>状态</th><th>在哪个页面</th></tr></thead>
-      <tbody><tr class="">
+      <tbody><tr id="req-REQ-001" class="">
         <td><code>REQ-001</code></td>
         <td>一键开始录音</td>
         <td>P0</td>
         <td><span class="pill pill--prototyped">原型已完成</span></td>
         <td><a href="prototype/screens/home.html">首页 · 一键开录</a></td>
       </tr>
-<tr class="">
+<tr id="req-REQ-002" class="">
         <td><code>REQ-002</code></td>
         <td>录音中实时转写</td>
         <td>P0</td>
         <td><span class="pill pill--prototyped">原型已完成</span></td>
         <td><a href="prototype/screens/recording.html">录音中 · 实时转写</a></td>
       </tr>
-<tr class="">
+<tr id="req-REQ-003" class="">
         <td><code>REQ-003</code></td>
         <td>自动生成三段式纪要</td>
         <td>P0</td>
         <td><span class="pill pill--prototyped">原型已完成</span></td>
         <td><a href="prototype/screens/note.html">纪要详情 · 编辑与分享</a></td>
       </tr>
-<tr class="">
+<tr id="req-REQ-004" class="">
         <td><code>REQ-004</code></td>
         <td>纪要编辑与分享</td>
         <td>P0</td>
         <td><span class="pill pill--prototyped">原型已完成</span></td>
         <td><a href="prototype/screens/note.html">纪要详情 · 编辑与分享</a></td>
       </tr>
-<tr class="">
+<tr id="req-REQ-005" class="">
         <td><code>REQ-005</code></td>
         <td>历史纪要搜索</td>
         <td>P1</td>
         <td><span class="pill pill--draft">待做原型</span></td>
         <td><span class="muted">—</span></td>
       </tr>
-<tr class="is-dropped">
+<tr id="req-REQ-006" class="is-dropped">
         <td><code>REQ-006</code></td>
         <td>说话人自动分离</td>
         <td>P2</td>
