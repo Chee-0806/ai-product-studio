@@ -14,7 +14,7 @@
 
 2. **拿到模板**：
    - 当前目录有 `scripts/new.mjs`，说明已经在仓库里，直接用。
-   - 否则下载：`git clone --depth 1 https://github.com/Chee-0806/For_Jasmine.git <临时目录>`。
+   - 否则下载：`git clone --depth 1 https://github.com/Chee-0806/ai-product-studio.git <临时目录>`。
 
 3. **建工位**：
    - 位置：用户说了就用她说的；没说就放在桌面，用产品名命名。目标目录已存在且不为空时先问她。

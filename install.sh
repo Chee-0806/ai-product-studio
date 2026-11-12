@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# 从 For_Jasmine 模板创建一个新的产品工位。
+# 从 ai-product-studio 模板创建一个新的产品工位。
 #
 #   bash install.sh install ../宝宝喂养 --name "宝宝喂养"
-#   bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.sh) install ../宝宝喂养 --name "宝宝喂养"
+#   bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/main/install.sh) install ../宝宝喂养 --name "宝宝喂养"
 #
 # 选项：
 #   --name "产品名"   显示在产品 PRD / 工作台里的名字
@@ -11,8 +11,8 @@
 #   --ref <ref>       使用指定分支/标签/commit（默认 main）
 set -euo pipefail
 
-REPO="${FOR_JASMINE_REPO:-Chee-0806/For_Jasmine}"
-REF="${FOR_JASMINE_REF:-main}"
+REPO="${PRODUCT_STUDIO_REPO:-Chee-0806/ai-product-studio}"
+REF="${PRODUCT_STUDIO_REF:-main}"
 
 usage() {
   cat <<'EOF'
@@ -24,8 +24,8 @@ usage() {
   bash install.sh install ../宝宝喂养 --name "宝宝喂养" --git
 
 远程一行：
-  bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.sh) install ../宝宝喂养 --name "宝宝喂养"
-  curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.sh | bash -s -- install ../宝宝喂养 --name "宝宝喂养"
+  bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/main/install.sh) install ../宝宝喂养 --name "宝宝喂养"
+  curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/main/install.sh | bash -s -- install ../宝宝喂养 --name "宝宝喂养"
 
 要求：Node.js >= 18。
 EOF
@@ -90,7 +90,7 @@ TEMPLATE=""
 if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/scripts/new.mjs" ] && [ -d "$SCRIPT_DIR/skills" ]; then
   TEMPLATE="$SCRIPT_DIR"
 else
-  TMP="$(mktemp -d "${TMPDIR:-/tmp}/for-jasmine.XXXXXX")"
+  TMP="$(mktemp -d "${TMPDIR:-/tmp}/product-studio.XXXXXX")"
   trap 'rm -rf "$TMP"' EXIT
   URL="https://codeload.github.com/$REPO/tar.gz/$REF"
 

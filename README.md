@@ -1,10 +1,46 @@
-# 产品设计工位
+# 产品设计工位 · AI Product Studio
 
-一个**可复用的产品设计工位模板工程**：给不写代码、不用 git、不开终端的产品经理，用 AI 同时维护 PRD 和可点原型，并保证两者的追溯关系与进度不说谎。
+**给不写代码的产品经理做一个 AI 工位：她只对 AI 说话，PRD 和可点原型由 AI 保持同步，进度不会说谎。**
+
+- 不用 git、不用命令行、不用记技能名，也不用知道文件放在哪。
+- 每个工位只有一个入口 `工作台.html`：下一步、上一轮改了什么、需要你拍板什么、需求进度、原型，全在一页。
+- 一致性不靠 AI「记得」，靠 `npm run check` 每次强制检查；没有运行时依赖，不需要 `npm install`。
+
+**[▶ 在线演示](https://chee-0806.github.io/ai-product-studio/)**（示例产品「回声纪要」的只读工作台）· [一条命令开始](#开新项目)
+
+![产品工作台：下一步、本轮变更、需要你拍板、需求进度](media/workbench.png)
+
+## What is this (English)
+
+A **workspace template for product managers who don't write code**. You talk to an AI coding agent (Claude Code / Cursor / Codex) in plain language; the agent keeps a PRD and a clickable HTML prototype in sync, and regenerates one read-only dashboard you actually look at — next step, what changed last round, what needs your decision, requirement progress, prototype pages.
+
+The PM never touches git, the terminal, or file paths. Three mechanical rules keep the documents honest:
+
+1. every requirement has a stable ID (`REQ-001`), and prototype elements carry `data-req="REQ-001"`;
+2. a requirement marked "prototyped" must have a page, one marked "dropped" must not;
+3. the PRD version must equal the version in `STATE.md`.
+
+`npm run check` enforces all three; `npm run sync` regenerates the dashboard. No runtime dependencies, no `npm install`.
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/main/install.sh) install ../my-product --name "My Product"
+```
+
+**[Live demo](https://chee-0806.github.io/ai-product-studio/)** · MIT.
+
+## 它解决什么
+
+给不写代码、不用 git、不开终端的产品经理：用 AI 同时维护 PRD 和可点原型，并保证两者的追溯关系与进度不说谎。
 
 它不是代码框架，也不是原型工具：AI 负责产出，人负责判断，工作台负责把该判断的事摆到人面前。
 
-仓库：https://github.com/Chee-0806/For_Jasmine
+这个模板最初是为一位不写代码的产品经理做的：她会说的话是「首页太满了，只留开始记录和最近三条」，而不是「帮我改这个组件」。
+
+> **改动前后：** 现在她在页面里说一句需求，AI 改 PRD、改原型、跑检查、刷新工作台；她只需要看工作台、点原型、说哪里不对。
+
+![可点原型：静态 HTML，双击即开，AI 能直接改](media/prototype.png)
+
+仓库：https://github.com/Chee-0806/ai-product-studio
 
 ## 先分清四个词
 
@@ -20,7 +56,7 @@
 
 不用装东西，不用打开文件夹，也不用输入命令。打开平时用的 AI 助手（Claude Code / Cursor / Codex），新建一个对话，把这段原样发过去：
 
-> 从 https://github.com/Chee-0806/For_Jasmine 给我建一个产品工位，产品叫「宝宝喂养」。
+> 从 https://github.com/Chee-0806/ai-product-studio 给我建一个产品工位，产品叫「宝宝喂养」。
 > 需要装什么你自己装；装不了就停下来告诉我卡在哪，别让我运行命令。
 
 它会自己装好需要的东西，把工位建起来，检查一遍，然后打开工作台给你看。
@@ -31,7 +67,7 @@
 
 工作台每次都由 AI 改完刷新并打开；你也可以自己双击工位文件夹里的 `工作台.html`。顶部会显示最近一次检查结果，变红说明内容可能不是最新的，让 AI 修好再刷新。
 
-这一版加了企业项目适配：手机/桌面/自适应三种原型形态、SPA 清单、外部资源白名单、需求「依据」字段。不是所有项目都要开，按需使用，详见 [`docs/enterprise.md`](docs/enterprise.md)。
+> 企业项目另有一套可选适配：手机/桌面/自适应三种原型形态、SPA 清单、外部资源白名单、需求「依据」字段。不是所有项目都要开，按需使用，详见 [`docs/enterprise.md`](docs/enterprise.md)。
 
 ## 她只需要做三件事
 
@@ -186,6 +222,8 @@ dist/
 
 ```text
 工作台.html               唯一入口，自动生成，禁止手改
+index.html                在线演示的跳转页（GitHub Pages 根）
+media/                    README 用的截图，不进入工位
 BOOTSTRAP.md              从零建站说明，给 AI 看
 install.sh               远程安装入口
 AGENTS.md                 AI 的工作契约
@@ -295,13 +333,13 @@ dist/                     交付包与启动技能（生成物，不提交）
 ### 从 GitHub 一条命令
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.sh) install ../宝宝喂养 --name "宝宝喂养"
+bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/main/install.sh) install ../宝宝喂养 --name "宝宝喂养"
 ```
 
 也可以走管道：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Chee-0806/For_Jasmine/main/install.sh | bash -s -- install ../宝宝喂养 --name "宝宝喂养"
+curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/main/install.sh | bash -s -- install ../宝宝喂养 --name "宝宝喂养"
 ```
 
 `install` 后面是目标目录；脚本会下载模板、生成干净工位、自动检查，并打印入口。要求 **Node.js ≥ 18**。
