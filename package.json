@@ -1,7 +1,7 @@
 {
   "name": "ai-product-studio",
   "private": true,
-  "version": "0.5.2",
+  "version": "0.6.0",
   "type": "module",
   "license": "MIT",
   "description": "AI 协作产品设计工位：PRD 与 HTML 原型保持结构、进度一致的模板工程",
@@ -9,6 +9,7 @@
     "check": "node scripts/check-skills.mjs && node scripts/sync.mjs --check --strict",
     "check:skills": "node scripts/check-skills.mjs",
     "sync": "node scripts/sync.mjs",
+    "previews": "node scripts/previews.mjs",
     "pack:list": "node scripts/pack.mjs list",
     "pack:add": "node scripts/pack.mjs add",
     "pack:remove": "node scripts/pack.mjs remove",

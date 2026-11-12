@@ -101,7 +101,7 @@ SPA 可以只在 `screens.json` 的每个界面写 `reqs`，不必在入口 HTML
 - 页面加载了未在白名单的 `http(s)` 资源（script / img / link / iframe / 字体 / CSS `url()`），`npm run check` 直接失败；普通 `<a href>` 外链不算；
 - 白名单只表示「允许存在」，不表示「离线可用」；交付包 README 会列出实际使用的域名；
 - 能 vendor 的资源优先放 `prototype/assets/vendor/`，用相对路径引用；
-- 外部资源页面、大屏页面、超大 SPA 建议提供 `previews/<id>.png`，工作台用静态图代替 iframe；没有预览图时显示「外部资源 / 缩略图已降级」占位卡。
+- 外部资源页面、大屏页面、超大 SPA 要提供 `previews/<id>.png`（跑 `npm run previews` 即可），工作台用静态图代替 iframe；没有预览图时显示「外部资源 / 缩略图已降级」占位卡。
 
 ## 5. 内容
 
@@ -156,9 +156,10 @@ PRD 第 6 节列出的状态，在对应页面要有可演示的呈现：
 `工作台.html` 会把每个多页原型和 `assets/app.css` 内联成缩略图，因此**双击文件就能看**，不需要启动服务。
 
 - 页面必须继续引用 `../assets/app.css`，否则缩略图没有样式；
-- 有 `screen:preview` / `screens.json` 的 `preview` 时，工作台显示预览图，不再内联 HTML；
-- 含外部资源的页面自动降级为占位卡；SPA 没有预览图时也显示占位卡；
-- 单页 HTML 超过 512KB 时不再内联，改为「页面较大 / 缩略图已降级」占位卡；需要缩略图就补 `screen:preview`；
+- 预览图默认放 `prototype/previews/<界面 ID>.png`，工作台自动采用，不用写 meta；`screen:preview` / `screens.json` 的 `preview` 仍可指定别的路径；
+- 批量出图跑 `npm run previews`：默认只补超大页面、外部资源页面和 SPA 界面，`--all` 全部出图，`--force` 覆盖，`--only=a,b` 指定界面。它用本机 Chrome/Edge 无头截图，按 `screen:form` 选手机/桌面视口，2 倍图；
+- 有预览图时工作台显示静态图，不再内联 HTML；含外部资源的页面自动降级为占位卡；SPA 没有预览图时也显示占位卡；
+- 单页 HTML 超过 512KB 时不再内联，改为「页面较大 / 缩略图已降级」占位卡；`npm run check` 会对这类界面给出提示；
 - 缩略图里的按钮不可点击，点卡片会打开完整页面；
 - 因为要内联，单个页面的 HTML/CSS 不要引入巨大的 base64 资源。
 

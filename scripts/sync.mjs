@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import {
   FORMS,
   FORM_LABELS,
+  MAX_INLINE_BYTES,
   isExternalAllowed,
   loadExternalPolicy,
   loadScreens,
@@ -30,6 +31,7 @@ const WORKBENCH = path.join(ROOT, '工作台.html');
 
 const errors = [];
 const warnings = [];
+const hints = [];
 
 const rel = (p) => path.relative(ROOT, p);
 const fail = (msg) => errors.push(msg);
@@ -351,6 +353,46 @@ function reqIdsIn(value) {
   return [...new Set(String(value || '').match(/REQ-\d{3}/g) || [])];
 }
 
+/**
+ * 对外文档（依据、参考资料）里不能出现工作区内部路径：
+ * 交付包不带 product/、docs/ 这些目录，写了就是一条打不开的引用。
+ */
+const INTERNAL_PATH = /(^|[\s，,；;：:（(「『"'])((?:product|docs|skills|scripts|prototype|packs|dist)\/[^\s，,；;：:）)」』"']*)/;
+
+function internalPathsIn(text) {
+  return [...String(text || '').matchAll(new RegExp(INTERNAL_PATH.source, 'gm'))].map((match) => match[2]);
+}
+
+function validateReferences({ prdBody, reqs, prd }) {
+  for (const req of reqs) {
+    const bad = internalPathsIn(req.basis);
+    if (bad.length) {
+      fail(
+        `${req.id}：「依据」里写了工作区路径 ${bad[0]}，导出后打不开；只写文档名 + 章节或条款，如《XX 条例》第 12 条、访谈 2026-11（5 人）、《XX 说明文档》第 3.2 节`,
+      );
+    }
+  }
+  const section = sectionOf(prdBody, /^##\s*(?:\d+[.、]\s*)?(?:参考资料|参考来源)/);
+  if (prd.basis_required && !section) {
+    fail('product/PRD.md：开启了 basis_required，必须有「## 参考资料」一节，集中列出法规、标准、访谈与原始文档');
+  }
+  for (const bad of internalPathsIn(section)) {
+    fail(`product/PRD.md：「参考资料」里不能写工作区路径 ${bad}；写文档名、版本与章节，并注明原件不随交付包外发`);
+  }
+}
+
+/** 工作台里只能显示占位卡、又没预览图的界面，提示去批量生成。 */
+function collectPreviewHints(screens) {
+  const missing = screens.filter(
+    (screen) => !screen.previewRel && (screen.mode === 'spa' || screen.externalUrls.length > 0 || screen.bytes > MAX_INLINE_BYTES),
+  );
+  if (missing.length) {
+    hints.push(
+      `${missing.length} 个界面在工作台里只能显示占位卡：运行 npm run previews 批量生成预览图（或手动提供 prototype/previews/<界面 ID>.png）`,
+    );
+  }
+}
+
 /** 取某个二级标题下的正文；没有该标题时返回空串。 */
 function sectionOf(markdown, headingPattern) {
   const lines = String(markdown || '').split(/\r?\n/);
@@ -446,9 +488,6 @@ function screenPreviewHtml(file, tokens, appCss) {
   return html;
 }
 
-/** 超过这个体积的页面不再内联进工作台，改为降级卡片，避免工作台自己变成几十兆。 */
-const MAX_INLINE_BYTES = 512 * 1024;
-
 function readAssets() {
   return {
     tokens: readAsset(path.join(ROOT, 'prototype/assets/tokens.css')),
@@ -493,6 +532,7 @@ function renderBuildSection(build) {
   const messages = [
     ...build.errors.map((message) => `错误：${message}`),
     ...build.warnings.map((message) => `提醒：${message}`),
+    ...(build.hints || []).map((message) => `提示：${message}`),
   ];
   const detail = messages.length
     ? `<details class="build__detail">
@@ -750,6 +790,7 @@ function main() {
   const body = prdText ? prdText.replace(/^---\r?\n[\s\S]*?\r?\n---/, '') : '';
   const reqs = parseRequirements(body, PRD);
   const reqMap = validateRequirements(reqs, prd);
+  validateReferences({ prdBody: body, reqs, prd });
 
   const stateText = readText(STATE);
   const state = stateText ? parseFrontMatter(stateText, STATE) : {};
@@ -768,6 +809,7 @@ function main() {
 
   const externalPolicy = loadExternalPolicy(PROTOTYPE_DIR);
   validateExternal(screens, loaded, externalPolicy);
+  collectPreviewHints(screens);
 
   // 即使检查失败也要生成工作台：把失败状态直接显示给人看，而不是静默保留旧页面。
   const html = renderWorkbench({
@@ -776,7 +818,7 @@ function main() {
     reqs,
     screens,
     covered,
-    build: { errors, warnings },
+    build: { errors, warnings, hints },
     mode: loaded.mode,
     ctx: {
       prdBody: body,
@@ -813,6 +855,10 @@ function report() {
   if (warnings.length) {
     console.log(`\n${yellow('⚠ 警告')} (${warnings.length})`);
     for (const msg of warnings) console.log(`  - ${msg}`);
+  }
+  if (hints.length) {
+    console.log(`\n${yellow('· 提示')} (${hints.length})`);
+    for (const msg of hints) console.log(`  - ${msg}`);
   }
   if (errors.length) {
     console.log(`\n${red('✖ 错误')} (${errors.length})`);

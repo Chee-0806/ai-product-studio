@@ -12,6 +12,12 @@ export const FORMS = ['mobile', 'desktop', 'responsive'];
 export const FORM_LABELS = { mobile: '手机', desktop: '桌面', responsive: '自适应' };
 export const DEFAULT_FORM = 'responsive';
 
+/** 超过这个体积的页面不再内联进工作台，改为预览图或降级卡片。 */
+export const MAX_INLINE_BYTES = 512 * 1024;
+
+/** 预览图约定目录（相对 prototype/）：`previews/<screen:id>.png`。 */
+export const PREVIEW_DIR = 'previews';
+
 const toPosix = (value) => value.split(path.sep).join('/');
 const rel = (root, file) => toPosix(path.relative(root, file));
 const uniq = (values) => [...new Set(values)];
@@ -125,11 +131,23 @@ export function loadExternalPolicy(protoRoot) {
   return { allow, errors };
 }
 
+/**
+ * 预览图：显式声明的优先（`screen:preview` / `screens.json` 的 `preview`），
+ * 否则按约定取 `prototype/previews/<id>.png`——跑过 `npm run previews` 后自动生效。
+ */
+function resolvePreview({ declared, id, protoRoot }) {
+  const explicit = String(declared || '').trim();
+  if (explicit) return { raw: explicit, file: path.resolve(protoRoot, explicit) };
+  if (!id) return { raw: '', file: null };
+  const name = `${id}.png`;
+  const auto = path.join(protoRoot, PREVIEW_DIR, name);
+  return fs.existsSync(auto) ? { raw: toPosix(path.join(PREVIEW_DIR, name)), file: auto } : { raw: '', file: null };
+}
+
 function parseScreenFile(file, root, protoRoot) {
   const html = fs.readFileSync(file, 'utf8');
   const meta = parseMeta(html);
-  const previewRaw = (meta.preview || '').trim();
-  const previewFile = previewRaw ? path.resolve(protoRoot, previewRaw) : null;
+  const preview = resolvePreview({ declared: meta.preview, id: (meta.id || '').trim(), protoRoot });
   return {
     file,
     relFile: rel(root, file),
@@ -139,9 +157,9 @@ function parseScreenFile(file, root, protoRoot) {
     flow: (meta.flow || '').trim(),
     form: (meta.form || DEFAULT_FORM).trim().toLowerCase(),
     reqs: uniq([...html.matchAll(/data-req=["'](REQ-\d{3})["']/g)].map((match) => match[1])),
-    previewRaw,
-    previewFile,
-    previewRel: previewFile ? rel(root, previewFile) : '',
+    previewRaw: preview.raw,
+    previewFile: preview.file,
+    previewRel: preview.file ? rel(root, preview.file) : '',
     externalUrls: detectExternalResources(html),
     mode: 'multi',
     source: 'html',
@@ -226,13 +244,13 @@ function loadSpa({ root, protoRoot, manifestFile, manifest, errors, warnings }) 
 
     const flow = typeof raw.flow === 'string' ? raw.flow.trim() : '';
 
-    const previewRaw = typeof raw.preview === 'string' ? raw.preview.trim() : '';
-    let previewFile = previewRaw ? path.resolve(protoRoot, previewRaw) : null;
+    const preview = resolvePreview({ declared: raw.preview, id, protoRoot });
+    let previewFile = preview.file;
     if (previewFile && !isInside(protoRoot, previewFile)) {
-      errors.push(`${where}：preview 不能指向 prototype/ 之外（当前「${previewRaw}」）`);
+      errors.push(`${where}：preview 不能指向 prototype/ 之外（当前「${preview.raw}」）`);
       previewFile = null;
     } else if (previewFile && !fs.existsSync(previewFile)) {
-      warnings.push(`${where}：preview 指向的图片不存在：prototype/${previewRaw}`);
+      warnings.push(`${where}：preview 指向的图片不存在：prototype/${preview.raw}`);
       previewFile = null;
     }
 
@@ -244,7 +262,7 @@ function loadSpa({ root, protoRoot, manifestFile, manifest, errors, warnings }) 
       flow,
       form,
       reqs,
-      previewRaw,
+      previewRaw: preview.raw,
       previewFile,
       previewRel: previewFile ? rel(root, previewFile) : '',
       // 入口扫描结果统一挂在清单上，避免每个路由重复告警。

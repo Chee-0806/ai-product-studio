@@ -37,7 +37,7 @@ description: 当需求已存在、需要做成可点击页面或调整现有界�
 7. 补齐 PRD 第 6 节要求的状态：空、加载、错误、权限、超长；不能演示的写进汇报。
 8. 页面之间用真实相对链接串起来；主流程必须点通；SPA 路由刷新后要停在当前界面。
 9. 只用原生 HTML/CSS/JS 与 `assets/app.css`；外部地图/字体等服务必须写进 `prototype/external.json`，能 vendor 的放 `assets/vendor/`。
-10. 含外部资源或超大页面时，提供 `previews/<id>.png` 并在 meta / `screens.json` 里声明。
+10. 页面很大（单文件 > 512KB）、含外部资源或是 SPA 时，跑 `npm run previews` 生成 `prototype/previews/<id>.png`；工作台按约定自动采用，不用写 meta。指定界面用 `--only=a,b`，全部重出用 `--all --force`。
 11. 刷新 `STATE.md`，跑 `npm run sync && npm run check`。
 12. 汇报改了哪些页面/路由、覆盖哪些 REQ。
 
@@ -57,5 +57,5 @@ description: 当需求已存在、需要做成可点击页面或调整现有界�
 - 不要给整个 `<body>` 或页面容器打 `data-req`。
 - 不要使用 lorem ipsum、空按钮、`href="#"`、死链。
 - 不要无条件引入外部资源；必须走 `prototype/external.json` 白名单，或 vendor 到 `assets/vendor/`。
-- 不要把 SPA 重写成多页，也不要为了缩略图内联 2.4MB 的入口文件；用预览图或占位卡。
+- 不要把 SPA 重写成多页，也不要为了缩略图内联 2.4MB 的入口文件；用 `npm run previews` 出图或接受占位卡。
 - 不要手改 `工作台.html`；它由脚本生成。

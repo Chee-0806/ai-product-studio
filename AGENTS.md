@@ -103,6 +103,8 @@ npm run pack:remove -- pm-methods
 - ID 固定为 `REQ-001` 三位数字，**永不复用、永不重编号**。删除需求用 `dropped`，不删 ID。
 - 每条非 `dropped` 需求必须有：`状态`、`优先级`、`用户故事`、`行为`、至少一条 `- [ ]` 验收。
 - 强监管/企业项目在 PRD front matter 写 `basis_required: true`，每条非 `dropped` 需求再补 `- **依据**: ...`（法规、标准、访谈、数据或 ADR 链接）；缺依据校验失败。普通项目可写 `basis_required: false` 或不写。
+- `- **依据**` 只写能脱离工位核对的来源：法规名 + 条款、标准编号、访谈时间与样本数、《文档名》第 X 节、数据看板名称、ADR 编号。**不写工作区路径**（`product/...`、`docs/...` 等）：交付包不带这些目录，写了就是一条打不开的引用，`npm run check` 会直接报错。
+- 开了 `basis_required` 的项目必须有「## 参考资料」一节，集中列出处（法规全名与条款、标准编号、文档名与版本、访谈记录）；这一节同样不写工作区路径，并注明原件不随交付包外发、需要时向产品经理索取。
 - PRD 中引用界面文案时用「」标注，原型必须逐字一致；改文案时两边同改。
 - 行为变化必须升 `version` 并补「变更记录」；仅澄清措辞用 patch，行为/范围变化用 minor，方向重做用 major。
 
@@ -121,7 +123,8 @@ npm run pack:remove -- pm-methods
 - 页面之间用真实相对链接串起来，主流程必须能点通。
 - **单页应用**：在 `prototype/screens.json` 写 `mode: "spa"`、`entry` 与每个界面的 `id/title/route/flow/form/reqs`。路由必须以 `#` 开头，保证 `file://` 双击可开；每个界面的 `reqs` 就是该路由的需求追溯，不再要求入口 HTML 里逐元素标 `data-req`。没有 `screens.json` 时按原来的 `screens/*.html` 扫描。
 - 只用 `prototype/assets/` 下的共享样式与原生 HTML/CSS/JS；不引构建链、不装依赖。外部地图/字体等服务必须写进 `prototype/external.json` 的 `allow` 白名单；能 vendor 到 `assets/vendor/` 的优先本地化。
-- 含外部资源或单页 HTML 超过 512KB 的页面，用 `screen:preview`（图片路径相对 `prototype/`）或 `screens.json` 的 `preview` 提供静态预览图；工作台不会再内联这类页面，改为显示降级卡片。
+- 含外部资源或单页 HTML 超过 512KB 的页面，工作台不再内联，需要静态预览图：默认放 `prototype/previews/<界面 ID>.png`，不用写 meta，工作台自动采用；也支持 `screen:preview` 或 `screens.json` 的 `preview` 指定别的路径。
+- 批量出预览图用 `npm run previews`（本机 Chrome/Edge 无头截图，不装依赖）：默认只补超大页面、外部资源页面和 SPA 界面，`--all` 全部出图，`--force` 覆盖，`--only=a,b` 指定界面。没有预览图的大页面只能显示占位卡。
 - 使用真实感的中文示例数据；禁止 lorem ipsum、`TODO`、空按钮、死链。
 - PRD 第 6 节列出的边界态，在对应页面要有可演示的呈现；不能演示的，在汇报里说明。
 
@@ -137,6 +140,7 @@ npm run pack:remove -- pm-methods
 - **禁止手改 `工作台.html`**，它由 `node scripts/sync.mjs` 生成。
 - 工作台顶部显示构建状态；检查失败时会直接显示错误，并提示内容可能不是最新的。不要把红色失败状态留给用户，修好后再重新生成。
 - 每次改动结束都跑 `npm run sync` 和 `npm run check`；必须通过。不要要求用户代跑。`npm run check` 同时校验 PRD/原型一致性与技能格式。
+- 新增或改动大页面、外部资源页面、SPA 界面后，先 `npm run previews` 出预览图，再 `npm run sync`，不要留一整屏占位卡给用户。
 
 ## 6. 一次变更的标准动作
 
@@ -147,7 +151,7 @@ npm run pack:remove -- pm-methods
 3. **改原型**：更新受影响页面；新增页面时加 meta 与 `data-req`；同步文案。
 4. **改决策**：如果推翻了已有取舍，新增 ADR 并在 PRD 链接；不要改写旧 ADR。
 5. **更新 STATE**：阶段、版本、下一步，以及 `last_round` / `last_reason` / `last_reqs`（这一轮改了什么、为什么、影响哪些需求）；用户能看懂的语言。
-6. **跑校验并刷新工作台**：`npm run sync && npm run check`；失败就修到通过，不要绕过。
+6. **跑校验并刷新工作台**：`npm run sync && npm run check`；失败就修到通过，不要绕过。大页面或 SPA 改动先 `npm run previews`。
 7. **留底**：如果仓库有 `.git`，自动提交这次改动（中文提交信息，包含 REQ ID）；不要推送远端。没有 `.git` 就跳过，不要要求用户初始化。
 8. **汇报**：按第 8 节格式，用产品语言，不用术语。
 
@@ -171,7 +175,11 @@ npm run pack:remove -- pm-methods
 - 产物：`dist/<产品>-v<版本>/` 与同名 `.zip`。入口是 `index.html`，PRD 是 `PRD.html` / `PRD.md`，原型是 `prototype/index.html`。
 - 多页原型导出 `prototype/screens/`；SPA 导出入口文件与它依赖的脚本/样式/数据，内部清单、预览图和 `external.json` 不进入交付包。
 - 交付包保留已声明白名单的外部资源；`README.md` 会列出域名。内网/离线交付时，提醒用户提前 vendor 或准备本地副本。
-- **只发 zip**；系统没有 `zip` 命令时，发 `dist/<产品>-v<版本>/` 文件夹。
+- 导出前扫一遍 PRD 与生成的 HTML/Word：「依据」「参考资料」以及正文里不得出现 `product/`、`docs/`、`skills/`、`scripts/`、`prototype/` 这类工作区路径。命中的改成文档名 + 章节或条款，不要把打不开的引用发给评审方。
+- 打包用 Python `zipfile`（自动给中文文件名写 UTF-8 标志 `0x800`）。macOS 自带的 `zip` 是 Info-ZIP 3.0，中文名不带 UTF-8 标志，也不支持 `-UN`，Windows 解压会乱码；打包后逐条确认 `flag_bits & 0x800`。
+- **只发 zip**；没有 Python 时发 `dist/<产品>-v<版本>/` 文件夹并说明原因。
+- 导出后在工位根目录留一份同名 zip，并在回复里给出绝对路径。`dist/` 是生成物、被工位忽略，用户手机和文件应用里翻不到。
+- **PRD 只有一份事实源**：`PRD.html`、评审 Word、汇报材料都是快照，封面或页脚必须写「依据 PRD v<版本>（<updated>）生成」。改完 PRD，旧快照立即作废——重新生成或删掉并说明，不要逐段手工同步三处；交付时说清这次生成了哪几份快照。
 - `dist/` 是生成物，不手改、不提交。
 - 评审通过后，主动问用户是否需要导出交付包、评审 Word 或汇报材料。
 
@@ -255,6 +263,7 @@ LICENSES/                 第三方许可证原文
 BOOTSTRAP.md              从零建站说明，给 AI 看（仅模板工程有，不进入工位）
 launcher/                 用户级启动技能源文件（仅模板工程有，不进入工位）
 scripts/sync.mjs          一致性校验 + 工作台生成
+scripts/previews.mjs      用本机浏览器批量生成 prototype/previews/ 预览图
 scripts/check-skills.mjs  技能格式校验（含可选包源与启动技能）
 scripts/pack.mjs          安装/移除可选内容包
 scripts/new.mjs           从模板创建新项目

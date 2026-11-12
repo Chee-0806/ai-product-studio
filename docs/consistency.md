@@ -33,6 +33,8 @@
 
 `npm run check` = `node scripts/check-skills.mjs && node scripts/sync.mjs --check --strict`。
 
+三类输出：**错误**（阻断）、**警告**（strict 下阻断）、**提示**（只提醒，不阻断，例如「大页面还没有预览图，跑 `npm run previews`」）。
+
 ### PRD
 
 - front matter 必须有 `product`、`version`、`updated`、`status`；
@@ -44,7 +46,9 @@
 - `状态` ∈ `draft | prototyped | approved | delivered | dropped`，支持中文别名；
 - `优先级` ∈ `P0 | P1 | P2`；
 - 非 `dropped` 需求必须有 `- **用户故事**: ...`、`- **行为**: ...`，以及至少一条 `- [ ]` 验收；
-- `basis_required: true` 时，每条非 `dropped` 需求必须有 `- **依据**: ...`。
+- `basis_required: true` 时，每条非 `dropped` 需求必须有 `- **依据**: ...`；
+- 「依据」里不得出现工作区路径（`product/`、`docs/`、`prototype/`、`skills/`、`scripts/` 等），否则导出后是打不开的引用；
+- `basis_required: true` 时必须有「## 参考资料」一节，这一节同样不得出现工作区路径。
 
 ### 原型
 
@@ -130,7 +134,15 @@ ID 永不复用。删除需求用 `dropped`；页面改名时同时改 `screen:i
 
 ### `PRD 开启了 basis_required，必须补「- **依据**: ...」`
 
-给对应需求补一条依据，写清来源：法规条款、标准编号、访谈日期与样本、数据看板或 ADR 链接。不要写「业务要求」这种无法核对的空话。确实没有依据的需求，要么补调研，要么标 `dropped`。
+给对应需求补一条依据，写清来源：法规条款、标准编号、访谈日期与样本、数据看板或 ADR 编号。不要写「业务要求」这种无法核对的空话。确实没有依据的需求，要么补调研，要么标 `dropped`。
+
+### `依据里写了工作区路径`
+
+交付包只带 PRD 与原型，`product/discovery/xxx.docx` 这类路径发出去点不开。把依据改写成「《文档名》第 X 节」「《XX 条例》第 N 条」「访谈 2026-11（5 人）」，原件登记到 PRD「参考资料」一节，并注明不随包外发。
+
+### `参考资料里不能写工作区路径` / `必须有「## 参考资料」一节`
+
+同上：开了 `basis_required` 就要有一节集中列出来源（法规全名与条款、标准编号、文档名与版本、访谈记录），写名字而不是写路径。
 
 ### `REQ-005 状态是 draft，但已有页面覆盖`
 
