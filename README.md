@@ -252,7 +252,8 @@ scripts/
   sync.mjs                一致性检查 + 生成工作台
   check-skills.mjs        技能格式检查
   new.mjs                 从模板创建新项目
-  upgrade.mjs             把工位的规则、脚本、技能升级到当前版本
+  upgrade.mjs             把工位的规则、脚本、技能升级到当前版本（自动备份，可 --rollback）
+  previews.mjs            批量生成工作台预览图
   launcher.mjs            打包/安装用户级启动技能
   pack.mjs                安装/移除可选内容包
   serve.mjs               可选的本地预览服务

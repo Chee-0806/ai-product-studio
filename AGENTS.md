@@ -267,7 +267,7 @@ scripts/previews.mjs      用本机浏览器批量生成 prototype/previews/ 预
 scripts/check-skills.mjs  技能格式校验（含可选包源与启动技能）
 scripts/pack.mjs          安装/移除可选内容包
 scripts/new.mjs           从模板创建新项目
-scripts/upgrade.mjs       把工位升级到当前模板版本
+scripts/upgrade.mjs       把工位升级到当前模板版本；自动备份机器层，支持 --rollback
 scripts/lib/screens.mjs   多页/SPA 页面读取与外部资源匹配
 scripts/lib/json.mjs      读取 JSON 的公共函数
 docs/                     工作流、一致性模型、原型规范、评审清单、企业适配

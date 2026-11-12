@@ -4,3 +4,4 @@ node_modules/
 prototype/spikes/**/*.local.*
 dist/
 /*.zip
+.upgrade-backups/

@@ -877,8 +877,8 @@ footer {
 
   <section class="round" aria-label="本轮变更">
     <p class="round__label">本轮变更</p>
-    <p class="round__change">README 的「常用工作流」改成按顺序的五步说明，每步写清你会拿到什么；去掉看不懂的箭头图和技能名串</p>
-    <p class="round__meta">为什么：写给产品经理看的段落里堆着英文技能名和 ASCII 流程图，读者看不出这段在讲什么</p>
+    <p class="round__change">升级工位不再需要手动备份：upgrade.mjs 自己把要替换的规则与脚本存进工位的 .upgrade-backups，保留最近 3 份，可一键回滚</p>
+    <p class="round__meta">为什么：已经在用的工位每次升级都要人先整站备份，太麻烦；只备份会被替换的机器层就够回滚，体积从几十兆降到几百 K</p>
     
   </section>
 
