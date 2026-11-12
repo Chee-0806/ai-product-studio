@@ -5,3 +5,4 @@ prototype/spikes/**/*.local.*
 dist/
 /*.zip
 .upgrade-backups/
+.demo/
