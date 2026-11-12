@@ -43,7 +43,7 @@
 - REQ ID 不重复；
 - `状态` ∈ `draft | prototyped | approved | delivered | dropped`，支持中文别名；
 - `优先级` ∈ `P0 | P1 | P2`；
-- 非 `dropped` 需求至少一条 `- [ ]` 验收；
+- 非 `dropped` 需求必须有 `- **用户故事**: ...`、`- **行为**: ...`，以及至少一条 `- [ ]` 验收；
 - `basis_required: true` 时，每条非 `dropped` 需求必须有 `- **依据**: ...`。
 
 ### 原型
@@ -55,7 +55,7 @@
   <meta name="screen:flow" content="记录">
   <meta name="screen:form" content="mobile">
   ```
-- 页面 ID 不重复；
+- 页面 ID 不重复；`screen:id` 只能用小写英文、数字和短横线，且不以短横线开头；
 - `screen:form` ∈ `mobile | desktop | responsive`，不写默认 `responsive`；
 - 每个 `data-req` 能在 PRD 找到；
 - 页面没有任何 `data-req` 会告警；
@@ -74,14 +74,14 @@
 - `STATE.md` 必须有 `stage`、`spec_version`、`updated`、`next_action`；
 - `stage` ∈ `discovery | prd | prototype | review | handoff`；
 - `spec_version` === PRD `version`；
-- `last_round` / `last_reason` / `last_reqs` 可选，写了就展示在工作台「本轮变更」；`last_reqs` 里的 REQ 必须存在；
+- `last_round` / `last_reason` / `last_reqs` 必填，会显示在工作台「本轮变更」；`last_reqs` 里的 REQ 必须存在；
 - `工作台.html` 必须与脚本生成结果逐字一致。
 
 工作台里「需要你拍板」由三处汇总：`STATE.md` 的「待确认 / 阻塞」、PRD 的「开放问题」表（状态为已定/已解决的行不显示）、以及状态为 `prototyped` 的待评审需求。它只读，不产生新的进度状态。
 
 ### 技能
 
-检查两处，分开计算：已安装的 `skills/`，以及可选内容包的 `packs/<name>/skills/`。
+检查三处，分开计算：已安装的 `skills/`、可选内容包的 `packs/<name>/skills/`，以及启动技能 `launcher/`。
 
 - `SKILL.md` 必须有 `name`、`description`；
 - `name` 必须与目录名一致，且只含小写英文/数字/短横线；

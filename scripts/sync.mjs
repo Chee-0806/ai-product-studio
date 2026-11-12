@@ -26,7 +26,7 @@ const STATE = path.join(ROOT, 'STATE.md');
 const PROTOTYPE_DIR = path.join(ROOT, 'prototype');
 const SCREENS_DIR = path.join(PROTOTYPE_DIR, 'screens');
 const SCREEN_MANIFEST = path.join(PROTOTYPE_DIR, 'screens.json');
-const GALLERY = path.join(ROOT, '工作台.html');
+const WORKBENCH = path.join(ROOT, '工作台.html');
 
 const errors = [];
 const warnings = [];
@@ -116,11 +116,13 @@ function parseRequirements(body, file) {
   const reqs = [];
   let cur = null;
   let inAcceptance = false;
+  let inBehavior = false;
 
   const flush = () => {
     if (cur) reqs.push(cur);
     cur = null;
     inAcceptance = false;
+    inBehavior = false;
   };
 
   body.split(/\r?\n/).forEach((line, index) => {
@@ -136,6 +138,7 @@ function parseRequirements(body, file) {
         priority: '',
         acceptance: 0,
         story: '',
+        behavior: '',
         basis: '',
       };
       return;
@@ -149,15 +152,26 @@ function parseRequirements(body, file) {
       cur.acceptance += 1;
       return;
     }
+    if (inBehavior) {
+      const item = line.match(/^\s+(?:\d+[.、)]|[-*])\s+(.+?)\s*$/);
+      if (item) {
+        cur.behavior = cur.behavior ? `${cur.behavior}\n${item[1]}` : item[1];
+        return;
+      }
+    }
     const field = line.match(/^\s*-\s*(?:\*\*)?([^*:：]+?)(?:\*\*)?\s*[:：]\s*(.*)$/);
     if (!field) return;
     const key = field[1].trim();
     const value = field[2].trim().replace(/`/g, '');
     inAcceptance = false;
+    inBehavior = false;
     if (key === '状态') cur.status = value;
     else if (key === '优先级') cur.priority = value.toUpperCase();
     else if (key === '用户故事') cur.story = value;
-    else if (key === '依据') cur.basis = value;
+    else if (key === '行为') {
+      inBehavior = true;
+      if (value) cur.behavior = value;
+    } else if (key === '依据') cur.basis = value;
     else if (key === '验收') inAcceptance = true;
   });
   flush();
@@ -184,6 +198,9 @@ function validateScreens(screens, reqMap) {
     const label = screenLabel(screen);
     if (screen.source !== 'manifest') {
       if (!screen.id) fail(`${label}：缺少 <meta name="screen:id">`);
+      else if (!/^[a-z0-9][a-z0-9-]*$/.test(screen.id)) {
+        fail(`${label}：screen:id 只能用小写英文、数字和短横线（当前「${screen.id}」）`);
+      }
       if (!screen.title) fail(`${label}：缺少 <meta name="screen:title">`);
       if (!FORMS.includes(screen.form)) {
         fail(`${label}：screen:form 只能是 ${FORMS.join(' | ')}（当前「${screen.form}」）`);
@@ -281,6 +298,14 @@ function validateRequirements(reqs, prd) {
       fail(`${req.id}：优先级「${req.priority}」不合法，只能是 P0 | P1 | P2`);
     }
 
+    if (req.status !== 'dropped' && !req.story) {
+      fail(`${req.id}：缺少「- **用户故事**: ...」`);
+    }
+
+    if (req.status !== 'dropped' && !req.behavior) {
+      fail(`${req.id}：缺少「- **行为**: ...」`);
+    }
+
     if (req.status !== 'dropped' && req.acceptance === 0) {
       fail(`${req.id}：至少需要一条「- [ ]」验收标准`);
     }
@@ -307,6 +332,11 @@ function validateState(state, prd, reqMap) {
     fail(`STATE.md：updated 必须是 YYYY-MM-DD（当前「${state.updated}」）`);
   }
   if (!state.next_action) fail('STATE.md：front matter 缺少 next_action（下一件具体要做的事）');
+  for (const key of ['last_round', 'last_reason', 'last_reqs']) {
+    if (!state[key]) {
+      fail(`STATE.md：front matter 缺少 ${key}（这一轮改了什么、为什么、影响哪些需求）`);
+    }
+  }
   if (state.last_reqs) {
     for (const id of reqIdsIn(state.last_reqs)) {
       if (reqMap && !reqMap.has(id)) {
@@ -385,7 +415,6 @@ function collectDecisions(stateBody, prdBody, reqs) {
     items.push({
       text: `${waiting.length} 条需求已有原型，等评审确认是否通过`,
       from: '需求评审',
-      href: '#requirements',
     });
   }
   return items;
@@ -417,53 +446,73 @@ function screenPreviewHtml(file, tokens, appCss) {
   return html;
 }
 
-function renderGallery(
-  prd,
-  state,
-  reqs,
-  screens,
-  covered,
-  build = { errors: [], warnings: [] },
-  mode = 'multi',
-  ctx = {},
-) {
-  const tokens = readAsset(path.join(ROOT, 'prototype/assets/tokens.css'));
-  const appCss = readAsset(path.join(ROOT, 'prototype/assets/app.css'));
-  const workbenchCss = readAsset(path.join(ROOT, 'prototype/assets/workbench.css'));
-  const stageLabel = STAGE_LABELS[state.stage] || state.stage || '未设置';
-  const nextAction = state.next_action || '先读一遍 PRD，确定下一步要做什么';
-  const sortedReqs = [...reqs].sort((a, b) => cmp(a.id, b.id));
-  const showBasis = prd.basis_required === true || sortedReqs.some((req) => req.basis);
-  const pageWord = mode === 'spa' ? '个界面' : '个页面';
+/** 超过这个体积的页面不再内联进工作台，改为降级卡片，避免工作台自己变成几十兆。 */
+const MAX_INLINE_BYTES = 512 * 1024;
+
+function readAssets() {
+  return {
+    tokens: readAsset(path.join(ROOT, 'prototype/assets/tokens.css')),
+    appCss: readAsset(path.join(ROOT, 'prototype/assets/app.css')),
+    workbenchCss: readAsset(path.join(ROOT, 'prototype/assets/workbench.css')),
+  };
+}
+
+/** 有需求的页面按最小 REQ 编号排在前面，其余按流程与 ID。 */
+function sortScreensForWorkbench(screens) {
   const reqOrder = (screen) =>
     screen.reqs.length ? Math.min(...screen.reqs.map((id) => Number(id.slice(4)))) : 9999;
-  const sortedScreens = [...screens].sort(
+  return [...screens].sort(
     (a, b) => reqOrder(a) - reqOrder(b) || cmp(a.flow || '未分组', b.flow || '未分组') || cmp(a.id, b.id),
   );
-  const active = sortedReqs.filter((r) => r.status !== 'dropped');
-  const done = active.filter((r) => (covered.get(r.id) || []).length > 0);
+}
 
+function coverageOf(reqs, covered) {
+  const active = reqs.filter((req) => req.status !== 'dropped');
+  return { active, done: active.filter((req) => (covered.get(req.id) || []).length > 0) };
+}
+
+function renderBuildSection(build) {
+  const failed = build.errors.length > 0;
+  const warned = !failed && build.warnings.length > 0;
+  const cls = failed ? 'fail' : warned ? 'warn' : 'ok';
+  const icon = failed
+    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/></svg>'
+    : warned
+      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 21 20H3L12 3.5Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>'
+      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>';
+  const title = failed
+    ? `检查没通过（${build.errors.length} 个问题），工作台可能不是最新的`
+    : warned
+      ? `检查通过，有 ${build.warnings.length} 条提醒`
+      : '检查通过，PRD 和原型对得上';
+  const note = failed
+    ? '把这句话发给 AI：「检查没通过，请修好再刷新工作台」。修好前，下面的内容可能不完整。'
+    : warned
+      ? '不影响查看，建议让 AI 处理这些提醒。'
+      : '需求状态、页面覆盖和版本都一致。';
+  const messages = [
+    ...build.errors.map((message) => `错误：${message}`),
+    ...build.warnings.map((message) => `提醒：${message}`),
+  ];
+  const detail = messages.length
+    ? `<details class="build__detail">
+        <summary>给 AI 看的技术细节（${messages.length}）</summary>
+        <ul>${messages.map((message) => `<li>${esc(message)}</li>`).join('')}</ul>
+      </details>`
+    : '';
+  const noteHtml = failed || warned ? `<p class="build__note">${esc(note)}</p>` : '';
+  return `  <section class="build build--${cls}" aria-label="检查状态">
+    <p class="build__title"><span class="build__icon" aria-hidden="true">${icon}</span>${esc(title)}</p>${noteHtml}${detail}
+  </section>`;
+}
+
+function renderRound(state) {
   const round = {
     change: String(state.last_round || '').trim(),
     reason: String(state.last_reason || '').trim(),
     reqs: reqIdsIn(state.last_reqs),
   };
-  const decisions = collectDecisions(ctx.stateBody || '', ctx.prdBody || '', sortedReqs);
-  const shownDecisions = decisions.slice(0, MAX_DECISIONS);
-  const decisionHtml = shownDecisions.length
-    ? `<ol class="decisions">
-      ${shownDecisions
-        .map(
-          (item) => `<li><span>${esc(item.text)}</span><span class="decisions__from">${esc(item.from)}</span></li>`,
-        )
-        .join('\n      ')}
-    </ol>${
-      decisions.length > shownDecisions.length
-        ? `<p class="note">还有 ${decisions.length - shownDecisions.length} 条在 PRD 的「开放问题」里。</p>`
-        : ''
-    }`
-    : '<p class="empty">目前没有需要你决定的事。</p>';
-  const roundHtml = round.change
+  return round.change
     ? `<section class="round" aria-label="本轮变更">
     <p class="round__label">本轮变更</p>
     <p class="round__change">${esc(round.change)}</p>
@@ -484,51 +533,31 @@ function renderGallery(
     <p class="round__label">本轮变更</p>
     <p class="round__meta">这一轮还没有变更记录。</p>
   </section>`;
+}
 
-  const buildFailed = build.errors.length > 0;
-  const buildWarned = !buildFailed && build.warnings.length > 0;
-  const buildClass = buildFailed ? 'fail' : buildWarned ? 'warn' : 'ok';
-  const buildIcon = buildFailed
-    ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5"/><path d="M12 16.5h.01"/></svg>'
-    : buildWarned
-      ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5 21 20H3L12 3.5Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>'
-      : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>';
-  const buildTitle = buildFailed
-    ? `检查没通过（${build.errors.length} 个问题），工作台可能不是最新的`
-    : buildWarned
-      ? `检查通过，有 ${build.warnings.length} 条提醒`
-      : '检查通过，PRD 和原型对得上';
-  const buildNote = buildFailed
-    ? '把这句话发给 AI：「检查没通过，请修好再刷新工作台」。修好前，下面的内容可能不完整。'
-    : buildWarned
-      ? '不影响查看，建议让 AI 处理这些提醒。'
-      : '需求状态、页面覆盖和版本都一致。';
-  const buildMessages = [
-    ...build.errors.map((message) => `错误：${message}`),
-    ...build.warnings.map((message) => `提醒：${message}`),
-  ];
-  const buildDetail = buildMessages.length
-    ? `<details class="build__detail">
-        <summary>给 AI 看的技术细节（${buildMessages.length}）</summary>
-        <ul>${buildMessages.map((message) => `<li>${esc(message)}</li>`).join('')}</ul>
-      </details>`
-    : '';
-  const buildNoteHtml =
-    buildFailed || buildWarned ? `<p class="build__note">${esc(buildNote)}</p>` : '';
+function renderDecisionList(decisions) {
+  const shown = decisions.slice(0, MAX_DECISIONS);
+  return shown.length
+    ? `<ol class="decisions">
+      ${shown
+        .map(
+          (item) => `<li><span>${esc(item.text)}</span><span class="decisions__from">${esc(item.from)}</span></li>`,
+        )
+        .join('\n      ')}
+    </ol>${
+      decisions.length > shown.length
+        ? `<p class="note">还有 ${decisions.length - shown.length} 条在 PRD 的「开放问题」里。</p>`
+        : ''
+    }`
+    : '<p class="empty">目前没有需要你决定的事。</p>';
+}
 
-  const groups = new Map();
-  for (const screen of sortedScreens) {
-    const key = screen.flow || '未分组';
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(screen);
-  }
-
+function renderRequirementRows(sortedReqs, covered, showBasis) {
   const pills = (status) => {
     const meta = STATUS[status] || { label: status || '未知', cls: 'draft' };
     return `<span class="pill pill--${meta.cls}">${esc(meta.label)}</span>`;
   };
-
-  const reqRows = sortedReqs
+  return sortedReqs
     .map((req) => {
       const screensForReq = covered.get(req.id) || [];
       const links = screensForReq.length
@@ -548,8 +577,33 @@ function renderGallery(
       </tr>`;
     })
     .join('\n');
+}
 
-  const cardsByFlow = [...groups.entries()]
+function renderScreenCards(sortedScreens, { tokens, appCss }) {
+  const groups = new Map();
+  for (const screen of sortedScreens) {
+    const key = screen.flow || '未分组';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(screen);
+  }
+  const placeholderIcon =
+    '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>';
+  const frameOf = (screen) => {
+    if (screen.previewRel) {
+      return `<img src="${esc(screen.previewRel)}" alt="${esc(screen.title)} 预览" loading="lazy">`;
+    }
+    if (screen.mode === 'spa') {
+      return `<span class="proto__placeholder">${placeholderIcon}<span>单页应用</span><small>点开查看</small></span>`;
+    }
+    if (screen.externalUrls.length) {
+      return `<span class="proto__placeholder">${placeholderIcon}<span>外部资源</span><small>缩略图已降级</small></span>`;
+    }
+    if (screen.bytes > MAX_INLINE_BYTES) {
+      return `<span class="proto__placeholder">${placeholderIcon}<span>页面较大</span><small>缩略图已降级</small></span>`;
+    }
+    return `<iframe srcdoc="${esc(screenPreviewHtml(screen.file, tokens, appCss))}" title="${esc(screen.title)}" loading="lazy" tabindex="-1"></iframe>`;
+  };
+  return [...groups.entries()]
     .map(
       ([flow, list]) => `<section class="flow-group">
       <h3 class="flow-title">${esc(flow)} <span class="count">${list.length}</span></h3>
@@ -558,19 +612,10 @@ function renderGallery(
           .map((screen) => {
             const form = FORMS.includes(screen.form) ? screen.form : 'responsive';
             const formLabel = FORM_LABELS[form] || form;
-            const placeholderIcon =
-              '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>';
-            const frame = screen.previewRel
-              ? `<img src="${esc(screen.previewRel)}" alt="${esc(screen.title)} 预览" loading="lazy">`
-              : screen.mode === 'spa'
-                ? `<span class="proto__placeholder">${placeholderIcon}<span>单页应用</span><small>点开查看</small></span>`
-                : screen.externalUrls.length
-                  ? `<span class="proto__placeholder">${placeholderIcon}<span>外部资源</span><small>缩略图已降级</small></span>`
-                  : `<iframe srcdoc="${esc(screenPreviewHtml(screen.file, tokens, appCss))}" title="${esc(screen.title)}" loading="lazy" tabindex="-1"></iframe>`;
             return `<article class="proto proto--${form}">
           <a class="proto__link" href="${esc(screen.relFile)}" aria-label="打开 ${esc(screen.title)}">
             <span class="proto__frame">
-              ${frame}
+              ${frameOf(screen)}
             </span>
             <span class="proto__body">
               <span class="proto__title">${esc(screen.title || screen.id)}</span>
@@ -587,6 +632,23 @@ function renderGallery(
     </section>`,
     )
     .join('');
+}
+
+function renderWorkbench({ prd, state, reqs, screens, covered, build, mode, ctx }) {
+  const { tokens, appCss, workbenchCss } = readAssets();
+  const stageLabel = STAGE_LABELS[state.stage] || state.stage || '未设置';
+  const nextAction = state.next_action || '先读一遍 PRD，确定下一步要做什么';
+  const sortedReqs = [...reqs].sort((a, b) => cmp(a.id, b.id));
+  const showBasis = prd.basis_required === true || sortedReqs.some((req) => req.basis);
+  const pageWord = mode === 'spa' ? '个界面' : '个页面';
+  const sortedScreens = sortScreensForWorkbench(screens);
+  const { active, done } = coverageOf(sortedReqs, covered);
+  const decisions = collectDecisions(ctx.stateBody || '', ctx.prdBody || '', sortedReqs);
+  const buildSection = renderBuildSection(build);
+  const roundHtml = renderRound(state);
+  const decisionHtml = renderDecisionList(decisions);
+  const reqRows = renderRequirementRows(sortedReqs, covered, showBasis);
+  const cardsByFlow = renderScreenCards(sortedScreens, { tokens, appCss });
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -608,9 +670,7 @@ ${workbenchCss}
     }</p>
   </header>
 
-  <section class="build build--${buildClass}" aria-label="检查状态">
-    <p class="build__title"><span class="build__icon" aria-hidden="true">${buildIcon}</span>${esc(buildTitle)}</p>${buildNoteHtml}${buildDetail}
-  </section>
+${buildSection}
 
   <section class="next">
     <p class="next__label">下一步</p>
@@ -710,13 +770,22 @@ function main() {
   validateExternal(screens, loaded, externalPolicy);
 
   // 即使检查失败也要生成工作台：把失败状态直接显示给人看，而不是静默保留旧页面。
-  const html = renderGallery(prd, state, reqs, screens, covered, { errors, warnings }, loaded.mode, {
-    prdBody: body,
-    stateBody: stateText ? stateText.replace(/^---\r?\n[\s\S]*?\r?\n---/, '') : '',
+  const html = renderWorkbench({
+    prd,
+    state,
+    reqs,
+    screens,
+    covered,
+    build: { errors, warnings },
+    mode: loaded.mode,
+    ctx: {
+      prdBody: body,
+      stateBody: stateText ? stateText.replace(/^---\r?\n[\s\S]*?\r?\n---/, '') : '',
+    },
   });
   let current = null;
   try {
-    current = fs.readFileSync(GALLERY, 'utf8');
+    current = fs.readFileSync(WORKBENCH, 'utf8');
   } catch {
     current = null;
   }
@@ -724,12 +793,11 @@ function main() {
     if (CHECK_ONLY) {
       fail('工作台.html 已过期：运行 npm run sync 重新生成');
     } else {
-      fs.writeFileSync(GALLERY, html);
+      fs.writeFileSync(WORKBENCH, html);
     }
   }
 
-  const active = reqs.filter((r) => r.status !== 'dropped');
-  const done = active.filter((r) => (covered.get(r.id) || []).length > 0);
+  const { active, done } = coverageOf(reqs, covered);
   console.log(
     `PRD v${prd.version || '?'} · ${reqs.length} 个需求 · ${screens.length} 个${loaded.mode === 'spa' ? '界面（SPA）' : '页面'}`,
   );

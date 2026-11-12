@@ -53,8 +53,7 @@
 
 ```json
 {
-  "allow": ["https://webapi.amap.com", "https://*.example.com"],
-  "note": "内网演示时把地图 SDK 放到 assets/vendor/"
+  "allow": ["https://webapi.amap.com", "https://*.example.com"]
 }
 ```
 

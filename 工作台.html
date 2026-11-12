@@ -23,6 +23,11 @@
   --brand-2: #6366f1;
   --brand-ink: #3730a3;
   --brand-weak: #eef0ff;
+  --brand-deep: #4338ca;
+  --brand-light: #7c7cf5;
+  --brand-light-0: rgba(124, 124, 245, 0);
+  --brand-wash: #eceefe;
+  --brand-wash-2: #dfe3fb;
 
   --danger: #d92d20;
   --danger-weak: #fef3f2;
@@ -34,6 +39,17 @@
   --warn-weak: #fffaeb;
   --warn-line: #f0d9a8;
 
+  --on-brand: #ffffff;
+  --on-brand-soft: rgba(255, 255, 255, 0.72);
+  --on-brand-muted: rgba(255, 255, 255, 0.78);
+  --glass: rgba(255, 255, 255, 0.14);
+  --glass-strong: rgba(255, 255, 255, 0.22);
+  --glass-line: rgba(255, 255, 255, 0.3);
+  --surface-glass: rgba(255, 255, 255, 0.92);
+  --scrim: rgba(16, 24, 40, 0.4);
+  --toast: rgba(23, 25, 31, 0.92);
+
+  --radius-2xs: 4px;
   --radius-xs: 8px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -44,6 +60,10 @@
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
   --shadow-md: 0 2px 6px rgba(16, 24, 40, 0.05), 0 12px 28px rgba(16, 24, 40, 0.08);
   --shadow-lg: 0 24px 64px rgba(16, 24, 40, 0.18);
+  --shadow-brand: 0 14px 34px rgba(79, 70, 229, 0.32);
+  --shadow-brand-sm: 0 8px 20px rgba(79, 70, 229, 0.28);
+  --shadow-float: 0 8px 20px rgba(23, 25, 31, 0.22);
+  --shadow-sheet: 0 -18px 48px rgba(16, 24, 40, 0.22);
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro SC", "PingFang SC", "Hiragino Sans GB",
     "Segoe UI", "Microsoft YaHei", sans-serif;
@@ -97,7 +117,7 @@ a:hover {
 :where(a, summary):focus-visible {
   outline: 2px solid var(--brand);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: var(--radius-2xs);
 }
 
 .wrap {
@@ -573,7 +593,7 @@ td a:hover {
   display: inline-block;
   padding: 0 5px;
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-2xs);
   color: var(--ink-3);
   font-size: 10.5px;
   line-height: 1.5;
@@ -857,8 +877,8 @@ footer {
 
   <section class="round" aria-label="本轮变更">
     <p class="round__label">本轮变更</p>
-    <p class="round__change">第一次使用改成「对 AI 说一句话」：不用预装技能、不用命令行；补了从零建站的说明，由 AI 装环境、建站并打开工作台</p>
-    <p class="round__meta">为什么：使用者是零研发经验的产品经理，任何需要她动手的步骤都算失败；环境装不上时如实说明，不假装完成</p>
+    <p class="round__change">修完一轮代码审查：升级工位不再删掉工位自己的资源和名字，样式统一用设计变量，补上需求故事、行为和页面命名的检查</p>
+    <p class="round__meta">为什么：升级要保留工位里的东西；规则、脚本和文档说法要一致，检查要真的执行；产品需求未变</p>
     
   </section>
 
@@ -965,6 +985,11 @@ footer {
   --brand-2: #6366f1;
   --brand-ink: #3730a3;
   --brand-weak: #eef0ff;
+  --brand-deep: #4338ca;
+  --brand-light: #7c7cf5;
+  --brand-light-0: rgba(124, 124, 245, 0);
+  --brand-wash: #eceefe;
+  --brand-wash-2: #dfe3fb;
 
   --danger: #d92d20;
   --danger-weak: #fef3f2;
@@ -976,6 +1001,17 @@ footer {
   --warn-weak: #fffaeb;
   --warn-line: #f0d9a8;
 
+  --on-brand: #ffffff;
+  --on-brand-soft: rgba(255, 255, 255, 0.72);
+  --on-brand-muted: rgba(255, 255, 255, 0.78);
+  --glass: rgba(255, 255, 255, 0.14);
+  --glass-strong: rgba(255, 255, 255, 0.22);
+  --glass-line: rgba(255, 255, 255, 0.3);
+  --surface-glass: rgba(255, 255, 255, 0.92);
+  --scrim: rgba(16, 24, 40, 0.4);
+  --toast: rgba(23, 25, 31, 0.92);
+
+  --radius-2xs: 4px;
   --radius-xs: 8px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -986,6 +1022,10 @@ footer {
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
   --shadow-md: 0 2px 6px rgba(16, 24, 40, 0.05), 0 12px 28px rgba(16, 24, 40, 0.08);
   --shadow-lg: 0 24px 64px rgba(16, 24, 40, 0.18);
+  --shadow-brand: 0 14px 34px rgba(79, 70, 229, 0.32);
+  --shadow-brand-sm: 0 8px 20px rgba(79, 70, 229, 0.28);
+  --shadow-float: 0 8px 20px rgba(23, 25, 31, 0.22);
+  --shadow-sheet: 0 -18px 48px rgba(16, 24, 40, 0.22);
 
   --font: -apple-system, BlinkMacSystemFont, &quot;SF Pro SC&quot;, &quot;PingFang SC&quot;, &quot;Hiragino Sans GB&quot;,
     &quot;Segoe UI&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
@@ -1178,7 +1218,7 @@ svg {
   height: 40px;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: linear-gradient(145deg, #eceefe, #dfe3fb);
+  background: linear-gradient(145deg, var(--brand-wash), var(--brand-wash-2));
   color: var(--brand-ink);
   font-weight: 700;
   font-size: 14px;
@@ -1233,12 +1273,12 @@ svg {
 .text-btn--primary {
   background: var(--brand);
   border-color: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .text-btn--primary:hover {
   background: var(--brand-ink);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .topbar__actions {
@@ -1256,10 +1296,10 @@ svg {
   padding: 22px;
   border-radius: var(--radius-xl);
   background:
-    radial-gradient(120% 140% at 0% 0%, #7c7cf5 0%, rgba(124, 124, 245, 0) 55%),
-    linear-gradient(145deg, #4f46e5 0%, #4338ca 100%);
-  color: #fff;
-  box-shadow: 0 14px 34px rgba(79, 70, 229, 0.32);
+    radial-gradient(120% 140% at 0% 0%, var(--brand-light) 0%, var(--brand-light-0) 55%),
+    linear-gradient(145deg, var(--brand) 0%, var(--brand-deep) 100%);
+  color: var(--on-brand);
+  box-shadow: var(--shadow-brand);
 }
 
 .hero::after {
@@ -1270,7 +1310,7 @@ svg {
   width: 190px;
   height: 190px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--glass);
   filter: blur(2px);
 }
 
@@ -1280,7 +1320,7 @@ svg {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--on-brand-soft);
 }
 
 .hero h2 {
@@ -1296,7 +1336,7 @@ svg {
   position: relative;
   margin-top: 8px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--on-brand-muted);
 }
 
 .record-cta {
@@ -1308,9 +1348,9 @@ svg {
   margin-top: 20px;
   padding: 12px 14px 12px 12px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+  border: 1px solid var(--glass-line);
+  background: var(--glass);
+  color: var(--on-brand);
   text-align: left;
   cursor: pointer;
   backdrop-filter: blur(10px);
@@ -1318,7 +1358,7 @@ svg {
 }
 
 .record-cta:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--glass-strong);
   transform: translateY(-1px);
 }
 
@@ -1331,11 +1371,11 @@ svg {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
   color: var(--brand);
   display: grid;
   place-items: center;
-  box-shadow: 0 8px 20px rgba(23, 25, 31, 0.22);
+  box-shadow: var(--shadow-float);
 }
 
 .record-cta__icon svg {
@@ -1354,7 +1394,7 @@ svg {
   display: block;
   margin-top: 1px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--on-brand-soft);
 }
 
 /* ---------- list ---------- */
@@ -1436,7 +1476,7 @@ a.list-item:hover {
   justify-content: space-around;
   padding: 8px 18px 12px;
   border-top: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-glass);
   backdrop-filter: blur(12px);
 }
 
@@ -1693,8 +1733,8 @@ a.list-item:hover {
 .btn--primary {
   border-color: var(--brand);
   background: var(--brand);
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
+  color: var(--on-brand);
+  box-shadow: var(--shadow-brand-sm);
 }
 
 .btn--primary:hover {
@@ -1882,7 +1922,7 @@ a.list-item:hover {
 .todo.is-done .todo__check {
   background: var(--brand);
   border-color: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .todo.is-done .todo__body strong {
@@ -1980,11 +2020,11 @@ a.list-item:hover {
   border-radius: 24px 24px 0 0;
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 -18px 48px rgba(16, 24, 40, 0.22);
+  box-shadow: var(--shadow-sheet);
 }
 
 .sheet::backdrop {
-  background: rgba(16, 24, 40, 0.4);
+  background: var(--scrim);
   backdrop-filter: blur(2px);
 }
 
@@ -2067,8 +2107,8 @@ a.list-item:hover {
   transform: translate(-50%, 16px);
   padding: 9px 16px;
   border-radius: var(--radius-pill);
-  background: rgba(23, 25, 31, 0.92);
-  color: #fff;
+  background: var(--toast);
+  color: var(--on-brand);
   font-size: 12px;
   font-weight: 600;
   opacity: 0;
@@ -2251,6 +2291,11 @@ a.list-item:hover {
   --brand-2: #6366f1;
   --brand-ink: #3730a3;
   --brand-weak: #eef0ff;
+  --brand-deep: #4338ca;
+  --brand-light: #7c7cf5;
+  --brand-light-0: rgba(124, 124, 245, 0);
+  --brand-wash: #eceefe;
+  --brand-wash-2: #dfe3fb;
 
   --danger: #d92d20;
   --danger-weak: #fef3f2;
@@ -2262,6 +2307,17 @@ a.list-item:hover {
   --warn-weak: #fffaeb;
   --warn-line: #f0d9a8;
 
+  --on-brand: #ffffff;
+  --on-brand-soft: rgba(255, 255, 255, 0.72);
+  --on-brand-muted: rgba(255, 255, 255, 0.78);
+  --glass: rgba(255, 255, 255, 0.14);
+  --glass-strong: rgba(255, 255, 255, 0.22);
+  --glass-line: rgba(255, 255, 255, 0.3);
+  --surface-glass: rgba(255, 255, 255, 0.92);
+  --scrim: rgba(16, 24, 40, 0.4);
+  --toast: rgba(23, 25, 31, 0.92);
+
+  --radius-2xs: 4px;
   --radius-xs: 8px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -2272,6 +2328,10 @@ a.list-item:hover {
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
   --shadow-md: 0 2px 6px rgba(16, 24, 40, 0.05), 0 12px 28px rgba(16, 24, 40, 0.08);
   --shadow-lg: 0 24px 64px rgba(16, 24, 40, 0.18);
+  --shadow-brand: 0 14px 34px rgba(79, 70, 229, 0.32);
+  --shadow-brand-sm: 0 8px 20px rgba(79, 70, 229, 0.28);
+  --shadow-float: 0 8px 20px rgba(23, 25, 31, 0.22);
+  --shadow-sheet: 0 -18px 48px rgba(16, 24, 40, 0.22);
 
   --font: -apple-system, BlinkMacSystemFont, &quot;SF Pro SC&quot;, &quot;PingFang SC&quot;, &quot;Hiragino Sans GB&quot;,
     &quot;Segoe UI&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
@@ -2464,7 +2524,7 @@ svg {
   height: 40px;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: linear-gradient(145deg, #eceefe, #dfe3fb);
+  background: linear-gradient(145deg, var(--brand-wash), var(--brand-wash-2));
   color: var(--brand-ink);
   font-weight: 700;
   font-size: 14px;
@@ -2519,12 +2579,12 @@ svg {
 .text-btn--primary {
   background: var(--brand);
   border-color: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .text-btn--primary:hover {
   background: var(--brand-ink);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .topbar__actions {
@@ -2542,10 +2602,10 @@ svg {
   padding: 22px;
   border-radius: var(--radius-xl);
   background:
-    radial-gradient(120% 140% at 0% 0%, #7c7cf5 0%, rgba(124, 124, 245, 0) 55%),
-    linear-gradient(145deg, #4f46e5 0%, #4338ca 100%);
-  color: #fff;
-  box-shadow: 0 14px 34px rgba(79, 70, 229, 0.32);
+    radial-gradient(120% 140% at 0% 0%, var(--brand-light) 0%, var(--brand-light-0) 55%),
+    linear-gradient(145deg, var(--brand) 0%, var(--brand-deep) 100%);
+  color: var(--on-brand);
+  box-shadow: var(--shadow-brand);
 }
 
 .hero::after {
@@ -2556,7 +2616,7 @@ svg {
   width: 190px;
   height: 190px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--glass);
   filter: blur(2px);
 }
 
@@ -2566,7 +2626,7 @@ svg {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--on-brand-soft);
 }
 
 .hero h2 {
@@ -2582,7 +2642,7 @@ svg {
   position: relative;
   margin-top: 8px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--on-brand-muted);
 }
 
 .record-cta {
@@ -2594,9 +2654,9 @@ svg {
   margin-top: 20px;
   padding: 12px 14px 12px 12px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+  border: 1px solid var(--glass-line);
+  background: var(--glass);
+  color: var(--on-brand);
   text-align: left;
   cursor: pointer;
   backdrop-filter: blur(10px);
@@ -2604,7 +2664,7 @@ svg {
 }
 
 .record-cta:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--glass-strong);
   transform: translateY(-1px);
 }
 
@@ -2617,11 +2677,11 @@ svg {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
   color: var(--brand);
   display: grid;
   place-items: center;
-  box-shadow: 0 8px 20px rgba(23, 25, 31, 0.22);
+  box-shadow: var(--shadow-float);
 }
 
 .record-cta__icon svg {
@@ -2640,7 +2700,7 @@ svg {
   display: block;
   margin-top: 1px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--on-brand-soft);
 }
 
 /* ---------- list ---------- */
@@ -2722,7 +2782,7 @@ a.list-item:hover {
   justify-content: space-around;
   padding: 8px 18px 12px;
   border-top: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-glass);
   backdrop-filter: blur(12px);
 }
 
@@ -2979,8 +3039,8 @@ a.list-item:hover {
 .btn--primary {
   border-color: var(--brand);
   background: var(--brand);
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
+  color: var(--on-brand);
+  box-shadow: var(--shadow-brand-sm);
 }
 
 .btn--primary:hover {
@@ -3168,7 +3228,7 @@ a.list-item:hover {
 .todo.is-done .todo__check {
   background: var(--brand);
   border-color: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .todo.is-done .todo__body strong {
@@ -3266,11 +3326,11 @@ a.list-item:hover {
   border-radius: 24px 24px 0 0;
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 -18px 48px rgba(16, 24, 40, 0.22);
+  box-shadow: var(--shadow-sheet);
 }
 
 .sheet::backdrop {
-  background: rgba(16, 24, 40, 0.4);
+  background: var(--scrim);
   backdrop-filter: blur(2px);
 }
 
@@ -3353,8 +3413,8 @@ a.list-item:hover {
   transform: translate(-50%, 16px);
   padding: 9px 16px;
   border-radius: var(--radius-pill);
-  background: rgba(23, 25, 31, 0.92);
-  color: #fff;
+  background: var(--toast);
+  color: var(--on-brand);
   font-size: 12px;
   font-weight: 600;
   opacity: 0;
@@ -3572,6 +3632,11 @@ a.list-item:hover {
   --brand-2: #6366f1;
   --brand-ink: #3730a3;
   --brand-weak: #eef0ff;
+  --brand-deep: #4338ca;
+  --brand-light: #7c7cf5;
+  --brand-light-0: rgba(124, 124, 245, 0);
+  --brand-wash: #eceefe;
+  --brand-wash-2: #dfe3fb;
 
   --danger: #d92d20;
   --danger-weak: #fef3f2;
@@ -3583,6 +3648,17 @@ a.list-item:hover {
   --warn-weak: #fffaeb;
   --warn-line: #f0d9a8;
 
+  --on-brand: #ffffff;
+  --on-brand-soft: rgba(255, 255, 255, 0.72);
+  --on-brand-muted: rgba(255, 255, 255, 0.78);
+  --glass: rgba(255, 255, 255, 0.14);
+  --glass-strong: rgba(255, 255, 255, 0.22);
+  --glass-line: rgba(255, 255, 255, 0.3);
+  --surface-glass: rgba(255, 255, 255, 0.92);
+  --scrim: rgba(16, 24, 40, 0.4);
+  --toast: rgba(23, 25, 31, 0.92);
+
+  --radius-2xs: 4px;
   --radius-xs: 8px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -3593,6 +3669,10 @@ a.list-item:hover {
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
   --shadow-md: 0 2px 6px rgba(16, 24, 40, 0.05), 0 12px 28px rgba(16, 24, 40, 0.08);
   --shadow-lg: 0 24px 64px rgba(16, 24, 40, 0.18);
+  --shadow-brand: 0 14px 34px rgba(79, 70, 229, 0.32);
+  --shadow-brand-sm: 0 8px 20px rgba(79, 70, 229, 0.28);
+  --shadow-float: 0 8px 20px rgba(23, 25, 31, 0.22);
+  --shadow-sheet: 0 -18px 48px rgba(16, 24, 40, 0.22);
 
   --font: -apple-system, BlinkMacSystemFont, &quot;SF Pro SC&quot;, &quot;PingFang SC&quot;, &quot;Hiragino Sans GB&quot;,
     &quot;Segoe UI&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
@@ -3785,7 +3865,7 @@ svg {
   height: 40px;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: linear-gradient(145deg, #eceefe, #dfe3fb);
+  background: linear-gradient(145deg, var(--brand-wash), var(--brand-wash-2));
   color: var(--brand-ink);
   font-weight: 700;
   font-size: 14px;
@@ -3840,12 +3920,12 @@ svg {
 .text-btn--primary {
   background: var(--brand);
   border-color: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .text-btn--primary:hover {
   background: var(--brand-ink);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .topbar__actions {
@@ -3863,10 +3943,10 @@ svg {
   padding: 22px;
   border-radius: var(--radius-xl);
   background:
-    radial-gradient(120% 140% at 0% 0%, #7c7cf5 0%, rgba(124, 124, 245, 0) 55%),
-    linear-gradient(145deg, #4f46e5 0%, #4338ca 100%);
-  color: #fff;
-  box-shadow: 0 14px 34px rgba(79, 70, 229, 0.32);
+    radial-gradient(120% 140% at 0% 0%, var(--brand-light) 0%, var(--brand-light-0) 55%),
+    linear-gradient(145deg, var(--brand) 0%, var(--brand-deep) 100%);
+  color: var(--on-brand);
+  box-shadow: var(--shadow-brand);
 }
 
 .hero::after {
@@ -3877,7 +3957,7 @@ svg {
   width: 190px;
   height: 190px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.14);
+  background: var(--glass);
   filter: blur(2px);
 }
 
@@ -3887,7 +3967,7 @@ svg {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--on-brand-soft);
 }
 
 .hero h2 {
@@ -3903,7 +3983,7 @@ svg {
   position: relative;
   margin-top: 8px;
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--on-brand-muted);
 }
 
 .record-cta {
@@ -3915,9 +3995,9 @@ svg {
   margin-top: 20px;
   padding: 12px 14px 12px 12px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+  border: 1px solid var(--glass-line);
+  background: var(--glass);
+  color: var(--on-brand);
   text-align: left;
   cursor: pointer;
   backdrop-filter: blur(10px);
@@ -3925,7 +4005,7 @@ svg {
 }
 
 .record-cta:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--glass-strong);
   transform: translateY(-1px);
 }
 
@@ -3938,11 +4018,11 @@ svg {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--surface);
   color: var(--brand);
   display: grid;
   place-items: center;
-  box-shadow: 0 8px 20px rgba(23, 25, 31, 0.22);
+  box-shadow: var(--shadow-float);
 }
 
 .record-cta__icon svg {
@@ -3961,7 +4041,7 @@ svg {
   display: block;
   margin-top: 1px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--on-brand-soft);
 }
 
 /* ---------- list ---------- */
@@ -4043,7 +4123,7 @@ a.list-item:hover {
   justify-content: space-around;
   padding: 8px 18px 12px;
   border-top: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-glass);
   backdrop-filter: blur(12px);
 }
 
@@ -4300,8 +4380,8 @@ a.list-item:hover {
 .btn--primary {
   border-color: var(--brand);
   background: var(--brand);
-  color: #fff;
-  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
+  color: var(--on-brand);
+  box-shadow: var(--shadow-brand-sm);
 }
 
 .btn--primary:hover {
@@ -4489,7 +4569,7 @@ a.list-item:hover {
 .todo.is-done .todo__check {
   background: var(--brand);
   border-color: var(--brand);
-  color: #fff;
+  color: var(--on-brand);
 }
 
 .todo.is-done .todo__body strong {
@@ -4587,11 +4667,11 @@ a.list-item:hover {
   border-radius: 24px 24px 0 0;
   background: var(--surface);
   color: var(--ink);
-  box-shadow: 0 -18px 48px rgba(16, 24, 40, 0.22);
+  box-shadow: var(--shadow-sheet);
 }
 
 .sheet::backdrop {
-  background: rgba(16, 24, 40, 0.4);
+  background: var(--scrim);
   backdrop-filter: blur(2px);
 }
 
@@ -4674,8 +4754,8 @@ a.list-item:hover {
   transform: translate(-50%, 16px);
   padding: 9px 16px;
   border-radius: var(--radius-pill);
-  background: rgba(23, 25, 31, 0.92);
-  color: #fff;
+  background: var(--toast);
+  color: var(--on-brand);
   font-size: 12px;
   font-weight: 600;
   opacity: 0;

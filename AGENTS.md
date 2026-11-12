@@ -115,13 +115,13 @@ npm run pack:remove -- pm-methods
   <meta name="screen:flow" content="记录">
   <meta name="screen:form" content="mobile">
   ```
-  `screen:form` 取 `mobile | desktop | responsive`；不写默认 `responsive`。企业桌面端项目用 `desktop`，响应式后台用 `responsive`。
+  `screen:id` 只能用小写英文、数字和短横线；`screen:form` 取 `mobile | desktop | responsive`；不写默认 `responsive`。企业桌面端项目用 `desktop`，响应式后台用 `responsive`。
 - 实现某条需求的元素，必须带 `data-req="REQ-00x"`；标在**最小可定位容器**上，不要给整个 `<body>` 打标。
 - `data-req` 只能引用 PRD 中已存在的需求。原型不能发明行为；需要新行为就先加 REQ。
 - 页面之间用真实相对链接串起来，主流程必须能点通。
 - **单页应用**：在 `prototype/screens.json` 写 `mode: "spa"`、`entry` 与每个界面的 `id/title/route/flow/form/reqs`。路由必须以 `#` 开头，保证 `file://` 双击可开；每个界面的 `reqs` 就是该路由的需求追溯，不再要求入口 HTML 里逐元素标 `data-req`。没有 `screens.json` 时按原来的 `screens/*.html` 扫描。
 - 只用 `prototype/assets/` 下的共享样式与原生 HTML/CSS/JS；不引构建链、不装依赖。外部地图/字体等服务必须写进 `prototype/external.json` 的 `allow` 白名单；能 vendor 到 `assets/vendor/` 的优先本地化。
-- 含外部资源或体积过大的页面，用 `screen:preview`（图片路径相对 `prototype/`）或 `screens.json` 的 `preview` 提供静态预览图；工作台不会再内联这类页面，改为显示降级卡片。
+- 含外部资源或单页 HTML 超过 512KB 的页面，用 `screen:preview`（图片路径相对 `prototype/`）或 `screens.json` 的 `preview` 提供静态预览图；工作台不会再内联这类页面，改为显示降级卡片。
 - 使用真实感的中文示例数据；禁止 lorem ipsum、`TODO`、空按钮、死链。
 - PRD 第 6 节列出的边界态，在对应页面要有可演示的呈现；不能演示的，在汇报里说明。
 
@@ -260,6 +260,7 @@ scripts/pack.mjs          安装/移除可选内容包
 scripts/new.mjs           从模板创建新项目
 scripts/upgrade.mjs       把工位升级到当前模板版本
 scripts/lib/screens.mjs   多页/SPA 页面读取与外部资源匹配
+scripts/lib/json.mjs      读取 JSON 的公共函数
 docs/                     工作流、一致性模型、原型规范、评审清单、企业适配
 dist/                     导出的交付包，生成物，不提交
 STATE.md                  会话交接板：当前阶段、下一步、上一轮摘要

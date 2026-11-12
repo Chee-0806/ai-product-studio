@@ -19,7 +19,7 @@
 <meta name="screen:form" content="mobile">
 ```
 
-- `screen:id`：稳定标识，小写英文/数字/短横线，永不复用；
+- `screen:id`：稳定标识，只能用小写英文/数字/短横线，永不复用；格式不对校验会失败；
 - `screen:title`：给人看的中文标题，会出现在工作台；
 - `screen:flow`：所属流程，工作台按它分组，例如「记录」「纪要」「设置」；
 - `screen:form`：`mobile`（手机）、`desktop`（桌面）、`responsive`（自适应）；不写默认 `responsive`。工作台按它选缩略图比例，评审按它选检查宽度。
@@ -158,6 +158,7 @@ PRD 第 6 节列出的状态，在对应页面要有可演示的呈现：
 - 页面必须继续引用 `../assets/app.css`，否则缩略图没有样式；
 - 有 `screen:preview` / `screens.json` 的 `preview` 时，工作台显示预览图，不再内联 HTML；
 - 含外部资源的页面自动降级为占位卡；SPA 没有预览图时也显示占位卡；
+- 单页 HTML 超过 512KB 时不再内联，改为「页面较大 / 缩略图已降级」占位卡；需要缩略图就补 `screen:preview`；
 - 缩略图里的按钮不可点击，点卡片会打开完整页面；
 - 因为要内联，单个页面的 HTML/CSS 不要引入巨大的 base64 资源。
 

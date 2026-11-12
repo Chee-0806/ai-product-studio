@@ -10,6 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readJson } from './lib/json.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKILLS = path.join(ROOT, 'skills');
@@ -21,14 +22,6 @@ const warnings = [];
 if (!fs.existsSync(SKILLS)) {
   console.error('✖ 缺少 skills/ 目录');
   process.exit(1);
-}
-
-function readJson(file) {
-  try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch {
-    return null;
-  }
 }
 
 function validateSkill(file, prefix, seen) {
@@ -72,7 +65,7 @@ function validateSkill(file, prefix, seen) {
   return true;
 }
 
-function validateRoot(dir, prefix, label) {
+function validateRoot(dir, prefix) {
   const seen = new Set();
   let count = 0;
   const dirs = fs
@@ -89,12 +82,12 @@ function validateRoot(dir, prefix, label) {
     count += 1;
     validateSkill(file, `${prefix}/${name}`, seen);
   }
-  return { label, count };
+  return { count };
 }
 
-const installed = validateRoot(SKILLS, 'skills', '已安装');
+const installed = validateRoot(SKILLS, 'skills');
 
-const launchers = fs.existsSync(LAUNCHER) ? validateRoot(LAUNCHER, 'launcher', '启动技能') : { count: 0 };
+const launchers = fs.existsSync(LAUNCHER) ? validateRoot(LAUNCHER, 'launcher') : { count: 0 };
 
 const packs = [];
 if (fs.existsSync(PACKS)) {
@@ -114,7 +107,7 @@ if (fs.existsSync(PACKS)) {
       errors.push(`packs/${name}/：缺少 skills/ 目录`);
       continue;
     }
-    const result = validateRoot(dir, `packs/${name}/skills`, `内容包 ${name}`);
+    const result = validateRoot(dir, `packs/${name}/skills`);
     packs.push({ name, count: result.count });
   }
 }

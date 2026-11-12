@@ -11,6 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readJson } from './lib/json.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PACKS = path.join(ROOT, 'packs');
@@ -21,14 +22,6 @@ const [command = 'list', packName = ''] = process.argv.slice(2);
 function fail(message) {
   console.error(`✖ ${message}`);
   process.exit(1);
-}
-
-function readJson(file) {
-  try {
-    return JSON.parse(fs.readFileSync(file, 'utf8'));
-  } catch {
-    return null;
-  }
 }
 
 function readPack(name) {

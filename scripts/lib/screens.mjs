@@ -105,17 +105,14 @@ export function isExternalAllowed(url, allow = []) {
 
 export function loadExternalPolicy(protoRoot) {
   const file = path.join(protoRoot, 'external.json');
-  if (!fs.existsSync(file)) return { file: null, allow: [], note: '', errors: [], warnings: [] };
+  if (!fs.existsSync(file)) return { allow: [], errors: [] };
   let data;
   try {
     data = JSON.parse(fs.readFileSync(file, 'utf8'));
   } catch (error) {
     return {
-      file,
       allow: [],
-      note: '',
       errors: [`prototype/external.json：不是合法 JSON（${error.message}）`],
-      warnings: [],
     };
   }
   const errors = [];
@@ -125,13 +122,7 @@ export function loadExternalPolicy(protoRoot) {
   } else {
     allow = (data.allow || []).map((item) => String(item).trim()).filter(Boolean);
   }
-  return {
-    file,
-    allow,
-    note: typeof data.note === 'string' ? data.note.trim() : '',
-    errors,
-    warnings: [],
-  };
+  return { allow, errors };
 }
 
 function parseScreenFile(file, root, protoRoot) {
@@ -142,7 +133,7 @@ function parseScreenFile(file, root, protoRoot) {
   return {
     file,
     relFile: rel(root, file),
-    href: toPosix(path.relative(protoRoot, file)),
+    bytes: Buffer.byteLength(html),
     id: (meta.id || '').trim(),
     title: (meta.title || '').trim(),
     flow: (meta.flow || '').trim(),
@@ -248,7 +239,6 @@ function loadSpa({ root, protoRoot, manifestFile, manifest, errors, warnings }) 
     screens.push({
       file: entryFile,
       relFile: `${rel(root, entryFile)}${route}`,
-      href: `${entryRel}${route}`,
       id,
       title,
       flow,

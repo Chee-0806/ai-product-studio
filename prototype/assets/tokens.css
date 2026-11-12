@@ -16,6 +16,11 @@
   --brand-2: #6366f1;
   --brand-ink: #3730a3;
   --brand-weak: #eef0ff;
+  --brand-deep: #4338ca;
+  --brand-light: #7c7cf5;
+  --brand-light-0: rgba(124, 124, 245, 0);
+  --brand-wash: #eceefe;
+  --brand-wash-2: #dfe3fb;
 
   --danger: #d92d20;
   --danger-weak: #fef3f2;
@@ -27,6 +32,17 @@
   --warn-weak: #fffaeb;
   --warn-line: #f0d9a8;
 
+  --on-brand: #ffffff;
+  --on-brand-soft: rgba(255, 255, 255, 0.72);
+  --on-brand-muted: rgba(255, 255, 255, 0.78);
+  --glass: rgba(255, 255, 255, 0.14);
+  --glass-strong: rgba(255, 255, 255, 0.22);
+  --glass-line: rgba(255, 255, 255, 0.3);
+  --surface-glass: rgba(255, 255, 255, 0.92);
+  --scrim: rgba(16, 24, 40, 0.4);
+  --toast: rgba(23, 25, 31, 0.92);
+
+  --radius-2xs: 4px;
   --radius-xs: 8px;
   --radius-sm: 12px;
   --radius-md: 16px;
@@ -37,6 +53,10 @@
   --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
   --shadow-md: 0 2px 6px rgba(16, 24, 40, 0.05), 0 12px 28px rgba(16, 24, 40, 0.08);
   --shadow-lg: 0 24px 64px rgba(16, 24, 40, 0.18);
+  --shadow-brand: 0 14px 34px rgba(79, 70, 229, 0.32);
+  --shadow-brand-sm: 0 8px 20px rgba(79, 70, 229, 0.28);
+  --shadow-float: 0 8px 20px rgba(23, 25, 31, 0.22);
+  --shadow-sheet: 0 -18px 48px rgba(16, 24, 40, 0.22);
 
   --font: -apple-system, BlinkMacSystemFont, "SF Pro SC", "PingFang SC", "Hiragino Sans GB",
     "Segoe UI", "Microsoft YaHei", sans-serif;
