@@ -105,7 +105,7 @@ basis_required: true
 - 内部工作台、`STATE.md`、`AGENTS.md`、`skills/`、`docs/`、`scripts/`、调研与决策不进入交付包；
 - 打包用 Python `zipfile`，不要用 macOS 自带的 `zip`（不写 UTF-8 文件名标志，Windows 解压乱码）；打包后确认每条 `flag_bits & 0x800`；
 - 导出后在工位根目录留一份 zip 副本并给出绝对路径；改过 PRD 的旧快照（HTML/Word/汇报）要重新生成或作废，不许手工同步；
-- `zip -r` 打包后，用 `file://` 抽查入口、PRD 与原型。
+- 打包后用 `file://` 抽查入口、PRD 与原型；跨平台解压前别忘了确认中文文件名没乱码（见上一条自检）。
 
 ## 6. Word / PPT / 评审材料
 
