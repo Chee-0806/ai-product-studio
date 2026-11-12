@@ -10,7 +10,7 @@
 
 **[▶ 在线演示](https://chee-0806.github.io/ai-product-studio/)**（示例产品「回声纪要」的只读工作台）· [一条命令开始](#开新项目)
 
-![产品工作台：下一步、本轮变更、需要你拍板、需求进度](media/workbench.png)
+![说一句「加一条需求」，AI 改 PRD、跑检查、刷新工作台](media/demo.gif)
 
 ## What is this (English)
 
@@ -212,7 +212,7 @@ PRD 改版后，之前导出的 HTML、Word、汇报材料都算过期快照：�
 ```text
 工作台.html               唯一入口，自动生成，禁止手改
 index.html                在线演示的跳转页（GitHub Pages 根）
-media/                    README 用的截图，不进入工位
+media/                    README 用的动图与截图，不进入工位
 BOOTSTRAP.md              从零建站说明，给 AI 看
 install.sh               远程安装入口
 AGENTS.md                 AI 的工作契约
