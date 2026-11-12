@@ -1,4 +1,5 @@
 # 产品设计工位 · AI Product Studio
+
 **中文** · [English](README.en.md)
 
 **我太太是产品经理。她不写代码、不用 git、也不碰终端，所以这个工位是照着她做的。**
@@ -31,7 +32,7 @@ A **workspace template for product managers who don't write code**. It was built
 
 仓库：https://github.com/Chee-0806/ai-product-studio
 
-## 先分清四个词
+## 先分清五个词
 
 | 词 | 指什么 |
 | --- | --- |
@@ -206,6 +207,7 @@ AGENTS.md                 AI 的工作契约
 CLAUDE.md                 Claude Code 入口，指向 AGENTS.md
 STATE.md                  当前阶段、版本、下一步
 README.md                 本文件
+README.en.md              英文版
 
 product/
   PRD.md                  需求与验收的唯一事实源

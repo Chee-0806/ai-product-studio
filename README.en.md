@@ -1,4 +1,4 @@
- # 产品设计工位 · AI Product Studio
+# 产品设计工位 · AI Product Studio
 
 [中文](README.md) · **English**
 
@@ -24,13 +24,11 @@ She talks like "The home page is too crowded, keep only Start Recording and the 
 
 The cost is that I have to make the machinery solid. Every requirement has a fixed ID, and the matching element in the prototype must carry it. A requirement marked "prototype done" must really have a page, and one marked "cut" must not still have one. The PRD version and the dashboard version must match. Only a machine can check these; you can't count on the AI to "remember".
 
-It is not a code framework, and it is not a prototyping tool: the AI produces, the human judges, and the dashboard puts the things that need judging in front of the human.
-
 ![Clickable prototype: static HTML, double-click to open, and the AI can edit it directly](media/prototype.png)
 
 Repository: https://github.com/Chee-0806/ai-product-studio
 
-## Four terms to keep straight
+## Five terms to keep straight
 
 | Term | What it means |
 | --- | --- |
@@ -405,4 +403,4 @@ What makes this studio different: it turns "consistency" from a verbal agreement
 - Dashboard thumbnails only inline `assets/app.css` and the page's own styles; pages with external resources degrade to placeholder cards, and when `previews/` exists a preview image is shown.
 - Traceability for an SPA is at the route level, not every element in a page; when finer traceability is needed, add `data-req` in the entry HTML.
 - The external resource allowlist only validates what is declared, not whether the resource is reachable; intranet/offline delivery still requires vendoring in advance.
-- It needs an AI that can read and write a local folder; web-only chat tools can't edit files. 
+- It needs an AI that can read and write a local folder; web-only chat tools can't edit files.
