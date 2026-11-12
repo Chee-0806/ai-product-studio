@@ -1,6 +1,8 @@
 # 产品设计工位 · AI Product Studio
 
-**给不写代码的产品经理做一个 AI 工位：她只对 AI 说话，PRD 和可点原型由 AI 保持同步，进度不会说谎。**
+**我太太是产品经理。她不写代码、不用 git、也不碰终端，所以这个工位是照着她做的。**
+
+她只对 AI 说话，PRD 和可点原型由 AI 保持同步，工作台负责把该她拍板的事摆到面前。
 
 - 不用 git、不用命令行、不用记技能名，也不用知道文件放在哪。
 - 每个工位只有一个入口 `工作台.html`：下一步、上一轮改了什么、需要你拍板什么、需求进度、原型，全在一页。
@@ -12,7 +14,7 @@
 
 ## What is this (English)
 
-A **workspace template for product managers who don't write code**. You talk to an AI coding agent (Claude Code / Cursor / Codex) in plain language; the agent keeps a PRD and a clickable HTML prototype in sync, and regenerates one read-only dashboard you actually look at — next step, what changed last round, what needs your decision, requirement progress, prototype pages.
+A **workspace template for product managers who don't write code**. It was built for my wife — a PM who doesn't touch git or the terminal — because teaching her a toolchain was the wrong trade. You talk to an AI coding agent (Claude Code / Cursor / Codex) in plain language; the agent keeps a PRD and a clickable HTML prototype in sync, and regenerates one read-only dashboard you actually look at — next step, what changed last round, what needs your decision, requirement progress, prototype pages.
 
 The PM never touches git, the terminal, or file paths. Three mechanical rules keep the documents honest:
 
@@ -28,13 +30,15 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/
 
 **[Live demo](https://chee-0806.github.io/ai-product-studio/)** · MIT.
 
-## 它解决什么
+## 为什么做这个
 
-给不写代码、不用 git、不开终端的产品经理：用 AI 同时维护 PRD 和可点原型，并保证两者的追溯关系与进度不说谎。
+我太太是产品经理。她不写代码，不用 git，也不碰命令行。让她去学一套工具链，不如让工具假装不存在。
+
+她说话的方式是「首页太满了，只留开始记录和最近三条」，不是「帮我改这个组件」。所以这个工位只承诺一件事：她用平时说话的方式提需求，剩下的 AI 做完——改 PRD、改原型、跑检查、刷新工作台，然后打开给她看。
+
+代价是我这边得把机器做扎实。每个需求有固定 ID，原型里对应的元素得挂着它；标了「已完成原型」就必须真有页面，标了「已砍」就不能还有页面；PRD 版本和工作台版本必须对得上。这些只能机器查，不能指望 AI「记得」。
 
 它不是代码框架，也不是原型工具：AI 负责产出，人负责判断，工作台负责把该判断的事摆到人面前。
-
-这个模板最初是为一位不写代码的产品经理做的。她不会说「帮我改这个组件」，她说的是「首页太满了，只留开始记录和最近三条」——她要的是想清楚产品，不是碰文件。
 
 ![可点原型：静态 HTML，双击即开，AI 能直接改](media/prototype.png)
 
