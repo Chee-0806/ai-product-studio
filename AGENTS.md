@@ -252,6 +252,7 @@ packs/                    可选内容包源，默认不安装（pm-methods）
 LICENSE                   自有代码与文档的 MIT 许可证
 THIRD_PARTY_NOTICES.md    外部技能来源、许可证与修改说明
 LICENSES/                 第三方许可证原文
+BOOTSTRAP.md              从零建站说明，给 AI 看（仅模板工程有，不进入工位）
 launcher/                 用户级启动技能源文件（仅模板工程有，不进入工位）
 scripts/sync.mjs          一致性校验 + 工作台生成
 scripts/check-skills.mjs  技能格式校验（含可选包源与启动技能）
