@@ -38,8 +38,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/Chee-0806/ai-product-studio/
 
 代价是我这边得把机器做扎实。每个需求有固定 ID，原型里对应的元素得挂着它；标了「已完成原型」就必须真有页面，标了「已砍」就不能还有页面；PRD 版本和工作台版本必须对得上。这些只能机器查，不能指望 AI「记得」。
 
-它不是代码框架，也不是原型工具：AI 负责产出，人负责判断，工作台负责把该判断的事摆到人面前。
-
 ![可点原型：静态 HTML，双击即开，AI 能直接改](media/prototype.png)
 
 仓库：https://github.com/Chee-0806/ai-product-studio
