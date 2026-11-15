@@ -10,7 +10,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, spawn } from 'node:child_process';
 import readline from 'node:readline/promises';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -52,6 +52,20 @@ function slugify(value) {
 function fail(message) {
   console.error(`✖ ${message}`);
   process.exit(1);
+}
+
+function openFile(file) {
+  const [cmd, cmdArgs] =
+    process.platform === 'win32' ? ['cmd', ['/c', 'start', '""', file]] :
+    process.platform === 'darwin' ? ['open', [file]] :
+    ['xdg-open', [file]];
+  try {
+    const child = spawn(cmd, cmdArgs, { stdio: 'ignore', detached: true });
+    child.on('error', () => {}); // 打不开不影响使用 (failing to open doesn't affect usage)
+    child.unref();
+  } catch {
+    // 打不开不影响使用 (failing to open doesn't affect usage)
+  }
 }
 
 async function ask(question, fallback) {
@@ -341,7 +355,13 @@ npm run pack:remove -- pm-methods
   console.log(`入口：${path.join(target, '工作台.html')}`);
   console.log(`下一步：用 AI 打开这个文件夹，粘贴 README 里的开场白。`);
   if (!opts.git) console.log('需要 git 留底时，加 --git 重新创建，或在新目录里运行 git init。');
+
+  const entry = path.join(target, '工作台.html');
+  if (!process.env.CI && !process.env.PRODUCT_STUDIO_NO_OPEN && fs.existsSync(entry)) {
+    openFile(entry);
+  }
 }
+
 
 main().catch((error) => {
   console.error(error);
